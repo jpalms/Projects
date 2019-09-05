@@ -9,6 +9,11 @@ amazon-fine-food-reviews/Reviews.csv
 ```
 ../gradlew build
 ```
+or on Windows machine
+```
+cd ..
+start gradlew.bat build
+```
 
 
 ### Run this example in this folder
