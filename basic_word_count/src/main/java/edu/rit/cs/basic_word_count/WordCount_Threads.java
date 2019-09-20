@@ -56,7 +56,16 @@ public class WordCount_Threads {
             }
         }
 
-//        /* Count words */
+
+        myTimer.stop_timer();
+
+        //print_word_count(wordcount, order);
+
+        myTimer.print_elapsed_time();
+    }
+
+    private static Map<String, Integer> count_words(List<String> words){
+        //        /* Count words */
         Map<String, Integer> wordcount = new HashMap<>();
         List<String> order = new ArrayList<>();
         for(String word : words) {
@@ -81,11 +90,21 @@ public class WordCount_Threads {
                 wordcount.replace(word, init_value, init_value+1);
             }
         }
-        myTimer.stop_timer();
 
-        print_word_count(wordcount, order);
-
-        myTimer.print_elapsed_time();
+        return wordcount;
     }
 
+    private Map<String, Integer> mergeMaps(Map<String, Integer> base, Map<String, Integer> extension){
+
+        for (String word: extension.keySet()) {
+            if(base.containsKey(word)){
+                int val = base.get(word);
+                base.replace(word, val, val + extension.get(word));
+            }
+            else{
+                base.put(word, extension.get(word));
+            }
+        }
+        return base;
+    }
 }
