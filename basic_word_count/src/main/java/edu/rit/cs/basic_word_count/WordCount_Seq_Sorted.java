@@ -28,6 +28,7 @@ public class WordCount_Seq_Sorted {
     }
 
 
+    // prints word count in a-z order
     public static void print_word_count( Map<String, Integer> wordcount, List<String> order){
         for(String word : order){
             System.out.println(word + " : " + wordcount.get(word));
@@ -43,7 +44,6 @@ public class WordCount_Seq_Sorted {
 //        }
 
         MyTimer myTimer = new MyTimer("wordCount");
-        System.out.println("timer start");
         myTimer.start_timer();
         /* Tokenize words */
         List<String> words = new ArrayList<String>();
@@ -62,6 +62,7 @@ public class WordCount_Seq_Sorted {
         for(String word : words) {
             if(!wordcount.containsKey(word)) {
                 wordcount.put(word, 1);
+                // sort words
                 int size = order.size();
                 for (int i = 0; i < size ; i++) {
                     if(order.get(i).compareTo(word) > 0){
@@ -72,7 +73,7 @@ public class WordCount_Seq_Sorted {
                         order.add(word);
                     }
                 }
-                if(order.size() == 0){
+                if(size == 0){
                     order.add(word);
                 }
             } else{
