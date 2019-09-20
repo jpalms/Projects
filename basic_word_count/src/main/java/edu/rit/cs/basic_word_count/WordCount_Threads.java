@@ -56,6 +56,23 @@ public class WordCount_Threads {
             }
         }
 
+        int numThreads = 5;
+        int size = words.size();
+        for (int i = 0; i < numThreads; i++) {
+            int start = (i/numThreads) * size;
+            int end = ((i+1)/numThreads) * size - 1;
+            if(i == (numThreads -1)) {
+                end = size;
+            }
+            new countThread(words.subList(start, end)).start();
+        }
+        ArrayList<Map<String, Integer>> mapArrayList = new ArrayList<>();
+
+        Map<String, Integer> result = mapArrayList.get(0);
+
+        for (int i = 1; i < mapArrayList.size(); i++) {
+            result = mergeMaps(result, mapArrayList.get(i));
+        }
 
         myTimer.stop_timer();
 
@@ -64,37 +81,7 @@ public class WordCount_Threads {
         myTimer.print_elapsed_time();
     }
 
-    private static Map<String, Integer> count_words(List<String> words){
-        //        /* Count words */
-        Map<String, Integer> wordcount = new HashMap<>();
-        List<String> order = new ArrayList<>();
-        for(String word : words) {
-            if(!wordcount.containsKey(word)) {
-                wordcount.put(word, 1);
-                // sort words
-                int size = order.size();
-                for (int i = 0; i < size ; i++) {
-                    if(order.get(i).compareTo(word) > 0){
-                        order.add(i,word);
-                        break;
-                    }
-                    else if( i == (size - 1)){
-                        order.add(word);
-                    }
-                }
-                if(size == 0){
-                    order.add(word);
-                }
-            } else{
-                int init_value = wordcount.get(word);
-                wordcount.replace(word, init_value, init_value+1);
-            }
-        }
-
-        return wordcount;
-    }
-
-    private Map<String, Integer> mergeMaps(Map<String, Integer> base, Map<String, Integer> extension){
+    private static Map<String, Integer> mergeMaps(Map<String, Integer> base, Map<String, Integer> extension){
 
         for (String word: extension.keySet()) {
             if(base.containsKey(word)){
@@ -106,5 +93,47 @@ public class WordCount_Threads {
             }
         }
         return base;
+    }
+
+    public static class countThread extends Thread{
+        private  List<String> words;
+
+        public countThread(List<String> words){
+            this.words = words;
+        }
+
+        public void run(){
+            count_words(words);
+        }
+
+        private Map<String, Integer> count_words(List<String> words){
+            //        /* Count words */
+            Map<String, Integer> wordcount = new HashMap<>();
+            List<String> order = new ArrayList<>();
+            for(String word : words) {
+                if(!wordcount.containsKey(word)) {
+                    wordcount.put(word, 1);
+                    // sort words
+                    int size = order.size();
+                    for (int i = 0; i < size ; i++) {
+                        if(order.get(i).compareTo(word) > 0){
+                            order.add(i,word);
+                            break;
+                        }
+                        else if( i == (size - 1)){
+                            order.add(word);
+                        }
+                    }
+                    if(size == 0){
+                        order.add(word);
+                    }
+                } else{
+                    int init_value = wordcount.get(word);
+                    wordcount.replace(word, init_value, init_value+1);
+                }
+            }
+
+            return wordcount;
+        }
     }
 }
