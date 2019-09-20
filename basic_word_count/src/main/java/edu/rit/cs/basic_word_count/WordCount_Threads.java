@@ -58,25 +58,28 @@ public class WordCount_Threads {
 
         int numThreads = 5;
         int size = words.size();
+        ArrayList<countThread> countThreads = new ArrayList<>();
         for (int i = 0; i < numThreads; i++) {
             int start = (i/numThreads) * size;
             int end = ((i+1)/numThreads) * size - 1;
             if(i == (numThreads -1)) {
                 end = size;
             }
-            new countThread(words.subList(start, end)).start();
+            countThreads.add(new countThread(words.subList(start, end)));
+            countThreads.get(i).start();
         }
-        ArrayList<Map<String, Integer>> mapArrayList = new ArrayList<>();
 
-        Map<String, Integer> result = mapArrayList.get(0);
+        Map<String, Integer> result = countThreads.get(0).getResult();
+        List<String> order = countThreads.get(0).getOrder();
 
-        for (int i = 1; i < mapArrayList.size(); i++) {
-            result = mergeMaps(result, mapArrayList.get(i));
+        for (int i = 1; i < countThreads.size(); i++) {
+            result = mergeMaps(result, countThreads.get(i).getResult());
+            order = sort(order, countThreads.get(i).getOrder());
         }
 
         myTimer.stop_timer();
 
-        //print_word_count(wordcount, order);
+        print_word_count(result, order);
 
         myTimer.print_elapsed_time();
     }
@@ -95,8 +98,28 @@ public class WordCount_Threads {
         return base;
     }
 
+    private static List<String> sort(List<String> base, List<String> extenstion){
+
+        for (String word: extenstion) {
+            int size = base.size();
+            if(!base.contains(word)){
+                for (int i = 0; i < size; i++) {
+                    if(base.get(i).compareTo(word) > 0){
+                        base.add(i,word);
+                        break;
+                    }
+                    else if( i == (size - 1)){
+                        base.add(word);
+                    }
+                }
+            }
+        }
+
+        return base;
+    }
     public static class countThread extends Thread{
-        private  List<String> words;
+        private  List<String> words, order;
+        private Map<String, Integer> result;
 
         public countThread(List<String> words){
             this.words = words;
@@ -106,7 +129,7 @@ public class WordCount_Threads {
             count_words(words);
         }
 
-        private Map<String, Integer> count_words(List<String> words){
+        private void count_words(List<String> words){
             //        /* Count words */
             Map<String, Integer> wordcount = new HashMap<>();
             List<String> order = new ArrayList<>();
@@ -133,7 +156,16 @@ public class WordCount_Threads {
                 }
             }
 
-            return wordcount;
+            result = wordcount;
+            this.order = order;
+        }
+
+        public Map<String, Integer> getResult(){
+            return result;
+        }
+
+        public List<String> getOrder(){
+            return order;
         }
     }
 }
