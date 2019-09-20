@@ -56,17 +56,17 @@ public class WordCount_Threads {
             }
         }
 
-        int numThreads = 5;
+        int numThreads = 1;
         int size = words.size();
         ArrayList<countThread> countThreads = new ArrayList<>();
-        for (double i = 0.0; i < numThreads; i++) {
-            int start = (int)((i/numThreads) * size);
-            int end = (int)((((i+1)/numThreads) * size) - 1);
+        for (int i = 0; i < numThreads; i++) {
+            int start = (int)((double)i * size/numThreads);
+            int end = (int)((i+1.0)* size/numThreads) - 1;
             if(i == (numThreads -1)) {
                 end = size;
             }
             countThreads.add(new countThread(words.subList(start, end)));
-            countThreads.get((int)i).start();
+            countThreads.get(i).start();
         }
 
 
