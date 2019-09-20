@@ -59,14 +59,26 @@ public class WordCount_Threads {
         int numThreads = 5;
         int size = words.size();
         ArrayList<countThread> countThreads = new ArrayList<>();
-        for (int i = 0; i < numThreads; i++) {
-            int start = (i/numThreads) * size;
-            int end = ((i+1)/numThreads) * size - 1;
+        for (double i = 0.0; i < numThreads; i++) {
+            int start = (int)((i/numThreads) * size);
+            int end = (int)((((i+1)/numThreads) * size) - 1);
             if(i == (numThreads -1)) {
                 end = size;
             }
             countThreads.add(new countThread(words.subList(start, end)));
-            countThreads.get(i).start();
+            countThreads.get((int)i).start();
+        }
+
+
+        boolean alive = true;
+        while(alive){
+            for (Thread thread: countThreads) {
+                if(thread.isAlive()){
+                    alive = true;
+                    break;
+                }else
+                    alive = false;
+            }
         }
 
         Map<String, Integer> result = countThreads.get(0).getResult();
@@ -123,6 +135,7 @@ public class WordCount_Threads {
 
         public countThread(List<String> words){
             this.words = words;
+            order = new ArrayList<>();
         }
 
         public void run(){
@@ -156,7 +169,7 @@ public class WordCount_Threads {
                 }
             }
 
-            result = wordcount;
+            this.result = wordcount;
             this.order = order;
         }
 
