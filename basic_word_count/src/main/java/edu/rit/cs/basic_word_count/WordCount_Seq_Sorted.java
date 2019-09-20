@@ -1,6 +1,5 @@
 package edu.rit.cs.basic_word_count;
 
-import javax.naming.ldap.SortKey;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.*;
@@ -29,8 +28,8 @@ public class WordCount_Seq_Sorted {
     }
 
 
-    public static void print_word_count( Map<String, Integer> wordcount){
-        for(String word : wordcount.keySet()){
+    public static void print_word_count( Map<String, Integer> wordcount, List<String> order){
+        for(String word : order){
             System.out.println(word + " : " + wordcount.get(word));
         }
     }
@@ -44,6 +43,7 @@ public class WordCount_Seq_Sorted {
 //        }
 
         MyTimer myTimer = new MyTimer("wordCount");
+        System.out.println("timer start");
         myTimer.start_timer();
         /* Tokenize words */
         List<String> words = new ArrayList<String>();
@@ -52,24 +52,29 @@ public class WordCount_Seq_Sorted {
             Matcher matcher = pattern.matcher(review.get_Summary());
 
             while(matcher.find()) {
-                String temp = matcher.group().toLowerCase();
-                for (int i = 0; i < words.size(); i ++) {
-                    if(words.get(i).compareTo(temp) < 0){
-                        words.set(i,temp);
-                        break;
-                    }
-                }
-                if(!words.contains(temp)){
-                    words.add(temp);
-                }
+                words.add(matcher.group().toLowerCase());
             }
         }
 
 //        /* Count words */
         Map<String, Integer> wordcount = new HashMap<>();
+        List<String> order = new ArrayList<>();
         for(String word : words) {
             if(!wordcount.containsKey(word)) {
                 wordcount.put(word, 1);
+                int size = order.size();
+                for (int i = 0; i < size ; i++) {
+                    if(order.get(i).compareTo(word) > 0){
+                        order.add(i,word);
+                        break;
+                    }
+                    else if( i == (size - 1)){
+                        order.add(word);
+                    }
+                }
+                if(order.size() == 0){
+                    order.add(word);
+                }
             } else{
                 int init_value = wordcount.get(word);
                 wordcount.replace(word, init_value, init_value+1);
@@ -77,7 +82,7 @@ public class WordCount_Seq_Sorted {
         }
         myTimer.stop_timer();
 
-        print_word_count(wordcount);
+        print_word_count(wordcount, order);
 
         myTimer.print_elapsed_time();
     }
