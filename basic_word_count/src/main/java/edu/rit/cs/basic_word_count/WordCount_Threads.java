@@ -33,6 +33,7 @@ public class WordCount_Threads {
         for(String word : order){
             System.out.println(word + " : " + wordcount.get(word));
         }
+        System.out.println("map: " + wordcount.size() + " sort: " + order.size());
     }
 
     public static void main(String[] args) {
@@ -45,27 +46,22 @@ public class WordCount_Threads {
 
         MyTimer myTimer = new MyTimer("wordCount");
         myTimer.start_timer();
-        /* Tokenize words */
-        List<String> words = new ArrayList<String>();
-        for(AmazonFineFoodReview review : allReviews) {
-            Pattern pattern = Pattern.compile("([a-zA-Z]+)");
-            Matcher matcher = pattern.matcher(review.get_Summary());
 
-            while(matcher.find()) {
-                words.add(matcher.group().toLowerCase());
-            }
-        }
 
-        int numThreads = 1;
-        int size = words.size();
+        int numThreads = 10;
+        int size = allReviews.size();
+        //List partition = new ArrayList<>();
         ArrayList<countThread> countThreads = new ArrayList<>();
         for (int i = 0; i < numThreads; i++) {
             int start = (int)((double)i * size/numThreads);
-            int end = (int)((i+1.0)* size/numThreads) - 1;
+            int end = (int)((i+1.0)* size/numThreads);
             if(i == (numThreads -1)) {
                 end = size;
             }
-            countThreads.add(new countThread(words.subList(start, end)));
+            List partition = new ArrayList<>();
+            partition.addAll(allReviews.subList(start, end));
+
+            countThreads.add(new countThread(partition));
             countThreads.get(i).start();
         }
 
@@ -86,7 +82,7 @@ public class WordCount_Threads {
 
         for (int i = 1; i < countThreads.size(); i++) {
             result = mergeMaps(result, countThreads.get(i).getResult());
-            order = sort(order, countThreads.get(i).getOrder());
+            //order = sort(order, countThreads.get(i).getOrder());
         }
 
         myTimer.stop_timer();
@@ -97,7 +93,6 @@ public class WordCount_Threads {
     }
 
     private static Map<String, Integer> mergeMaps(Map<String, Integer> base, Map<String, Integer> extension){
-
         for (String word: extension.keySet()) {
             if(base.containsKey(word)){
                 int val = base.get(word);
@@ -110,8 +105,9 @@ public class WordCount_Threads {
         return base;
     }
 
+    // tbd fix time complexity for O(n^2)
     private static List<String> sort(List<String> base, List<String> extenstion){
-
+        //List<String> arr = new ArrayList<>(base.size() + extenstion.size());
         for (String word: extenstion) {
             int size = base.size();
             if(!base.contains(word)){
@@ -130,15 +126,27 @@ public class WordCount_Threads {
         return base;
     }
     public static class countThread extends Thread{
-        private  List<String> words, order;
+        private List<AmazonFineFoodReview> allReviews;
+        private  List<String> order;
         private Map<String, Integer> result;
 
-        public countThread(List<String> words){
-            this.words = words;
+        public countThread(List<AmazonFineFoodReview> allReviews){
+            this.allReviews = allReviews;
             order = new ArrayList<>();
         }
 
         public void run(){
+            /* Tokenize words */
+            List<String> words = new ArrayList<String>();
+            for(AmazonFineFoodReview review : allReviews) {
+                Pattern pattern = Pattern.compile("([a-zA-Z]+)");
+                Matcher matcher = pattern.matcher(review.get_Summary());
+
+                while(matcher.find()) {
+                    words.add(matcher.group().toLowerCase());
+                }
+            }
+
             count_words(words);
         }
 
