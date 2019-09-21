@@ -33,7 +33,7 @@ public class WordCount_Threads {
         for(String word : order){
             System.out.println(word + " : " + wordcount.get(word));
         }
-        System.out.println("map: " + wordcount.size() + " sort: " + order.size());
+        //System.out.println("map: " + wordcount.size() + " sort: " + order.size());
     }
 
     public static void main(String[] args) {
@@ -48,7 +48,7 @@ public class WordCount_Threads {
         myTimer.start_timer();
 
 
-        int numThreads = 10;
+        int numThreads = 3;
         int size = allReviews.size();
         //List partition = new ArrayList<>();
         ArrayList<countThread> countThreads = new ArrayList<>();
@@ -81,8 +81,9 @@ public class WordCount_Threads {
         List<String> order = countThreads.get(0).getOrder();
 
         for (int i = 1; i < countThreads.size(); i++) {
+            order = sort(order, countThreads.get(i).getOrder(), result);
             result = mergeMaps(result, countThreads.get(i).getResult());
-            //order = sort(order, countThreads.get(i).getOrder());
+
         }
 
         myTimer.stop_timer();
@@ -105,13 +106,13 @@ public class WordCount_Threads {
         return base;
     }
 
-    // tbd fix time complexity for O(n^2)
-    private static List<String> sort(List<String> base, List<String> extenstion){
+    private static List<String> sort(List<String> base, List<String> extenstion, Map<String, Integer> map){
         //List<String> arr = new ArrayList<>(base.size() + extenstion.size());
+        int i = 0;
         for (String word: extenstion) {
             int size = base.size();
-            if(!base.contains(word)){
-                for (int i = 0; i < size; i++) {
+            if(!map.containsKey(word)){
+                for (; i < size; i++) {
                     if(base.get(i).compareTo(word) > 0){
                         base.add(i,word);
                         break;
