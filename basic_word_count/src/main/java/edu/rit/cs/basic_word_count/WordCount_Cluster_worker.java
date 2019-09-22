@@ -7,13 +7,22 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import java.net.*;
+import java.io.*;
+
 public class WordCount_Cluster_worker {
 
     private List<AmazonFineFoodReview> allReviews;
     private  List<String> order;
     private Map<String, Integer> result;
+    private List<String> words;
 
-    private List<String> getWords(){
+    public WordCount_Cluster_worker(List<AmazonFineFoodReview> allReviews){
+        this.allReviews = allReviews;
+    }
+
+
+    private void setWords(){
         List<String> words = new ArrayList<String>();
         for(AmazonFineFoodReview review : allReviews) {
             Pattern pattern = Pattern.compile("([a-zA-Z]+)");
@@ -24,10 +33,10 @@ public class WordCount_Cluster_worker {
             }
         }
 
-        return words;
+        this.words = words;
     }
 
-    private void count_words(List<String> words){
+    private void count_words(){
         //        /* Count words */
         Map<String, Integer> wordcount = new HashMap<>();
         List<String> order = new ArrayList<>();
@@ -64,5 +73,46 @@ public class WordCount_Cluster_worker {
 
     public List<String> getOrder(){
         return order;
+    }
+
+    public static class TCPClient {
+
+        public static void main(String [] args) {
+            String server_address = args[0];
+
+            Socket s = null;
+            try {
+                int serverPort = 7896;
+                s = new Socket(server_address, serverPort);
+                ObjectInputStream in = new ObjectInputStream(s.getInputStream());
+                ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
+
+                List<AmazonFineFoodReview> partition = (List<AmazonFineFoodReview>) in.readObject();
+
+                WordCount_Cluster_worker cluster = new WordCount_Cluster_worker(partition);
+
+                cluster.setWords();
+                cluster.count_words();
+
+                out.writeObject(cluster.getResult());
+                out.writeObject(cluster.getOrder());
+
+            } catch (UnknownHostException e) {
+                System.out.println("Sock:" + e.getMessage());
+            } catch (EOFException e) {
+                System.out.println("EOF:" + e.getMessage());
+            } catch (IOException e) {
+                System.out.println("IO:" + e.getMessage());
+            } catch (ClassNotFoundException e) {
+                System.out.println("CLASS:" + e.getMessage());
+            } finally {
+                if (s != null)
+                    try {
+                        s.close();
+                    } catch (IOException e) {
+                        System.out.println("close:" + e.getMessage());
+                    }
+            }
+        }
     }
 }
