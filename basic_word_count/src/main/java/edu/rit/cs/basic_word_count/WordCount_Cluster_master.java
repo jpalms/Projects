@@ -36,7 +36,7 @@ public class WordCount_Cluster_master {
         for(String word : order){
             System.out.println(word + " : " + wordcount.get(word));
         }
-        //System.out.println("map: " + wordcount.size() + " sort: " + order.size());
+        System.out.println("map: " + wordcount.size() + " sort: " + order.size());
     }
 
     public static void main(String[] args) {
@@ -128,8 +128,8 @@ public class WordCount_Cluster_master {
     public static class TCPServer {
 
         List nodeParam;
-        ArrayList<Map<String, Integer>> maps;
-        ArrayList<List<String>> sortedLists;
+        ArrayList<Map<String, Integer>> maps = new ArrayList<>();
+        ArrayList<List<String>> sortedLists = new ArrayList<>();
         public TCPServer(List nodeParam) {
             this.nodeParam = nodeParam;
             try {
@@ -140,8 +140,10 @@ public class WordCount_Cluster_master {
                 while (!nodeParam.isEmpty()) {
                     Socket clientSocket = listenSocket.accept();
                     Connection c = new Connection(clientSocket, (List<AmazonFineFoodReview>) nodeParam.remove(0));
-                    maps.add(c.getMap());
-                    sortedLists.add(c.getOrder());
+                    if(!c.isAlive()) {
+                        maps.add(c.getMap());
+                        sortedLists.add(c.getOrder());
+                    }
                 }
             } catch (IOException e) {
                 System.out.println("Listen :" + e.getMessage());
@@ -166,6 +168,7 @@ public class WordCount_Cluster_master {
 
         public Connection(Socket aClientSocket, List<AmazonFineFoodReview> partition) {
             try {
+                System.out.println("Made a connection");
                 clientSocket = aClientSocket;
                 in = new ObjectInputStream(clientSocket.getInputStream());
                 out = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -178,7 +181,9 @@ public class WordCount_Cluster_master {
         public void run(List<AmazonFineFoodReview> partition) {
             try {   // send word to node, retrieve result
 
-                out.writeObject(partition);
+                System.out.println("Send");
+                out.writeObject((Object)partition);
+                System.out.println("Read");
                 wordcount = (Map<String, Integer>)in.readObject();
                 order = (List<String>) in.readObject();
             } catch (EOFException e) {
@@ -187,7 +192,9 @@ public class WordCount_Cluster_master {
                 System.out.println("IO:" + e.getMessage());
             } catch (ClassNotFoundException e){
                 System.out.println("CLASS:" + e.getMessage());
-            } finally{
+            } catch (NullPointerException e){
+                System.out.println("NULL: " + e.getMessage());
+            } finally {
                 try {
                     clientSocket.close();
                 } catch (IOException e) {/*close failed*/}
