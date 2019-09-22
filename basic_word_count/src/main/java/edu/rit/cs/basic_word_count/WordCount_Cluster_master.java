@@ -55,7 +55,6 @@ public class WordCount_Cluster_master {
         int numNodes = 5;
         int size = allReviews.size();
         List nodeParam = new ArrayList<>();
-        ArrayList<WordCount_Cluster_worker> countThreads = new ArrayList<>();
         for (int i = 0; i < numNodes; i++) {
             int start = (int)((double)i * size/numNodes);
             int end = (int)((i+1.0)* size/numNodes);
@@ -65,22 +64,28 @@ public class WordCount_Cluster_master {
             List partition = new ArrayList<>();
             partition.addAll(allReviews.subList(start, end));
             nodeParam.add(partition);
-
-            //countThreads.add(new countThread(partition));
-            //countThreads.get(i).start();
         }
 
         TCPServer server = new TCPServer(nodeParam);
 
-        ArrayList<Map<String, Integer>> maps = server.getMaps();
-        ArrayList<List<String>> sortedLists = server.getSortedLists();
+        ArrayList<Connection> connections = server.getConnections();
+        boolean alive = true;
+        while(alive){
+            for (Connection c: connections) {
+                if(c.isAlive()){
+                    alive = true;
+                    break;
+                }else
+                    alive = false;
+            }
+        }
 
-        Map<String, Integer> result = maps.get(0);
-        List<String> order = sortedLists.get(0);
+        Map<String, Integer> result = connections.get(0).getMap();
+        List<String> order = connections.get(0).getOrder();
 
-        for (int i = 1; i < maps.size(); i++) {
-            order = sort(order, sortedLists.get(i), result);
-            result = mergeMaps(result, maps.get(i));
+        for (int i = 1; i < connections.size(); i++) {
+            order = sort(order, connections.get(i).getOrder(), result);
+            result = mergeMaps(result, connections.get(i).getMap());
 
         }
 
@@ -128,8 +133,7 @@ public class WordCount_Cluster_master {
     public static class TCPServer {
 
         List nodeParam;
-        ArrayList<Map<String, Integer>> maps = new ArrayList<>();
-        ArrayList<List<String>> sortedLists = new ArrayList<>();
+        ArrayList<Connection> connections = new ArrayList<>();
         public TCPServer(List nodeParam) {
             this.nodeParam = nodeParam;
             try {
@@ -140,22 +144,15 @@ public class WordCount_Cluster_master {
                 while (!nodeParam.isEmpty()) {
                     Socket clientSocket = listenSocket.accept();
                     Connection c = new Connection(clientSocket, (List<AmazonFineFoodReview>) nodeParam.remove(0));
-                    if(!c.isAlive()) {
-                        maps.add(c.getMap());
-                        sortedLists.add(c.getOrder());
-                    }
+                    connections.add(c);
                 }
             } catch (IOException e) {
                 System.out.println("Listen :" + e.getMessage());
             }
         }
 
-        public ArrayList<Map<String, Integer>> getMaps() {
-            return maps;
-        }
-
-        public ArrayList<List<String>> getSortedLists() {
-            return sortedLists;
+        public ArrayList<Connection> getConnections() {
+            return connections;
         }
     }
 
@@ -165,6 +162,7 @@ public class WordCount_Cluster_master {
         Socket clientSocket;
         Map<String, Integer> wordcount;
         List<String> order;
+        List<AmazonFineFoodReview> partition;
 
         public Connection(Socket aClientSocket, List<AmazonFineFoodReview> partition) {
             try {
@@ -172,13 +170,14 @@ public class WordCount_Cluster_master {
                 clientSocket = aClientSocket;
                 in = new ObjectInputStream(clientSocket.getInputStream());
                 out = new ObjectOutputStream(clientSocket.getOutputStream());
-                this.run(partition);
+                this.partition = partition;
+                this.start();
             } catch (IOException e) {
                 System.out.println("Connection:" + e.getMessage());
             }
         }
 
-        public void run(List<AmazonFineFoodReview> partition) {
+        public void run() {
             try {   // send word to node, retrieve result
 
                 System.out.println("Send");

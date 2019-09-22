@@ -78,7 +78,7 @@ public class WordCount_Cluster_worker {
     public static class TCPClient{
 
         public static void main(String [] args) {
-            String server_address = "127.0.0.1";
+            String server_address = args[0];
             ObjectInputStream in;
             ObjectOutputStream out;
 
@@ -90,20 +90,15 @@ public class WordCount_Cluster_worker {
                 out = new ObjectOutputStream(s.getOutputStream());
                 in = new ObjectInputStream(s.getInputStream());
 
-
-                System.out.println("Get partition");
                 Object obj = in.readObject();
-                //System.out.println("Obj: " + obj.toString());
                 List<AmazonFineFoodReview> partition = (List<AmazonFineFoodReview>) obj;
 
                 System.out.println(partition.size());
                 WordCount_Cluster_worker cluster = new WordCount_Cluster_worker(partition);
 
-                System.out.println("Sort");
                 cluster.setWords();
                 cluster.count_words();
 
-                System.out.println("Send Result");
                 out.writeObject(cluster.getResult());
                 out.writeObject(cluster.getOrder());
 
@@ -123,7 +118,6 @@ public class WordCount_Cluster_worker {
                         System.out.println("close:" + e.getMessage());
                     }
             }
-            System.out.println("done");
         }
     }
 }
