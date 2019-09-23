@@ -1,3 +1,4 @@
+// @author: Justin Palmer
 package edu.rit.cs.basic_word_count;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.regex.Pattern;
 import java.net.*;
 import java.io.*;
 
+// Does the work to a sublist given by the server
 public class WordCount_Cluster_worker {
 
     private List<AmazonFineFoodReview> allReviews;
@@ -22,6 +24,7 @@ public class WordCount_Cluster_worker {
     }
 
 
+    // Read in Data
     private void setWords(){
         List<String> words = new ArrayList<String>();
         for(AmazonFineFoodReview review : allReviews) {
@@ -75,6 +78,7 @@ public class WordCount_Cluster_worker {
         return order;
     }
 
+    // Establish a connection with Server and gets the data partition to sort
     public static class TCPClient{
 
         public static void main(String [] args) {
@@ -84,21 +88,26 @@ public class WordCount_Cluster_worker {
 
             Socket s = null;
             try {
+                // create connection
                 int serverPort = 7896;
                 s = new Socket(server_address, serverPort);
 
                 out = new ObjectOutputStream(s.getOutputStream());
                 in = new ObjectInputStream(s.getInputStream());
 
+                // get data
                 Object obj = in.readObject();
                 List<AmazonFineFoodReview> partition = (List<AmazonFineFoodReview>) obj;
 
-                System.out.println(partition.size());
+                //System.out.println(partition.size());
+
+                // sort data
                 WordCount_Cluster_worker cluster = new WordCount_Cluster_worker(partition);
 
                 cluster.setWords();
                 cluster.count_words();
 
+                // send back result
                 out.writeObject(cluster.getResult());
                 out.writeObject(cluster.getOrder());
 

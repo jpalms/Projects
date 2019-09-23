@@ -1,3 +1,4 @@
+// @author: Justin Palmer
 package edu.rit.cs.basic_word_count;
 
 import java.io.BufferedReader;
@@ -6,10 +7,12 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+// Counts the occurrence of words and sorts them a-z
+// Partitions the data with threads for efficiency
 public class WordCount_Threads {
     public static final String AMAZON_FINE_FOOD_REVIEWS_file="basic_word_count/amazon-fine-food-reviews/Reviews.csv";
 
+    // Read in Data
     public static List<AmazonFineFoodReview> read_reviews(String dataset_file) {
         List<AmazonFineFoodReview> allReviews = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(dataset_file))){
@@ -33,25 +36,22 @@ public class WordCount_Threads {
         for(String word : order){
             System.out.println(word + " : " + wordcount.get(word));
         }
-        //System.out.println("map: " + wordcount.size() + " sort: " + order.size());
+        System.out.println("map: " + wordcount.size() + " sort: " + order.size());
     }
 
+    // main program to partition and sort word count from a-z
     public static void main(String[] args) {
         List<AmazonFineFoodReview> allReviews = read_reviews(AMAZON_FINE_FOOD_REVIEWS_file);
-
-        /* For debug purpose */
-//        for(AmazonFineFoodReview review : allReviews){
-//            System.out.println(review.get_Text());
-//        }
 
         MyTimer myTimer = new MyTimer("wordCount");
         myTimer.start_timer();
 
 
-        int numThreads = 3;
+        int numThreads = 5;
         int size = allReviews.size();
-        //List partition = new ArrayList<>();
         ArrayList<countThread> countThreads = new ArrayList<>();
+
+        // partitions data into sublists
         for (int i = 0; i < numThreads; i++) {
             int start = (int)((double)i * size/numThreads);
             int end = (int)((i+1.0)* size/numThreads);
@@ -59,13 +59,15 @@ public class WordCount_Threads {
                 end = size;
             }
             List partition = new ArrayList<>();
+
             partition.addAll(allReviews.subList(start, end));
 
+            // generates thread to sort a sublist
             countThreads.add(new countThread(partition));
             countThreads.get(i).start();
         }
 
-
+        // wait till all threads are done
         boolean alive = true;
         while(alive){
             for (Thread thread: countThreads) {
@@ -80,6 +82,7 @@ public class WordCount_Threads {
         Map<String, Integer> result = countThreads.get(0).getResult();
         List<String> order = countThreads.get(0).getOrder();
 
+        // merge results and sort
         for (int i = 1; i < countThreads.size(); i++) {
             order = sort(order, countThreads.get(i).getOrder(), result);
             result = mergeMaps(result, countThreads.get(i).getResult());
@@ -93,12 +96,14 @@ public class WordCount_Threads {
         myTimer.print_elapsed_time();
     }
 
+    // function to merge two maps together
     private static Map<String, Integer> mergeMaps(Map<String, Integer> base, Map<String, Integer> extension){
         for (String word: extension.keySet()) {
+            // add duplicate word's counts together
             if(base.containsKey(word)){
                 int val = base.get(word);
                 base.replace(word, val, val + extension.get(word));
-            }
+            } // add word to combined maps
             else{
                 base.put(word, extension.get(word));
             }
@@ -106,9 +111,10 @@ public class WordCount_Threads {
         return base;
     }
 
+    // function to combine two sorted lists
     private static List<String> sort(List<String> base, List<String> extenstion, Map<String, Integer> map){
-        //List<String> arr = new ArrayList<>(base.size() + extenstion.size());
         int i = 0;
+        // add words not in the first list to the second list
         for (String word: extenstion) {
             int size = base.size();
             if(!map.containsKey(word)){
@@ -127,6 +133,7 @@ public class WordCount_Threads {
         return base;
     }
 
+    // Threads that are used to sort partitioned data
     public static class countThread extends Thread{
         private List<AmazonFineFoodReview> allReviews;
         private  List<String> order;

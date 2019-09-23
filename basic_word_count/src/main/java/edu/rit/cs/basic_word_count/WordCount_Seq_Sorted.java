@@ -1,3 +1,4 @@
+// @author: Justin Palmer
 package edu.rit.cs.basic_word_count;
 
 import java.io.BufferedReader;
@@ -6,10 +7,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+// Counts the occurrence of words and sorts them a-z
 public class WordCount_Seq_Sorted {
     public static final String AMAZON_FINE_FOOD_REVIEWS_file="basic_word_count/amazon-fine-food-reviews/Reviews.csv";
 
+    // Read in data
     public static List<AmazonFineFoodReview> read_reviews(String dataset_file) {
         List<AmazonFineFoodReview> allReviews = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(dataset_file))){
@@ -35,16 +37,13 @@ public class WordCount_Seq_Sorted {
         }
     }
 
+    // main program
     public static void main(String[] args) {
         List<AmazonFineFoodReview> allReviews = read_reviews(AMAZON_FINE_FOOD_REVIEWS_file);
 
-        /* For debug purpose */
-//        for(AmazonFineFoodReview review : allReviews){
-//            System.out.println(review.get_Text());
-//        }
-
         MyTimer myTimer = new MyTimer("wordCount");
         myTimer.start_timer();
+
         /* Tokenize words */
         List<String> words = new ArrayList<String>();
         for(AmazonFineFoodReview review : allReviews) {

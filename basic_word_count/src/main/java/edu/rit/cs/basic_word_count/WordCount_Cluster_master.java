@@ -1,3 +1,4 @@
+// @author: Justin Palmer
 package edu.rit.cs.basic_word_count;
 
 import java.io.BufferedReader;
@@ -10,9 +11,13 @@ import java.util.Map;
 import java.net.*;
 import java.io.*;
 
+// Counts the occurrence of words and sorts them a-z
+// The client nodes sort partitions of the data
+// Then sorted data gets merged back together
 public class WordCount_Cluster_master {
     public static final String AMAZON_FINE_FOOD_REVIEWS_file="basic_word_count/amazon-fine-food-reviews/Reviews.csv";
 
+    // Read in data
     public static List<AmazonFineFoodReview> read_reviews(String dataset_file) {
         List<AmazonFineFoodReview> allReviews = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(dataset_file))){
@@ -39,19 +44,15 @@ public class WordCount_Cluster_master {
         System.out.println("map: " + wordcount.size() + " sort: " + order.size());
     }
 
+    // main program that partitions data, creates a Server for clients to get partitions and send back results
+    // then merges results together
     public static void main(String[] args) {
         List<AmazonFineFoodReview> allReviews = read_reviews(AMAZON_FINE_FOOD_REVIEWS_file);
-
-        /* For debug purpose */
-//        for(AmazonFineFoodReview review : allReviews){
-//            System.out.println(review.get_Text());
-//        }
 
         MyTimer myTimer = new MyTimer("wordCount");
         myTimer.start_timer();
 
-        // insert partition and docker nodes
-
+        // create 5 partitions for the nodes
         int numNodes = 5;
         int size = allReviews.size();
         List nodeParam = new ArrayList<>();
@@ -66,10 +67,14 @@ public class WordCount_Cluster_master {
             nodeParam.add(partition);
         }
 
+        // create server
+
         TCPServer server = new TCPServer(nodeParam);
 
         ArrayList<Connection> connections = server.getConnections();
         boolean alive = true;
+
+        // wait till all nodes are done
         while(alive){
             for (Connection c: connections) {
                 if(c.isAlive()){
@@ -83,6 +88,7 @@ public class WordCount_Cluster_master {
         Map<String, Integer> result = connections.get(0).getMap();
         List<String> order = connections.get(0).getOrder();
 
+        // merge results and sort
         for (int i = 1; i < connections.size(); i++) {
             order = sort(order, connections.get(i).getOrder(), result);
             result = mergeMaps(result, connections.get(i).getMap());
@@ -96,6 +102,7 @@ public class WordCount_Cluster_master {
         myTimer.print_elapsed_time();
     }
 
+    // function to merge two maps together
     private static Map<String, Integer> mergeMaps(Map<String, Integer> base, Map<String, Integer> extension){
         for (String word: extension.keySet()) {
             if(base.containsKey(word)){
@@ -108,7 +115,7 @@ public class WordCount_Cluster_master {
         }
         return base;
     }
-
+    // function to combine two sorted lists
     private static List<String> sort(List<String> base, List<String> extenstion, Map<String, Integer> map){
         //List<String> arr = new ArrayList<>(base.size() + extenstion.size());
         int i = 0;
@@ -130,6 +137,7 @@ public class WordCount_Cluster_master {
         return base;
     }
 
+    // Server that wait for 5 clients to sort the partitions and send back results
     public static class TCPServer {
 
         List nodeParam;
@@ -137,10 +145,12 @@ public class WordCount_Cluster_master {
         public TCPServer(List nodeParam) {
             this.nodeParam = nodeParam;
             try {
+                // start server
                 int serverPort = 7896;
                 ServerSocket listenSocket = new ServerSocket(serverPort);
-                System.out.println("TCP Server is running and accepting client connections...");
+                //System.out.println("TCP Server is running and accepting client connections...");
 
+                // wait till all the partitions have been taken by clients
                 while (!nodeParam.isEmpty()) {
                     Socket clientSocket = listenSocket.accept();
                     Connection c = new Connection(clientSocket, (List<AmazonFineFoodReview>) nodeParam.remove(0));
@@ -165,8 +175,9 @@ public class WordCount_Cluster_master {
         List<AmazonFineFoodReview> partition;
 
         public Connection(Socket aClientSocket, List<AmazonFineFoodReview> partition) {
+            // Make a connection
             try {
-                System.out.println("Made a connection");
+                //System.out.println("Made a connection");
                 clientSocket = aClientSocket;
                 in = new ObjectInputStream(clientSocket.getInputStream());
                 out = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -180,9 +191,9 @@ public class WordCount_Cluster_master {
         public void run() {
             try {   // send word to node, retrieve result
 
-                System.out.println("Send");
+                //System.out.println("Send");
                 out.writeObject((Object)partition);
-                System.out.println("Read");
+                //System.out.println("Read");
                 wordcount = (Map<String, Integer>)in.readObject();
                 order = (List<String>) in.readObject();
             } catch (EOFException e) {
