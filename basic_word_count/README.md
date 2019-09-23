@@ -44,14 +44,14 @@ export JVM_ARGS="-Xmx1024m -XX:MaxPermSize=256m"
 ### Task 3
     ### WordCount_Cluster_master
         ```
-        Contained all logic from WordCount_Threads that happend outside a thread.
-        Instead of using Threads for the partion data, a Server is created that waits for clients.
+        Contained all logic from WordCount_Threads that happened outside a thread.
+        Instead of using Threads for the partition data, a Server is created that waits for clients.
         The clients sort the partitions and return the results.
         After all connections are establish, wait till all connections are finished than merge and sort results.
 
         ```
     ### WordCount_Cluster_worker
         ```
-        Contained all logic from WordCount_Threads that happend inside a thread.
+        Contained all logic from WordCount_Threads that happened inside a thread.
         Establishes a connection with the Server to get the partitioned data, then return results.
         ```
