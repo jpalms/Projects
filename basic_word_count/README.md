@@ -25,3 +25,33 @@ java -cp target/basic_word_count-1.0-SNAPSHOT.jar edu.rit.cs.basic_word_count.Wo
 ```
 export JVM_ARGS="-Xmx1024m -XX:MaxPermSize=256m"
 ```
+
+### Task 1
+    ### WordCount_Seq_Sorted
+    ```
+    Created an ArrayList that uses InsertionSort to keep a sort list.
+    list was used when printing to determine the order to print the map from a-z.
+    ```
+
+### Task 2
+    ### WordCount_Threads
+    ```
+    Created sublists of the data that was passed to each thread.
+    Thread used logic from WordCount_Seq_Sorted to sort each partition.
+    While threads were running, main program waited for all threads to finish before merging and sorting results.
+    The maps and list were merged/sorted seperately.
+    ```
+### Task 3
+    ### WordCount_Cluster_master
+        ```
+        Contained all logic from WordCount_Threads that happend outside a thread.
+        Instead of using Threads for the partion data, a Server is created that waits for clients.
+        The clients sort the partitions and return the results.
+        After all connections are establish, wait till all connections are finished than merge and sort results.
+
+        ```
+    ### WordCount_Cluster_worker
+        ```
+        Contained all logic from WordCount_Threads that happend inside a thread.
+        Establishes a connection with the Server to get the partitioned data, then return results.
+        ```

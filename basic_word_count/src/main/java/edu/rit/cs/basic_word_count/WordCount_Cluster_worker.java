@@ -23,7 +23,6 @@ public class WordCount_Cluster_worker {
         this.allReviews = allReviews;
     }
 
-
     // Read in Data
     private void setWords(){
         List<String> words = new ArrayList<String>();
