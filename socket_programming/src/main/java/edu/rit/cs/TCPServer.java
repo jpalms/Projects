@@ -14,7 +14,7 @@ public class TCPServer {
                 Connection c = new Connection(clientSocket);
             }
         } catch (IOException e) {
-            System.out.println("Listen :" + e.getMessage());
+            System.out.println("Listen :" + e.getMessage(j));
         }
     }
 }
