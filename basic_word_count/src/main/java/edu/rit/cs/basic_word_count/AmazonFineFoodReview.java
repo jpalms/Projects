@@ -3,7 +3,7 @@ package edu.rit.cs.basic_word_count;
 import java.io.Serializable;
 
 //Id,ProductId,UserId,ProfileName,HelpfulnessNumerator,HelpfulnessDenominator,Score,Time,Summary,Text
-public class AmazonFineFoodReview {
+public class AmazonFineFoodReview implements Serializable {
 
     private int _Id;
     private String _ProductId;
