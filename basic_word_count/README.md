@@ -9,6 +9,11 @@ amazon-fine-food-reviews/Reviews.csv
 ```
 mvn package
 ```
+or on Windows machine
+```
+cd ..
+start gradlew.bat build
+```
 
 ### Run WordCount_Seq
 ```
