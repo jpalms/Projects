@@ -1,16 +1,35 @@
 package edu.rit.cs;
 
 import java.util.List;
+import java.util.HashMap;
 
 public class Topic {
 	private int id;
 	private List<String> keywords;
 	private String name;
+	private HashMap<String, User> subs;
 
 	public Topic(int id, List<String> keywords, String name){
 		this.id = id;
 		this.keywords = keywords;
 		this.name = name;
+		this.subs = subs;
+	}
+
+	public HashMap<String, User> getSubs() {
+		return subs;
+	}
+
+	public void setSubs(HashMap<String, User> subs) {
+		this.subs = subs;
+	}
+
+	public void addSub(String ident, User subscriber){
+		subs.put(ident, subscriber);
+	}
+
+	public void removeSub(String ident){
+		subs.remove(ident);
 	}
 
 	public int getId() {
