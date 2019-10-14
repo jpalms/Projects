@@ -28,16 +28,16 @@ public class User extends PubSubAgent{
         this.role = role;
     }
 
-    public boolean isSub(pubOrSub role){
-        if (role.equals(pubOrSub.SUB)){
+    public boolean isSub(){
+        if (this.getRole().equals(pubOrSub.SUB)){
             return true;
         } else {
             return false;
         }
     }
 
-    public boolean isPub(pubOrSub role){
-        if (role.equals(pubOrSub.PUB)){
+    public boolean isPub(){
+        if (this.getRole().equals(pubOrSub.PUB)){
             return true;
         } else {
             return false;
@@ -52,10 +52,9 @@ public class User extends PubSubAgent{
         this.id = id;
     }
 
-    public String getPassword() {
-        return password;
+    public boolean isCorrectPassord(String password){
+        return this.password.equals(password);
     }
-
     public void setPassword(String password) {
         this.password = password;
     }
