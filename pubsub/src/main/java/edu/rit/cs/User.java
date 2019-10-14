@@ -28,6 +28,22 @@ public class User extends PubSubAgent{
         this.role = role;
     }
 
+    public boolean isSub(pubOrSub role){
+        if (role.equals(pubOrSub.SUB)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isPub(pubOrSub role){
+        if (role.equals(pubOrSub.PUB)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public String getId() {
         return id;
     }

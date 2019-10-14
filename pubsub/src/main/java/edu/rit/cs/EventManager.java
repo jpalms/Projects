@@ -8,6 +8,7 @@ public class EventManager{
 
 	private HashMap<String, User> subscribers;
 	private HashMap<String, Topic> topics;
+
 	/*
 	 * Start the repo service
 	 */
@@ -41,11 +42,13 @@ public class EventManager{
 	/*
 	 * remove subscriber from the list
 	 */
+
 	private synchronized void removeSubscriber(User user){
 		subscribers.remove(user);
 		for (Topic topic: topics.values()){
 		    topic.removeSub(user.getId());
         }
+
 
 	}
 	
