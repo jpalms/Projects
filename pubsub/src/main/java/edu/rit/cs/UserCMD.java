@@ -10,13 +10,15 @@ import java.util.*;
 public class UserCMD {
 
     private static enum cmdBegin() {
-        Scanner initial
+        Scanner initial = new Scanner(System.in);
 
         System.out.println(
                 "=================================\n" +
                 "            User Node            \n" +
                 "=================================\n\n");
 
+        System.out.println("Pick an option:\n" +
+                            "Create User(\"create\"" + "\t\t")
     }
 
     private static void startCMD() {
