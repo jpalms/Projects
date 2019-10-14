@@ -1,6 +1,7 @@
 package edu.rit.cs;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class EventManager{
@@ -19,41 +20,42 @@ public class EventManager{
 	/*
 	 * notify all subscribers of new event 
 	 */
-	private void notifySubscribers(Event event) {
+	private synchronized void notifySubscribers(Event event) {
 		//topics.get(event.getTopic().getId()).getSubs();
 	}
 	
 	/*
 	 * add new topic when received advertisement of new topic
 	 */
-	private void addTopic(Topic topic){
+	private synchronized void addTopic(Topic topic){
 		topics.put(topic.getId() + "", topic);
 	}
 	
 	/*
 	 * add subscriber to the internal list
 	 */
-	private void addSubscriber(User user){
+	private synchronized void addSubscriber(User user){
 		subscribers.put(user.getId(), user);
 	}
 	
 	/*
 	 * remove subscriber from the list
 	 */
-	private void removeSubscriber(Object user){
+	private synchronized void removeSubscriber(User user){
 		subscribers.remove(user);
-		//for (Topic topic: topics.
+		for (Topic topic: topics.values()){
+		    topic.removeSub(user.getId());
+        }
 
 	}
 	
 	/*
 	 * show the list of subscriber for a specified topic
 	 */
-	private void showSubscribers(Topic topic){
-		for (User user: subscribers.values()) {
-			//if(user.getTopic().equals(topic))
-				System.out.println(user);
-		}
+	private synchronized void showSubscribers(Topic topic){
+		for (String id: topic.getSubs().keySet()){
+		    System.out.println(subscribers.get(id));
+        }
 	}
 	
 	
