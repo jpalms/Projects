@@ -48,10 +48,6 @@ public class User extends PubSubAgent{
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public boolean isCorrectPassord(String password){
         return this.password.equals(password);
     }
