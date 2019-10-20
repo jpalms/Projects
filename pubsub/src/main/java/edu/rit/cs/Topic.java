@@ -4,13 +4,11 @@ import java.util.List;
 import java.util.HashMap;
 
 public class Topic {
-	private int id;
 	private List<String> keywords;
 	private String name;
 	private HashMap<String, User> subs;
 
 	public Topic(int id, List<String> keywords, String name){
-		this.id = id;
 		this.keywords = keywords;
 		this.name = name;
 		this.subs = subs;
@@ -32,10 +30,6 @@ public class Topic {
 		subs.remove(ident);
 	}
 
-	public int getId() {
-		return id;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -46,7 +40,7 @@ public class Topic {
 
 	@Override
 	public String toString(){
-		return "Topic: " + this.getName() + "\n\tid: " + this.getId() + "\n\tkeywords: " + this.getKeywords().toString();
+		return "Topic: " + this.getName() + "\n\tkeywords: " + this.getKeywords().toString();
 	}
 	@Override
 	public boolean equals(Object obj){
@@ -54,7 +48,7 @@ public class Topic {
 			return false;
 
 		Topic topic = (Topic) obj;
-		return this.getId() == topic.getId();
+		return this.getName().equals(topic.getName());
 	}
 
 
