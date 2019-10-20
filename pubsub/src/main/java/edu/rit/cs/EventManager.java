@@ -18,7 +18,6 @@ public class EventManager{
 	private HashMap<String, ArrayList<Event>> unNotified;
 	private List<Event> newEvents;
 
-	//@todo fill unotified
 	//
 	/*
 	 * Start the repo service
