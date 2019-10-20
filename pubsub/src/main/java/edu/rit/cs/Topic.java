@@ -24,6 +24,10 @@ public class Topic {
 		this.subs = subs;
 	}
 
+	public boolean hasSub(User user){
+		return this.subs.containsKey(user.getId());
+	}
+
 	public void addSub(String ident, User subscriber){
 		subs.put(ident, subscriber);
 	}
