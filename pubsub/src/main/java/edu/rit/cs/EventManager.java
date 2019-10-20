@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -92,6 +93,12 @@ public class EventManager{
         }
 	}
 
+	/**
+	 * Returns a list of Topics that a User is subscribed to
+	 *
+	 * @param user - Subscriber instance of User
+	 * @return - List of Subscrived Topics
+	 */
 	private synchronized ArrayList<Topic> getSubscribedTopics(User user){
 		ArrayList<Topic> topicArrayList = new ArrayList<>();
 
@@ -102,6 +109,24 @@ public class EventManager{
 		}
 
 		return topicArrayList;
+	}
+
+	/**
+	 * Returns a list of all Topics
+	 *
+	 * @return - list of all topics
+	 */
+	private synchronized Collection<Topic> getTopicList(){
+		return this.topics.values();
+	}
+
+	/**
+	 * Returns a list of all keywords
+	 *
+	 * @return - returns a list of all keywords
+	 **/
+	private synchronized Collection<String> getKeywords(){
+		return this.keyToTopics.keySet();
 	}
 
 	/**
@@ -160,6 +185,9 @@ public class EventManager{
 		// start command line
 	}
 
+	/**
+	 * Class to Handle the creations of all threads that communicate with clients
+	 **/
 	public class Handler extends Thread{
 		// create a thread to look for new logins
 		private HashMap<String, Worker> onlineUsers;
@@ -333,6 +361,10 @@ public class EventManager{
 						boolean sending = in.readBoolean();
 						User user = allUsers.get(username);
 						if (sending) {
+
+							out.writeObject(getTopicList());
+							out.writeObject(getKeywords());
+
 							if (user.isPub()) {
 								receivedFromPub();
 							} else if (user.isSub()) {
