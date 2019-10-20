@@ -118,6 +118,10 @@ public class UserCMD {
         }
     }
 
+    public static Topic topicExist(String check_string){
+
+    }
+
     public static void subSub(User currUser){
         Scanner subscribe = new Scanner(System.in);
         System.out.println("Choose: subscribe by Topic (\"t\") " +
@@ -201,10 +205,11 @@ public class UserCMD {
 
         boolean topic_flag = true;
         String e_topic_str;
+        Topic chk_top = null;
         do {
             System.out.println("Topic of your event: ");
             e_topic_str = publish.nextLine();
-            Topic chk_top = topicExist(e_topic_str);
+            chk_top = topicExist(e_topic_str);
             if (chk_top != null) {
                 topic_flag = false;
             }
@@ -213,13 +218,30 @@ public class UserCMD {
         System.out.println("Content for your event: \n");
         String e_content = publish.nextLine();
 
-
+        Event new_event = new Event( -1, chk_top, e_title, e_content);
 
         currUser.publish(new_event);
     }
 
     private static void pubAdv(User currUser) {
+        Scanner advertise = new Scanner (System.in);
 
+        System.out.println("Name of your topic: ");
+        String t_name = advertise.nextLine();
+
+        List<String> key_list = new ArrayList<String>();
+        String keyword;
+        do {
+            System.out.println("Input a keyword, or an empty string if you are done.");
+            keyword = advertise.nextLine();
+            if (!(keyword.equals(""))){
+                key_list.add(keyword);
+            }
+        } while(!(keyword.equals("")));
+
+        Topic new_topic = new Topic(key_list, t_name);
+
+        currUser.advertise(new_topic);
     }
 
     public static void pubCLI(User currUser){

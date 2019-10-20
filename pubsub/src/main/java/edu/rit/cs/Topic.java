@@ -9,7 +9,7 @@ public class Topic implements Serializable {
 	private String name;
 	private HashMap<String, User> subs;
 
-	public Topic(int id, List<String> keywords, String name){
+	public Topic(List<String> keywords, String name){
 		this.keywords = keywords;
 		this.name = name;
 		this.subs = subs;
