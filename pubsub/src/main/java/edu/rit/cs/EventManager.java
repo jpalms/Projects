@@ -92,6 +92,18 @@ public class EventManager{
         }
 	}
 
+	private synchronized ArrayList<Topic> getSubscribedTopics(User user){
+		ArrayList<Topic> topicArrayList = new ArrayList<>();
+
+		for(Topic topic:topics.values()){
+			if(topic.hasSub(user)){
+				topicArrayList.add(topic);
+			}
+		}
+
+		return topicArrayList;
+	}
+
 	/**
 	 * adds a subscriber to a Topic
 	 *
@@ -446,14 +458,18 @@ public class EventManager{
 			public void receivedFromSub(User user) throws IOException, ClassNotFoundException{
 				Object obj;
 				obj = in.readObject();
-				boolean subscribe = in.readBoolean();
+				boolean subOrUnsubAction = in.readBoolean();
+				boolean listOrUnsubAll = in.readBoolean();
 				if(obj instanceof Topic) {
 					Topic t = (Topic) obj;
-					if (subscribe) {
-						subscribeToTopic(user, t);
-					} else {
-						boolean unsubAll = in.readBoolean();
-						if(unsubAll){
+					if (subOrUnsubAction) {
+						if(listOrUnsubAll){
+							out.writeObject(getSubscribedTopics(user));
+						}else {
+							subscribeToTopic(user, t);
+						}
+					}else {
+						if(listOrUnsubAll){
 							unSubscribeFromAll(user);
 						}
 						else {

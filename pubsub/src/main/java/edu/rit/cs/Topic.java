@@ -1,9 +1,10 @@
 package edu.rit.cs;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.HashMap;
 
-public class Topic {
+public class Topic implements Serializable {
 	private List<String> keywords;
 	private String name;
 	private HashMap<String, User> subs;
