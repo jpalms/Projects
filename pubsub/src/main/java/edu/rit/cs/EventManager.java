@@ -45,7 +45,7 @@ public class EventManager{
 	 * @param topic - Topic component
 	 **/
 	private synchronized void addTopic(Topic topic){
-		topics.put(topic.getId() + "", topic);
+		topics.put(topic.getName() + "", topic);
 		for(String keyword: topic.getKeywords()){
 			if(keyToTopics.containsKey(keyword)){
 				keyToTopics.get(keyword).add(topic);
@@ -99,7 +99,7 @@ public class EventManager{
 	 * @param topic - Topic component
 	 **/
 	private synchronized void subscribeToTopic(User user, Topic topic){
-		this.topics.get(topic.getId()).addSub(user.getId(), user);
+		this.topics.get(topic.getName()).addSub(user.getId(), user);
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class EventManager{
 		List<Topic> topicList = this.keyToTopics.get(keyword);
 
 		for(Topic topic: topicList){
-			this.topics.get(topic.getId()).addSub(user.getId(), user);
+			this.topics.get(topic.getName()).addSub(user.getId(), user);
 		}
 	}
 
@@ -123,7 +123,7 @@ public class EventManager{
 	 * @param topic - Topic component
 	 **/
 	private synchronized void unSubscribeFromTopic(User user, Topic topic){
-		this.topics.get(topic.getId()).removeSub(user.getId());
+		this.topics.get(topic.getName()).removeSub(user.getId());
 	}
 
 	/**
@@ -244,7 +244,7 @@ public class EventManager{
 					// Updates an onlineSubscriber when a new Event is publisheded
 					if(!newEvents.isEmpty()){
 						for (Event e:newEvents) {
-							for(User user: topics.get(e.getTopic()).getSubs()){
+							for(User user: topics.get(e.getTopic()).getSubs().values()){
 								if(onlineUsers.containsKey(user.getId())){
 									try {
 										ArrayList<Event> events = new ArrayList<>();
