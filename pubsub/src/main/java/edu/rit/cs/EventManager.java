@@ -142,12 +142,27 @@ public class EventManager{
 
 			public void run(){
 				while(running){
+					if(!unNotified.isEmpty()){
+						for (String id: unNotified.keySet()) {
+							if(onlineUsers.containsKey(id)){
+								try {
+									onlineUsers.get(id).queueEvents(unNotified.get(id));
+									onlineUsers.get(id).notify();
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
+						}
+					}
 					if(!newEvents.isEmpty()){
 						for (Event e:newEvents) {
 							for(User user: topics.get(e.getTopic()).getSubs()){
 								if(onlineUsers.containsKey(user.getId())){
 									try {
-										onlineUsers.get(user.getId()).sendNewEvent(e);
+										ArrayList<Event> events = new ArrayList<>();
+										events.add(e);
+										onlineUsers.get(user.getId()).queueEvents(events);
+										onlineUsers.get(user.getId()).notify();
 									} catch (IOException e1) {
 										e1.printStackTrace();
 									}
@@ -179,6 +194,7 @@ public class EventManager{
 			Socket clientSocket;
 			boolean notify = false, running = false;
 			String username = "";
+			ArrayList<Event> eventsToSend;
 
 			public Worker(Socket aClientSocket) {
 				// Make a connection
@@ -205,8 +221,6 @@ public class EventManager{
 						boolean sending = in.readBoolean();
 						User user = subscribers.get(username);
 						if (sending) {
-							user = subscribers.get(username);//(User) in.readObject();
-
 							if (user.isPub()) {
 								recieveFromPub();
 							} else if (user.isSub()) {
@@ -218,8 +232,12 @@ public class EventManager{
 							running = true;
 							while(running){
 								wait();
+
+								while(!eventsToSend.isEmpty()){
+									out.writeObject(eventsToSend.remove(0));
+								}
 							}
-							// wait till get info to send
+							// wait till notified, then send Events
 						}
 					}
 				} catch (EOFException e) {
@@ -273,17 +291,8 @@ public class EventManager{
 				this.username = username;
 			}
 
-			public void sendMissedEvents(User user) throws IOException{
-				// notify missed events
-				ArrayList<Event> events = notifyMissedSubscriber(user);
-				while(!events.isEmpty()){
-					out.writeObject(events.remove(0));
-				}
-				out.writeObject("DONE");
-			}
-
-			public void sendNewEvent(Event e) throws IOException{
-				out.writeObject(e);
+			public void queueEvents(ArrayList<Event> events) throws IOException{
+				eventsToSend = events;
 			}
 
 			public void recieveFromPub() throws IOException, ClassNotFoundException{
@@ -310,10 +319,6 @@ public class EventManager{
 					unSubscribeFromTopic(user, t);
 				}
 
-			}
-
-			public void notifySub(){
-				notify = true;
 			}
 
 			public void turnOff(){
