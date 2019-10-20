@@ -43,7 +43,9 @@ public class UserCMD {
         String pass = "";
         String roleStr = "";
         User.pubOrSub role = null;
-        boolean uniqueId = false;
+        //boolean uniqueId = false;
+
+        /*
         while(!(uniqueId)) {
             System.out.println("\nPlease enter in a new username: ");
             user = create.nextLine();
@@ -52,6 +54,7 @@ public class UserCMD {
                 System.out.println("Username is taken already.\n");
             }
         }
+        */
 
         boolean passChk = true;
         while( passChk ) {
@@ -115,8 +118,151 @@ public class UserCMD {
         }
     }
 
+    public static void subSub(User currUser){
+        Scanner subscribe = new Scanner(System.in);
+        System.out.println("Choose: subscribe by Topic (\"t\") " +
+                           "or by keyword (\"k\")\n");
+        String sub_imp = subscribe.nextLine();
+        if (sub_imp.equals("t")){
+            System.out.println("What topic would you like to subscribe to?\n");
+            String topic_str = subscribe.nextLine();
+            Topic topic = topicExist(topic_str);
+            if (topic != null){
+                currUser.subscribe(topic);
+            } else {
+                System.out.println("Input does not match available options.\n" +
+                        "Returning to command list...\n");
+            }
+        } else if (sub_imp.equals("k")){
+            System.out.println("Please enter a keyword that you would like to search by: ");
+            String keyword = subscribe.nextLine();
+            currUser.subscribe(keyword);
+        } else {
+            System.out.println("Input does not match available options.\n" +
+                               "Returning to command list...\n");
+        }
+
+    }
+
+    public static void subUnsub(User currUser){
+        Scanner unsubscribe = new Scanner(System.in);
+        System.out.println("Would you like to unsubscribe from all topics (\"a\")" +
+                            "one just one (\"o\") ?\n");
+        String unsub_imp = unsubscribe.nextLine();
+        if (unsub_imp.equals("a")){
+            System.out.println("Removing all subscriptions...\n");
+            currUser.unsubscribe();
+        } else if (unsub_imp.equals("o")){
+            System.out.println("What topic would you like to unsubscribe from?\n");
+            System.out.println("Available topics: ");
+            currUser.listSubscribedTopics();
+            String topic_str = unsubscribe.nextLine();
+            // TODO error check input topic against topic list
+            Topic unsub_topic = null; //TODO - FIX
+            currUser.unsubscribe(unsub_topic);
+        } else {
+            System.out.println("Input does not match available options.\n" +
+                    "Returning to command list...\n");
+        }
+
+    }
+
+    public static void subCLI(User currUser){
+        Scanner sub_input = new Scanner(System.in);
+        boolean exit_flag = true;
+        do{
+            System.out.println("Commands available to subscribers: \n" +
+                                "Subscribe (\"s\") \t" +
+                                "Unsubscribe (\"u\") \t" +
+                                "Quit (\"q\")\n"
+                              );
+            String command = sub_input.nextLine();
+            switch(command){
+                case "s":
+                    subSub();
+                    break;
+                case "u":
+                    subUnsub();
+                    break;
+                case "q":
+                    exit_flag = false;
+                    break;
+                default:
+                    System.out.println("Not an available command for subscribers.\n");
+            }
+        } while (exit_flag);
+    }
+
+    private static void pubPub(User currUser) {
+        Scanner publish = new Scanner (System.in);
+
+        System.out.println("Title of your event: ");
+        String e_title = publish.nextLine();
+
+        boolean topic_flag = true;
+        String e_topic_str;
+        do {
+            System.out.println("Topic of your event: ");
+            e_topic_str = publish.nextLine();
+            Topic chk_top = topicExist(e_topic_str);
+            if (chk_top != null) {
+                topic_flag = false;
+            }
+        } while (topic_flag);
+
+        System.out.println("Content for your event: \n");
+        String e_content = publish.nextLine();
+
+
+
+        currUser.publish(new_event);
+    }
+
+    private static void pubAdv(User currUser) {
+
+    }
+
+    public static void pubCLI(User currUser){
+        Scanner pub_input = new Scanner(System.in);
+        boolean exit_flag = true;
+        do{
+            System.out.println("Commands available to subscribers: \n" +
+                    "Publish (\"p\") \t" +
+                    "Advertise (\"a\") \t" +
+                    "Quit (\"q\")\n"
+            );
+            String command = pub_input.nextLine();
+            switch(command){
+                case "p":
+                    pubPub();
+                    break;
+                case "a":
+                    pubAdv();
+                    break;
+                case "q":
+                    exit_flag = false;
+                    break;
+                default:
+                    System.out.println("Not an available command for subscribers.\n");
+            }
+        } while (exit_flag);
+    }
+
+
+
+
     private static void startCMD() {
         User currUser = cmdBegin();
+        // send user to eventmanager
+        if (currUser.role == User.pubOrSub.SUB){
+            System.out.println("============SUBSCRIBER============");
+            subCLI(currUser);
+        } else if (currUser.role == User.pubOrSub.PUB){
+            System.out.println("============PUBLISHER============");
+            pubCLI(currUser);
+        } else {
+            //error message here
+        }
     }
 
     public static void main(String[] args) {
