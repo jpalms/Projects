@@ -430,6 +430,7 @@ public class EventManager{
 				do {
 					obj = in.readObject();
 					id = (String) obj;
+					out.writeBoolean(!allUsers.containsKey(id));
 				}while(!allUsers.containsKey(id));
 
 				obj = in.readObject();
