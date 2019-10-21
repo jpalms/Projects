@@ -20,7 +20,7 @@ public class EventManager{
 	private HashMap<String, ArrayList<Event>> unNotified;
 	private HashMap<String, List<Topic>> keyToTopics;
 	private List<Event> newEvents;
-	private int eventId = 0;
+	private Handler handler;
 
 	//
 	/**
@@ -28,8 +28,12 @@ public class EventManager{
 	 *
 	 **/
 	private void startService() {
-		Handler handler = new Handler();
+		handler = new Handler();
 		handler.start();
+	}
+
+	public void stopService() {
+		handler.turnOff();
 	}
 
 	/**
@@ -38,7 +42,6 @@ public class EventManager{
 	 * @param event - Event component
 	 **/
 	private synchronized void notifySubscribers(Event event) {
-		event.setId(eventId++);
 		newEvents.add(event);
 	}
 	
@@ -123,6 +126,15 @@ public class EventManager{
 	}
 
 	/**
+	 * Returns the HashMap of all Topics
+	 *
+	 * @return - HashMap of all topics
+	 */
+	public synchronized HashMap<String, Topic> getTopicMap(){
+		return this.topics;
+	}
+
+	/**
 	 * Returns a list of all keywords
 	 *
 	 * @return - returns a list of all keywords
@@ -196,7 +208,6 @@ public class EventManager{
 		private ArrayList<Worker> workers;
 		boolean running;
 		private NotifySubs notify;
-		private ServerSocket listenSocket;
 
 		/**
 		 * Constructor class for Handler, initialize onlineUsers maps
@@ -215,7 +226,7 @@ public class EventManager{
 			try {
 				// start server
 				int serverPort = 7896;
-				listenSocket = new ServerSocket(serverPort);
+				ServerSocket listenSocket = new ServerSocket(serverPort);
 				//System.out.println("TCP Server is running and accepting client connections...");
 
 				// start notify thread
@@ -225,10 +236,8 @@ public class EventManager{
 				// look for new connections, then pass it to worker thread
 				while (running) {
 					Socket clientSocket = listenSocket.accept();
-					if(clientSocket.isConnected()) {
-						Worker c = new Worker(clientSocket);
-						workers.add(c);
-					}
+					Worker c = new Worker(clientSocket);
+					workers.add(c);
 				}
 			} catch (IOException e) {
 				System.out.println("Listen :" + e.getMessage());
@@ -241,11 +250,6 @@ public class EventManager{
 		public void turnOff(){
 			this.turnOffWorkers();
 			notify.turnOff();
-			try {
-				listenSocket.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 			this.running = false;
 		}
 

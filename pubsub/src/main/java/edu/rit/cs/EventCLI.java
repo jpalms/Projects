@@ -1,5 +1,8 @@
 package edu.rit.cs;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class EventCLI {
@@ -7,7 +10,9 @@ public class EventCLI {
 
     //TODO - Write termination protocol
     public static void emTerminate(EventManager em){
-        //TODO - graceful termination,
+        em.stopService();
+        System.out.println("EventManager has been terminated.");
+        System.exit(1);
     }
 
     //TODO - Show subscriptions for every topic
@@ -15,7 +20,16 @@ public class EventCLI {
         Scanner show = new Scanner(System.in);
         System.out.println("Please input the topic that you want to show subscribers for: ");
         String show_str = show.nextLine();
-        em.getTopic
+        HashMap<String, Topic> t_list = em.getTopicMap();
+        Topic topic = t_list.get(show_str);
+        if (topic != null){
+            for(User user:topic.getSubs().values()){
+                System.out.println(user);
+            }
+        } else {
+            System.out.println("Input does not match available options.\n" +
+                    "Returning to command list...\n");
+        }
     }
 
     public static void startCLI(){
