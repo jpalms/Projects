@@ -20,7 +20,6 @@ public class EventManager{
 	private HashMap<String, ArrayList<Event>> unNotified;
 	private HashMap<String, List<Topic>> keyToTopics;
 	private List<Event> newEvents;
-	private Handler handler;
 
 	//
 	/**
@@ -28,12 +27,14 @@ public class EventManager{
 	 *
 	 **/
 	private void startService() {
-		handler = new Handler();
+		Handler handler = new Handler();
 		handler.start();
+		EventCLI cli = new EventCLI();
+		cli.startCLI(this, handler);
 	}
 
-	public void stopService() {
-		handler.turnOff();
+	public void stopService(Handler h) {
+		h.turnOff();
 	}
 
 	/**
