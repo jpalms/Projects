@@ -1,6 +1,8 @@
 package edu.rit.cs;
 
 
+import java.util.ArrayList;
+
 public abstract class PubSubAgent implements Publisher, Subscriber{
 
 	/**
@@ -9,7 +11,9 @@ public abstract class PubSubAgent implements Publisher, Subscriber{
 	 * @param check_string - string to check against Topic names
 	 * @return Topic - matching topic, or null
 	 */
-	public static Topic topicExist(String check_string){};
+	public static Topic topicExist(String check_string){
+		return new Topic(new ArrayList<>(), "");
+	};
 
 
 	/**
