@@ -1,5 +1,11 @@
 package edu.rit.cs;
 
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.*;
 
 /*
@@ -43,7 +49,19 @@ public class UserCLI {
         String pass = "";
         String roleStr = "";
         User.pubOrSub role = null;
-        //boolean uniqueId = false;
+        boolean uniqueId = false;
+
+        do{
+            System.out.println("\nPlease enter in a new username: ");
+            user = create.nextLine();
+            // TODO - interact with EM to get list of users, see if there's a unique id or not
+            if (!(uniqueId)){
+                System.out.println("Username is taken already.\n");
+            } else {
+
+                uniqueId = true;
+            }
+        } while (!(uniqueId));
 
         /*
         while(!(uniqueId)) {
@@ -287,6 +305,41 @@ public class UserCLI {
             //error message here
         }
     }
+
+    public static class TCPClient extends Thread{
+
+        public static void main(String [] args) {
+            String server_address = args[0];
+            ObjectInputStream in;
+            ObjectOutputStream out;
+
+            Socket s = null;
+            try {
+                // create connection
+                int serverPort = 7896;
+                s = new Socket(server_address, serverPort);
+
+                out = new ObjectOutputStream(s.getOutputStream());
+                in = new ObjectInputStream(s.getInputStream());
+
+
+
+            } catch (UnknownHostException e) {
+                System.out.println("Sock:" + e.getMessage());
+            } catch (EOFException e) {
+                System.out.println("EOF:" + e.getMessage());
+            } catch (IOException e) {
+                System.out.println("IO:" + e.getMessage());
+            //} catch (ClassNotFoundException e) {
+            //    System.out.println("CLASS:" + e.getMessage());
+            } finally {
+                if (s != null)
+                    try {
+                        s.close();
+                    } catch (IOException e) {
+                        System.out.println("close:" + e.getMessage());
+                    }
+            }
 
     public static void main(String[] args) {
         startCLI();
