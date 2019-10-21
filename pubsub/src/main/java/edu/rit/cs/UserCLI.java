@@ -503,7 +503,12 @@ public class UserCLI {
             boolean running = true;
             while (running){
                 try {
-                    in.readObject();
+                    Object obj = in.readObject();
+                    if(obj instanceof Event){
+                        // @TODO display event
+                    }else if(obj instanceof Topic){
+                        // @TODO display topic
+                    }
                 } catch (IOException e){
                     System.err.println("IO: " + e.getMessage());
                 } catch (ClassNotFoundException e){
