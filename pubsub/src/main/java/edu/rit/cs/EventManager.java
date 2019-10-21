@@ -20,6 +20,7 @@ public class EventManager{
 	private HashMap<String, ArrayList<Event>> unNotified;
 	private HashMap<String, List<Topic>> keyToTopics;
 	private List<Event> newEvents;
+	private Handler handler;
 
 	//
 	/**
@@ -27,8 +28,12 @@ public class EventManager{
 	 *
 	 **/
 	private void startService() {
-		Handler handler = new Handler();
+		handler = new Handler();
 		handler.start();
+	}
+
+	public void stopService() {
+		handler.turnOff();
 	}
 
 	/**
@@ -118,6 +123,15 @@ public class EventManager{
 	 */
 	private synchronized Collection<Topic> getTopicList(){
 		return this.topics.values();
+	}
+
+	/**
+	 * Returns the HashMap of all Topics
+	 *
+	 * @return - HashMap of all topics
+	 */
+	public synchronized HashMap<String, Topic> getTopicMap(){
+		return this.topics;
 	}
 
 	/**
