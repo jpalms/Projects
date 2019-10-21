@@ -99,6 +99,13 @@ public class EventManager{
         }
 	}
 
+	public synchronized void showAllSubs(){
+	    System.out.println("All Subscribers:");
+	    for (User user: subscribers.values()){
+            System.out.println("\t " + user);
+        }
+    }
+
 	/**
 	 * Returns a list of Topics that a User is subscribed to
 	 *
