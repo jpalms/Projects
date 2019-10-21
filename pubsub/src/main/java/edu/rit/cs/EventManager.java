@@ -20,6 +20,7 @@ public class EventManager{
 	private HashMap<String, ArrayList<Event>> unNotified;
 	private HashMap<String, List<Topic>> keyToTopics;
 	private List<Event> newEvents;
+	private List<Topic> advertise;
 
 	//
 	/**
@@ -63,6 +64,7 @@ public class EventManager{
 				keyToTopics.put(keyword, list);
 			}
 		}
+		advertise.add(topic);
 	}
 	
 	/**
@@ -212,7 +214,7 @@ public class EventManager{
 	 **/
 	public class Handler extends Thread{
 		// create a thread to look for new logins
-		private HashMap<String, Worker> onlineUsers;
+		private HashMap<String, Worker> onlineUsers, onlinePublishers;
 		private ArrayList<Worker> workers;
 		boolean running;
 		private NotifySubs notify;
@@ -223,6 +225,7 @@ public class EventManager{
 		public Handler(){
 			running = true;
 			onlineUsers = new HashMap<>();
+			onlinePublishers = new HashMap<>();
 		}
 
 		/**
@@ -273,13 +276,13 @@ public class EventManager{
 		/**
 		 * Class of Notifying Subscribers about events
 		 **/
-		public class NotifySubs extends Thread {
+		private class NotifySubs extends Thread {
 			boolean running;
 
 			/**
 			 * Constructor Class for NotifySubs
 			 **/
-			public NotifySubs(){
+			private NotifySubs(){
 				running = true;
 			}
 
@@ -289,6 +292,24 @@ public class EventManager{
 			 **/
 			public void run(){
 				while(running){
+					if(!advertise.isEmpty()){
+						for(String id: onlinePublishers.keySet()){
+							try {
+								onlinePublishers.get(id).queueTopics(advertise);
+								onlinePublishers.get(id).notify();
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+						for(String id: onlineUsers.keySet()){
+							try {
+								onlineUsers.get(id).queueTopics(advertise);
+								onlineUsers.get(id).notify();
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+					}
 					// Updates a Subscriber with missed affects
 					// Takes care of asynchronous event update
 					if(!unNotified.isEmpty()){
@@ -349,6 +370,7 @@ public class EventManager{
 			boolean running = false;
 			String username = "";
 			ArrayList<Event> eventsToSend;
+			List<Topic> newTopics;
 
 			/**
 			 * Constructor class for Worker
@@ -395,13 +417,19 @@ public class EventManager{
 							}
 						}
 						else{
-							onlineUsers.put(user.getId(), this);
+							if(user.isSub())
+								onlineUsers.put(user.getId(), this);
+							else
+								onlinePublishers.put(user.getId(), this);
 							running = true;
 							while(running){
 								wait();
 
 								while(!eventsToSend.isEmpty()){
 									out.writeObject(eventsToSend.remove(0));
+								}
+								while (!newTopics.isEmpty()) {
+									out.writeObject(newTopics.remove(0));
 								}
 							}
 							// wait till notified, then send Events
@@ -489,6 +517,16 @@ public class EventManager{
 			 **/
 			public void queueEvents(ArrayList<Event> events) throws IOException{
 				eventsToSend = events;
+			}
+
+			/**
+			 * adds events to a list of events to send
+			 *
+			 * @param topics - list of Topics to advertise
+			 * @throws IOException
+			 **/
+			public void queueTopics(List<Topic> topics) throws IOException{
+				newTopics = topics;
 			}
 
 			/**
