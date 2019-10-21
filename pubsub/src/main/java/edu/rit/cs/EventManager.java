@@ -22,6 +22,16 @@ public class EventManager{
 	private List<Event> newEvents;
 	private List<Topic> advertise;
 
+
+	public EventManager(){
+		subscribers = new HashMap<>();
+		allUsers = new HashMap<>();
+		topics = new HashMap<>();
+		unNotified = new HashMap<>();
+		keyToTopics = new HashMap<>();
+		newEvents = new ArrayList<>();
+		advertise = new ArrayList<>();
+	}
 	//
 	/**
 	 * Start the repo service
