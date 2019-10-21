@@ -20,7 +20,8 @@ public class UserCLI {
 
     private static void turnOff(){
         for (TCPClient tcp: connections) {
-            tcp
+            tcp.turnOff();
+            connections.remove(tcp);
         }
     }
     private static User CLIBegin(String server) {
@@ -36,6 +37,7 @@ public class UserCLI {
                             "Sign In(\"signin\"");
 
         TCPClient firstThread = new TCPClient(server);
+        connections.add(firstThread);
         while(true) {
             String checkOpt = initial.nextLine(); // Read user's decision
             if (checkOpt.equals("create")) {
@@ -157,13 +159,13 @@ public class UserCLI {
 
         TCPClient thread = new TCPClient(server);
 
+        connections.add(thread);
         thread.autoLogin(currUser, password);
         currUser = (User) thread.readObject();
         thread.sendBool(true);
 
         List<Topic> topicList = (List<Topic>) thread.readObject();
         List<String> keywords = (List<String>) thread.readObject();
-
         if (sub_imp.equals("t")) {
             System.out.println("What topic would you like to subscribe to?\n");
             String topic_str = subscribe.nextLine();
@@ -220,6 +222,7 @@ public class UserCLI {
             System.out.println("Removing all subscriptions...\n");
             TCPClient thread = new TCPClient(server);
 
+            connections.add(thread);
             thread.autoLogin(currUser, password);
             currUser = (User) thread.readObject();
             thread.sendBool(true);
@@ -236,6 +239,7 @@ public class UserCLI {
             System.out.println("Available topics: ");
 
             TCPClient thread = new TCPClient(server);
+            connections.add(thread);
 
             thread.autoLogin(currUser, password);
             currUser = (User) thread.readObject();
@@ -292,7 +296,7 @@ public class UserCLI {
                     break;
                 case "l":
                     TCPClient thread = new TCPClient(server);
-
+                    connections.add(thread);
                     thread.autoLogin(currUser, password);
                     currUser = (User) thread.readObject();
                     thread.sendBool(true);
@@ -321,6 +325,7 @@ public class UserCLI {
         String e_title = publish.nextLine();
 
         TCPClient thread = new TCPClient(server);
+        connections.add(thread);
 
         thread.autoLogin(currUser, password);
         currUser = (User) thread.readObject();
@@ -363,6 +368,8 @@ public class UserCLI {
         String t_name = advertise.nextLine();
 
         TCPClient thread = new TCPClient(server);
+
+        connections.add(thread);
 
         thread.autoLogin(currUser, password);
         currUser = (User) thread.readObject();
@@ -432,10 +439,12 @@ public class UserCLI {
 
         ObjectInputStream in;
         ObjectOutputStream out;
+        boolean running;
+        Socket s;
 
         public TCPClient(String addr) {
             String server_address = addr;
-            Socket s = null;
+            s = null;
             try {
                 // create connection
                 int serverPort = 7896;
@@ -507,7 +516,7 @@ public class UserCLI {
         }
 
         public void reciever(){
-            boolean running = true;
+            running = true;
             while (running){
                 try {
                     Object obj = in.readObject();
@@ -522,6 +531,16 @@ public class UserCLI {
                     System.err.println("CLASS: " + e.getMessage());
                 }
             }
+        }
+
+        public void turnOff(){
+            running = false;
+            try {
+                s.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
 
     }
