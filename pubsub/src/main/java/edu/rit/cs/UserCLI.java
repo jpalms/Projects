@@ -8,13 +8,20 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.*;
 
-/*
+/**
  * Class to run on publisher / subscriber nodes.
  * Makes a User object based on input.
  */
 
 public class UserCLI {
 
+    /**
+     * Function to determine whether a user has an account or is creating one.
+     * No parameters, but operates based on user input.
+     * Returns a User to be used for the node.
+     *
+     * @return User Object
+     */
     private static User CLIBegin() {
         Scanner initial = new Scanner(System.in);
 
@@ -40,6 +47,13 @@ public class UserCLI {
         }
     }
 
+    /**
+     * Function to create a new publisher or subscriber.
+     * No parameters, but operates on user input, namely creating a User object based on input.
+     * Returns a User for the node. (Called by CLIBegin)
+     *
+     * @return User Object
+     */
     private static User usrCreate(){
         // send msg saying new user
 
@@ -105,6 +119,13 @@ public class UserCLI {
         return new User(role, user, pass);
     }
 
+    /**
+     * Function for a node to sign into a previously-created account.
+     * No parameters, but operates on user input, namely creating a User object based on EventManager info.
+     * Returns a User for the node. (Called by CLIBegin)
+     *
+     * @return User Object
+     */
     public static User usrSignin() {
         Scanner user_input = new Scanner(System.in);
         while (true){
@@ -137,9 +158,12 @@ public class UserCLI {
     }
 
     /**
-     *  Return a Topic from the list if it exists.
-     *  Takes a string, returns a Topic.
-     **/
+     * Function to subscribe to a Topic.
+     * Takes in the User object associated with the node.
+     * No return, but adds the User to a 'subscribed' list for the Topic.
+     *
+     * @param currUser - the node's associated User obj
+     */
     public static void subSub(User currUser){
         Scanner subscribe = new Scanner(System.in);
         System.out.println("Choose: subscribe by Topic (\"t\") " +
@@ -166,6 +190,14 @@ public class UserCLI {
 
     }
 
+    /**
+     * Function to unsubscribe from a topic.
+     * Takes in the User object associated with the node.
+     * No return, but removes the User from a 'subscribed' list for the Topic.
+     * (Can also remove User from all currently subscribed nodes.)
+     *
+     * @param currUser - the nodes' associated User obj
+     */
     public static void subUnsub(User currUser){
         Scanner unsubscribe = new Scanner(System.in);
         System.out.println("Would you like to unsubscribe from all topics (\"a\")" +
@@ -189,6 +221,13 @@ public class UserCLI {
 
     }
 
+    /**
+     * Function to run the CLI for a subscriber node.
+     * Takes in the User object associated with the node.
+     * No return, but calls other functions based on user input.
+     *
+     * @param currUser - the nodes' associated User obj.
+     */
     public static void subCLI(User currUser){
         Scanner sub_input = new Scanner(System.in);
         boolean exit_flag = true;
@@ -219,6 +258,13 @@ public class UserCLI {
         } while (exit_flag);
     }
 
+    /**
+     * Function to publish an Event for use in EventManager.
+     * Takes in the User object associated with the node.
+     * No return, but creates a new Event, handled by the EventManager.
+     *
+     * @param currUser - the nodes' associated User obj.
+     */
     private static void pubPub(User currUser) {
         Scanner publish = new Scanner (System.in);
 
@@ -245,6 +291,13 @@ public class UserCLI {
         currUser.publish(new_event);
     }
 
+    /**
+     * Function to advertise a Topic within EventManager.
+     * Takes in the User object associated with the node.
+     * No return, but creates a new Topic, handled by the EventManager.
+     *
+     * @param currUser
+     */
     private static void pubAdv(User currUser) {
         Scanner advertise = new Scanner (System.in);
 
@@ -266,6 +319,13 @@ public class UserCLI {
         currUser.advertise(new_topic);
     }
 
+    /**
+     * Function to run the CLI for a publisher node.
+     * Takes in the User object associated with the node.
+     * No return, but calls other functions based on user input.
+     *
+     * @param currUser - the nodes' associated User obj.
+     */
     public static void pubCLI(User currUser){
         Scanner pub_input = new Scanner(System.in);
         boolean exit_flag = true;
@@ -292,9 +352,13 @@ public class UserCLI {
         } while (exit_flag);
     }
 
+    /**
+     * Function to start the CLI for a User node.
+     * Takes no parameters and returns nothing.
+     * Calls publisher / subscriber CLI based on user input in CLIBegin.
+     */
     private static void startCLI() {
         User currUser = CLIBegin();
-        // send user to eventmanager
         if (currUser.role == User.pubOrSub.SUB){
             System.out.println("============SUBSCRIBER============");
             subCLI(currUser);
@@ -302,7 +366,8 @@ public class UserCLI {
             System.out.println("============PUBLISHER============");
             pubCLI(currUser);
         } else {
-            //error message here
+            System.out.println("Role not recognized; terminating node... ");
+            System.exit(1);
         }
     }
 
