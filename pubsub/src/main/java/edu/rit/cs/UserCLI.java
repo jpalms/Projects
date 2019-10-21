@@ -15,6 +15,8 @@ import java.util.*;
 
 public class UserCLI {
 
+    private static String password;
+
     private static User CLIBegin(String server) {
         Scanner initial = new Scanner(System.in);
 
@@ -119,6 +121,7 @@ public class UserCLI {
                     if (firstThread.readBool()) {
                         User user_node = (User)firstThread.readObject();
                         firstThread.sendBool(false);
+                        password = pass;
                         return user_node;
                     } else {
                         if (pass_tries > 3) {
@@ -378,7 +381,7 @@ public class UserCLI {
         //currUser.advertise(new_topic);
     }
 
-    public static void pubCLI(User currUser){
+    public static void pubCLI(User currUser, String server, String password){
         Scanner pub_input = new Scanner(System.in);
         boolean exit_flag = true;
         do{
@@ -390,10 +393,10 @@ public class UserCLI {
             String command = pub_input.nextLine();
             switch(command){
                 case "p":
-                    pubPub(currUser);
+                    pubPub(currUser, server, password);
                     break;
                 case "a":
-                    pubAdv(currUser);
+                    pubAdv(currUser, server, password);
                     break;
                 case "q":
                     exit_flag = false;
@@ -409,10 +412,10 @@ public class UserCLI {
         // send user to eventmanager
         if (currUser.role == User.pubOrSub.SUB){
             System.out.println("============SUBSCRIBER============");
-            subCLI(currUser);
+            subCLI(currUser, server, password);
         } else if (currUser.role == User.pubOrSub.PUB){
             System.out.println("============PUBLISHER============");
-            pubCLI(currUser);
+            pubCLI(currUser, server, password);
         } else {
             //error message here
         }
