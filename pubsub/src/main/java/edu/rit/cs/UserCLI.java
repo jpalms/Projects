@@ -7,9 +7,9 @@ import java.util.*;
  * Makes a User object based on input.
  */
 
-public class UserCMD {
+public class UserCLI {
 
-    private static User cmdBegin() {
+    private static User CLIBegin() {
         Scanner initial = new Scanner(System.in);
 
         System.out.println(
@@ -118,10 +118,10 @@ public class UserCMD {
         }
     }
 
-    public static Topic topicExist(String check_string){
-
-    }
-
+    /**
+     *  Return a Topic from the list if it exists.
+     *  Takes a string, returns a Topic.
+     **/
     public static void subSub(User currUser){
         Scanner subscribe = new Scanner(System.in);
         System.out.println("Choose: subscribe by Topic (\"t\") " +
@@ -130,7 +130,7 @@ public class UserCMD {
         if (sub_imp.equals("t")){
             System.out.println("What topic would you like to subscribe to?\n");
             String topic_str = subscribe.nextLine();
-            Topic topic = topicExist(topic_str);
+            Topic topic = currUser.topicExist(topic_str);
             if (topic != null){
                 currUser.subscribe(topic);
             } else {
@@ -178,15 +178,19 @@ public class UserCMD {
             System.out.println("Commands available to subscribers: \n" +
                                 "Subscribe (\"s\") \t" +
                                 "Unsubscribe (\"u\") \t" +
+                                "List Subscribed Topics (\"l\") \t" +
                                 "Quit (\"q\")\n"
                               );
             String command = sub_input.nextLine();
             switch(command){
                 case "s":
-                    subSub();
+                    subSub(currUser);
                     break;
                 case "u":
-                    subUnsub();
+                    subUnsub(currUser);
+                    break;
+                case "l":
+                    currUser.listSubscribedTopics();
                     break;
                 case "q":
                     exit_flag = false;
@@ -209,7 +213,7 @@ public class UserCMD {
         do {
             System.out.println("Topic of your event: ");
             e_topic_str = publish.nextLine();
-            chk_top = topicExist(e_topic_str);
+            chk_top = currUser.topicExist(e_topic_str);
             if (chk_top != null) {
                 topic_flag = false;
             }
@@ -256,10 +260,10 @@ public class UserCMD {
             String command = pub_input.nextLine();
             switch(command){
                 case "p":
-                    pubPub();
+                    pubPub(currUser);
                     break;
                 case "a":
-                    pubAdv();
+                    pubAdv(currUser);
                     break;
                 case "q":
                     exit_flag = false;
@@ -270,11 +274,8 @@ public class UserCMD {
         } while (exit_flag);
     }
 
-
-
-
-    private static void startCMD() {
-        User currUser = cmdBegin();
+    private static void startCLI() {
+        User currUser = CLIBegin();
         // send user to eventmanager
         if (currUser.role == User.pubOrSub.SUB){
             System.out.println("============SUBSCRIBER============");
@@ -288,9 +289,7 @@ public class UserCMD {
     }
 
     public static void main(String[] args) {
-        startCMD();
+        startCLI();
     }
-
-
 
 }
