@@ -99,7 +99,7 @@ public class EventManager{
 	 * Returns a list of Topics that a User is subscribed to
 	 *
 	 * @param user - Subscriber instance of User
-	 * @return - List of Subscrived Topics
+	 * @return - List of Subscribed Topics
 	 */
 	private synchronized ArrayList<Topic> getSubscribedTopics(User user){
 		ArrayList<Topic> topicArrayList = new ArrayList<>();

@@ -4,6 +4,9 @@ package edu.rit.cs;
 public class PubSubAgent implements Publisher, Subscriber{
 
 
+	public static Topic topicExist(String check_string){
+		// TODO - FIGURE THIS OUT
+	}
 
 	@Override
 	public void subscribe(Topic topic) {
