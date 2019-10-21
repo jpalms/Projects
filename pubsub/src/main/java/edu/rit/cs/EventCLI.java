@@ -20,6 +20,15 @@ public class EventCLI {
     }
 
     /**
+     * Function to show all subscribers in the EventManager.
+     * Takes an EventManager as a parameter.
+     * No return, but prints the list of subscribers to console.
+     */
+    public static void showAllsubs(EventManager em){
+        em.showAllSubs();
+    }
+
+    /**
      * Function to show all subscribers to a given topic, based on user input.
      * Takes an EventManager as a parameter.
      * Within the function, takes user input and either
@@ -60,6 +69,7 @@ public class EventCLI {
         do{
             System.out.println("Commands available: \n" +
                     "Terminate (\"t\") \t" +
+                    "Show All Subscribers (\"a\") \t" +
                     "Show Subscriber(s) for a Topic (\"s\") \t"
             );
             String command = em_input.nextLine();
@@ -68,6 +78,8 @@ public class EventCLI {
                     emTerminate(em, h);
                     exit_flag = false;
                     break;
+                case "a":
+                    showAllsubs(em);
                 case "s":
                     showSubs(em);
                     break;

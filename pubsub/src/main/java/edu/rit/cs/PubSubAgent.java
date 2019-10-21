@@ -1,7 +1,7 @@
 package edu.rit.cs;
 
 
-public class PubSubAgent implements Publisher, Subscriber{
+public abstract class PubSubAgent implements Publisher, Subscriber{
 
 	/**
 	 * Function to get a Topic based on a given string.
@@ -9,9 +9,7 @@ public class PubSubAgent implements Publisher, Subscriber{
 	 * @param check_string - string to check against Topic names
 	 * @return Topic - matching topic, or null
 	 */
-	public static Topic topicExist(String check_string){
-		// TODO - FIGURE THIS OUT
-	}
+	public static Topic topicExist(String check_string){};
 
 
 	/**
@@ -21,14 +19,7 @@ public class PubSubAgent implements Publisher, Subscriber{
 	 * @param topic - topic to subscribe to.
 	 */
 	@Override
-	public void subscribe(Topic topic) {
-		// TODO Auto-generated method stub
-
-		/*
-		topic.
-		 */
-		
-	}
+	public void subscribe(Topic topic) {};
 
 	/**
 	 * Function to subscribe to a Topic based on a given keyword.
@@ -37,10 +28,7 @@ public class PubSubAgent implements Publisher, Subscriber{
 	 * @param keyword - keyword string to check for.
 	 */
 	@Override
-	public void subscribe(String keyword) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void subscribe(String keyword) {};
 
 	/**
 	 * Function to unsubscribe from a Topic that has already been subscribed to.
@@ -48,10 +36,7 @@ public class PubSubAgent implements Publisher, Subscriber{
 	 * @param topic - topic to unsubscribe from
 	 */
 	@Override
-	public void unsubscribe(Topic topic) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void unsubscribe(Topic topic) {};
 
 	/**
 	 * Function to unsubscribe from all topics.
@@ -59,10 +44,7 @@ public class PubSubAgent implements Publisher, Subscriber{
 	 * Most of the heavy lifting is taken care of in EventManager.
 	 */
 	@Override
-	public void unsubscribe() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void unsubscribe() {};
 
 	/**
 	 * Function to list Topics that a User is subscribed to.
@@ -70,10 +52,7 @@ public class PubSubAgent implements Publisher, Subscriber{
 	 * Receives information from EventManager to perform the operation.
 	 */
 	@Override
-	public void listSubscribedTopics() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void listSubscribedTopics() {};
 
 	/**
 	 * Function to publish an Event.
@@ -82,21 +61,15 @@ public class PubSubAgent implements Publisher, Subscriber{
 	 * @param event - Event object sent to the EventManager
 	 */
 	@Override
-	public void publish(Event event) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void publish(Event event) {};
 
 	/**
 	 * Function to advertise a new Topic.
 	 * No return, but sends a Topic to be added to the list in EventManager.
 	 *
-	 * @param newTopic
+	 * @param newTopic - Topic to be sent to EventManager
 	 */
 	@Override
-	public void advertise(Topic newTopic) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void advertise(Topic newTopic) {};
 
 }
