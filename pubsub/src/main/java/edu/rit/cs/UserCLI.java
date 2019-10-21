@@ -13,31 +13,38 @@ import java.util.*;
  * Makes a User object based on input.
  */
 
+/**
+ * Function to determine whether a user has an account or is creating one.
+ * No parameters, but operates based on user input.
+ * Returns a User to be used for the node.
+ *
+ * @return User Object
+ */
 public class UserCLI {
 
-    /**
-     * Function to determine whether a user has an account or is creating one.
-     * No parameters, but operates based on user input.
-     * Returns a User to be used for the node.
-     *
-     * @return User Object
-     */
-    private static User CLIBegin() {
     private static String password;
+    private static ArrayList<TCPClient> connections;
 
+    private static void turnOff(){
+        for (TCPClient tcp: connections) {
+            tcp.turnOff();
+            connections.remove(tcp);
+        }
+    }
     private static User CLIBegin(String server) {
         Scanner initial = new Scanner(System.in);
 
         System.out.println(
                 "=================================\n" +
-                "            User Node            \n" +
-                "=================================\n\n");
+                        "            User Node            \n" +
+                        "=================================\n\n");
 
         System.out.println("Pick an option:\n" +
-                            "Create User(\"create\"" + "\t\t" +
-                            "Sign In(\"signin\"");
+                "Create User(\"create\"" + "\t\t" +
+                "Sign In(\"signin\"");
 
         TCPClient firstThread = new TCPClient(server);
+        connections.add(firstThread);
         while(true) {
             String checkOpt = initial.nextLine(); // Read user's decision
             if (checkOpt.equals("create")) {
@@ -63,7 +70,6 @@ public class UserCLI {
      *
      * @return User Object
      */
-    private static User usrCreate(){
     private static User usrCreate(TCPClient firstThread){
         // send msg saying new user
 
@@ -128,7 +134,6 @@ public class UserCLI {
      *
      * @return User Object
      */
-    public static User usrSignin() {
     public static User usrSignin(TCPClient firstThread) {
         Scanner user_input = new Scanner(System.in);
         while (true){
@@ -170,7 +175,7 @@ public class UserCLI {
      *
      * @param currUser - the node's associated User obj
      */
-    public static void subSub(User currUser){
+    public static void subSub(User currUser, String server, String password) {
         Scanner subscribe = new Scanner(System.in);
         System.out.println("Choose: subscribe by Topic (\"t\") " +
                 "or by keyword (\"k\")\n");
@@ -178,13 +183,13 @@ public class UserCLI {
 
         TCPClient thread = new TCPClient(server);
 
+        connections.add(thread);
         thread.autoLogin(currUser, password);
         currUser = (User) thread.readObject();
         thread.sendBool(true);
 
         List<Topic> topicList = (List<Topic>) thread.readObject();
         List<String> keywords = (List<String>) thread.readObject();
-
         if (sub_imp.equals("t")) {
             System.out.println("What topic would you like to subscribe to?\n");
             String topic_str = subscribe.nextLine();
@@ -227,7 +232,7 @@ public class UserCLI {
             currUser.subscribe(keyword);
         } else {
             System.out.println("Input does not match available options.\n" +
-                               "Returning to command list...\n");
+                    "Returning to command list...\n");
         }
 
     }
@@ -240,16 +245,16 @@ public class UserCLI {
      *
      * @param currUser - the nodes' associated User obj
      */
-    public static void subUnsub(User currUser){
     public static void subUnsub(User currUser, String server, String password){
         Scanner unsubscribe = new Scanner(System.in);
         System.out.println("Would you like to unsubscribe from all topics (\"a\")" +
-                            "one just one (\"o\") ?\n");
+                "one just one (\"o\") ?\n");
         String unsub_imp = unsubscribe.nextLine();
         if (unsub_imp.equals("a")){
             System.out.println("Removing all subscriptions...\n");
             TCPClient thread = new TCPClient(server);
 
+            connections.add(thread);
             thread.autoLogin(currUser, password);
             currUser = (User) thread.readObject();
             thread.sendBool(true);
@@ -266,6 +271,7 @@ public class UserCLI {
             System.out.println("Available topics: ");
 
             TCPClient thread = new TCPClient(server);
+            connections.add(thread);
 
             thread.autoLogin(currUser, password);
             currUser = (User) thread.readObject();
@@ -308,18 +314,17 @@ public class UserCLI {
      *
      * @param currUser - the nodes' associated User obj.
      */
-    public static void subCLI(User currUser){
     public static void subCLI(User currUser, String server, String password){
         Scanner sub_input = new Scanner(System.in);
 
         boolean exit_flag = true;
         do{
             System.out.println("Commands available to subscribers: \n" +
-                                "Subscribe (\"s\") \t" +
-                                "Unsubscribe (\"u\") \t" +
-                                "List Subscribed Topics (\"l\") \t" +
-                                "Quit (\"q\")\n"
-                              );
+                    "Subscribe (\"s\") \t" +
+                    "Unsubscribe (\"u\") \t" +
+                    "List Subscribed Topics (\"l\") \t" +
+                    "Quit (\"q\")\n"
+            );
             String command = sub_input.nextLine();
             switch(command){
                 case "s":
@@ -330,7 +335,7 @@ public class UserCLI {
                     break;
                 case "l":
                     TCPClient thread = new TCPClient(server);
-
+                    connections.add(thread);
                     thread.autoLogin(currUser, password);
                     currUser = (User) thread.readObject();
                     thread.sendBool(true);
@@ -359,7 +364,6 @@ public class UserCLI {
      *
      * @param currUser - the nodes' associated User obj.
      */
-    private static void pubPub(User currUser) {
     private static void pubPub(User currUser, String server, String password) {
         Scanner publish = new Scanner (System.in);
 
@@ -367,6 +371,7 @@ public class UserCLI {
         String e_title = publish.nextLine();
 
         TCPClient thread = new TCPClient(server);
+        connections.add(thread);
 
         thread.autoLogin(currUser, password);
         currUser = (User) thread.readObject();
@@ -409,7 +414,6 @@ public class UserCLI {
      *
      * @param currUser
      */
-    private static void pubAdv(User currUser) {
     private static void pubAdv(User currUser, String server, String password) {
         Scanner advertise = new Scanner (System.in);
 
@@ -417,6 +421,8 @@ public class UserCLI {
         String t_name = advertise.nextLine();
 
         TCPClient thread = new TCPClient(server);
+
+        connections.add(thread);
 
         thread.autoLogin(currUser, password);
         currUser = (User) thread.readObject();
@@ -479,8 +485,6 @@ public class UserCLI {
      * Takes no parameters and returns nothing.
      * Calls publisher / subscriber CLI based on user input in CLIBegin.
      */
-    private static void startCLI() {
-        User currUser = CLIBegin();
     private static void startCLI(String server) {
         User currUser = CLIBegin(server);
         // send user to eventmanager
@@ -491,19 +495,21 @@ public class UserCLI {
             System.out.println("============PUBLISHER============");
             pubCLI(currUser, server, password);
         } else {
-            System.out.println("Role not recognized; terminating node... ");
-            System.exit(1);
+            //error message here
         }
     }
 
-    public static class TCPClient extends Thread {
+    public static class
+    TCPClient extends Thread {
 
         ObjectInputStream in;
         ObjectOutputStream out;
+        boolean running;
+        Socket s;
 
         public TCPClient(String addr) {
             String server_address = addr;
-            Socket s = null;
+            s = null;
             try {
                 // create connection
                 int serverPort = 7896;
@@ -575,16 +581,31 @@ public class UserCLI {
         }
 
         public void reciever(){
-            boolean running = true;
+            running = true;
             while (running){
                 try {
-                    in.readObject();
+                    Object obj = in.readObject();
+                    if(obj instanceof Event){
+                        // @TODO display event
+                    }else if(obj instanceof Topic){
+                        // @TODO display topic
+                    }
                 } catch (IOException e){
                     System.err.println("IO: " + e.getMessage());
                 } catch (ClassNotFoundException e){
                     System.err.println("CLASS: " + e.getMessage());
                 }
             }
+        }
+
+        public void turnOff(){
+            running = false;
+            try {
+                s.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
 
     }
