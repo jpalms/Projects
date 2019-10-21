@@ -16,7 +16,13 @@ import java.util.*;
 public class UserCLI {
 
     private static String password;
+    private static ArrayList<TCPClient> connections;
 
+    private static void turnOff(){
+        for (TCPClient tcp: connections) {
+            tcp
+        }
+    }
     private static User CLIBegin(String server) {
         Scanner initial = new Scanner(System.in);
 
@@ -421,7 +427,8 @@ public class UserCLI {
         }
     }
 
-    public static class TCPClient extends Thread {
+    public static class
+    TCPClient extends Thread {
 
         ObjectInputStream in;
         ObjectOutputStream out;
