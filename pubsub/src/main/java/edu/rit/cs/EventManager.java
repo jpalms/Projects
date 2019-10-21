@@ -373,8 +373,9 @@ public class EventManager{
 						newLogin();
 					}
 					if(login()) {
-						boolean sending = in.readBoolean();
 						User user = allUsers.get(username);
+						out.writeObject(user);
+						boolean sending = in.readBoolean();
 						if (sending) {
 
 							out.writeObject(getTopicList());
@@ -430,8 +431,8 @@ public class EventManager{
 				do {
 					obj = in.readObject();
 					id = (String) obj;
-					out.writeBoolean(!allUsers.containsKey(id));
-				}while(!allUsers.containsKey(id));
+					out.writeBoolean(allUsers.containsKey(id));
+				}while(allUsers.containsKey(id));
 
 				obj = in.readObject();
 				User user = (User)obj;
@@ -451,8 +452,12 @@ public class EventManager{
 				String id, password;
 				Object obj;
 				//login
-				obj = in.readObject();
-				id = (String) obj;
+				do{
+					obj = in.readObject();
+					id = (String) obj;
+					out.writeBoolean(allUsers.containsKey(id));
+				} while(!allUsers.containsKey(id));
+
 				obj = in.readObject();
 				password = (String) obj;
 				setUsername(id);
