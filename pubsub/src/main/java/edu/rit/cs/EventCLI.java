@@ -80,6 +80,7 @@ public class EventCLI {
                     break;
                 case "a":
                     showAllsubs(em);
+                    break;
                 case "s":
                     showSubs(em);
                     break;
