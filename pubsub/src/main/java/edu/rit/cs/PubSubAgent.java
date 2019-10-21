@@ -4,15 +4,6 @@ package edu.rit.cs;
 public abstract class PubSubAgent implements Publisher, Subscriber{
 
 	/**
-	 * Function to get a Topic based on a given string.
-	 *
-	 * @param check_string - string to check against Topic names
-	 * @return Topic - matching topic, or null
-	 */
-	public static Topic topicExist(String check_string){};
-
-
-	/**
 	 * Function to subscribe to a given Topic.
 	 * Most of the heavy work is handled in EventManager.
 	 *
