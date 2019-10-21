@@ -1,11 +1,22 @@
 package edu.rit.cs;
 
+/**
+ * Class of Events that Publisher's publish and Subscriber's read
+ */
 public class Event {
 	private int id;
 	private Topic topic;
 	private String title;
 	private String content;
 
+	/**
+	 * Constructor for Event class
+	 *
+	 * @param id - unique id for Event
+	 * @param topic - topic associated with an Event
+	 * @param title - title of an Event
+	 * @param content - the content of an Event
+	 */
     public Event(int id, Topic topic, String title, String content) {
         this.id = id;
         this.topic = topic;
@@ -21,27 +32,39 @@ public class Event {
         this.id = id;
     }
 
-    public Topic getTopic() {
+	/**
+	 * Getter method for Topic
+	 *
+	 * @return - returns the Topic associated with the Event
+	 */
+	public Topic getTopic() {
         return topic;
     }
 
-    public void setTopic(Topic topic) {
-        this.topic = topic;
-    }
-
-    public String getTitle() {
+	/**
+	 * Getter method for title
+	 *
+	 * @return - returns the String of the Event's title
+	 */
+	public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
+	/**
+	 * Getter method for content
+	 *
+	 * @return - returns a String that contain the Event's information
+	 */
+	public String getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+	/**
+	 * Setter method for content
+	 *
+	 * @param content - information about the Event
+	 */
+	public void setContent(String content) {
         this.content = content;
     }
 }

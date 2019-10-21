@@ -1,7 +1,8 @@
 package edu.rit.cs;
 
-import java.util.*;
-
+/**
+ *
+ */
 public class User extends PubSubAgent{
 
     public enum pubOrSub {
