@@ -22,7 +22,8 @@ import java.util.*;
 public class UserCLI {
 
     private static String password;
-    private static ArrayList<TCPClient> connections;
+    private static ArrayList<TCPClient> connections = new ArrayList<TCPClient>();
+
 
     private static void turnOff(){
         for (TCPClient tcp: connections) {
@@ -39,8 +40,8 @@ public class UserCLI {
                         "=================================\n\n");
 
         System.out.println("Pick an option:\n" +
-                "Create User(\"create\"" + "\t\t" +
-                "Sign In(\"signin\"");
+                "Create User(\"create\")" + "\t\t" +
+                "Sign In(\"signin\")");
 
         TCPClient firstThread = new TCPClient(server);
         while(true) {
@@ -84,7 +85,7 @@ public class UserCLI {
             System.out.println("\nPlease enter in a new username: ");
             user = create.nextLine();
             firstThread.sendObject(user);
-            System.out.println("recieving bool");
+            // System.out.println("recieving bool");
             if (firstThread.readObject().equals("true")){
                 System.out.println("Username is taken already.\n");
             } else {
@@ -108,7 +109,7 @@ public class UserCLI {
             }
         }
 
-        System.out.println("Are you a subscriber(\"sub\") or a publisher(\"pub\"?");
+        System.out.println("Are you a subscriber(\"sub\") or a publisher(\"pub\")?");
         while(role == null) {
             System.out.println("Please clarify here: ");
             roleStr = create.nextLine();
@@ -141,27 +142,14 @@ public class UserCLI {
             String pass = "";
             firstThread.sendObject(user);
             if (firstThread.readObject().equals("true")) {
-                while (true) {
-                    System.out.println("Enter password: ");
-                    pass = user_input.nextLine();
-                    firstThread.sendObject(pass);
-                    int pass_tries = 0;
-                    if (pass == password) {
-                        User user_node = (User)firstThread.readObject();
-                        firstThread.sendObject(false);
-                        password = pass;
-                        connections.add(firstThread);
-                        return user_node;
-                    } else {
-                        if (pass_tries > 3) {
-                            System.out.println("Too many attempts. Program terminating.");
-                            System.exit(1);
-                        } else {
-                            System.out.println("Password does not match, please try again.");
-                            pass_tries++;
-                        }
-                    }
-                }
+                System.out.println("Enter password: ");
+                pass = user_input.nextLine();
+                firstThread.sendObject(pass);
+                User user_node = (User)firstThread.readObject();
+                firstThread.sendObject(false);
+                password = pass;
+                connections.add(firstThread);
+                return user_node;
             } else {
                 System.out.println("Username does not exist. Please try again. \n ");
             }

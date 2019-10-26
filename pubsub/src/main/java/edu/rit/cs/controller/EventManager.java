@@ -201,10 +201,13 @@ public class EventManager{
         }
 	}
 
+	/**
+	 * show all subscribers
+	 */
 	public synchronized void showAllSubs(){
 	    System.out.println("All Subscribers:");
 	    for (User user: subscribers.values()){
-            System.out.println("\t " + user);
+            System.out.println("\t " + user.toString());
         }
     }
 
