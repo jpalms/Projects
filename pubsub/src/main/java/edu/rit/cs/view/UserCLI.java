@@ -43,17 +43,20 @@ public class UserCLI {
                 "Sign In(\"signin\"");
 
         TCPClient firstThread = new TCPClient(server);
-        connections.add(firstThread);
         while(true) {
             String checkOpt = initial.nextLine(); // Read user's decision
             if (checkOpt.equals("create")) {
                 User temp = usrCreate(firstThread);
                 usrSignin(firstThread);
+
+                connections.add(firstThread);
                 firstThread.receiver();
                 return temp;
             } else if (checkOpt.equals("signin")) {
                 firstThread.sendBool(false);
                 firstThread.receiver();
+
+                connections.add(firstThread);
                 return usrSignin(firstThread);
             } else {
                 System.out.println("Does not match either of the commands.\n");
@@ -84,14 +87,16 @@ public class UserCLI {
         do{
             System.out.println("\nPlease enter in a new username: ");
             user = create.nextLine();
-            firstThread.sendObject(uniqueId);
-            if (firstThread.readBool()){
+            firstThread.sendObject(user);
+            System.out.println("recieving bool");
+            boolean bool = firstThread.readBool();
+            if (bool){
                 System.out.println("Username is taken already.\n");
             } else {
-
-                uniqueId = true;
+                System.out.println("Username is valid");
+                break;
             }
-        } while (!(uniqueId));
+        } while (true);
 
         boolean passChk = true;
         while( passChk ) {

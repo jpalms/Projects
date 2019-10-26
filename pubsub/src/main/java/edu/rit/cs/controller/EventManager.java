@@ -254,6 +254,8 @@ public class EventManager{
 	}
 
 	private synchronized boolean userExists(String id){
+		if(this.allUsers.isEmpty())
+			return false;
 		return this.allUsers.containsKey(id);
 	}
 
@@ -525,14 +527,17 @@ public class EventManager{
 				Object obj;
 				String id;
 				do {
+					System.out.println("read obj");
 					obj = in.readObject();
 					id = (String) obj;
+					System.out.println("write bool");
 					out.writeBoolean(userExists(id));
 				}while(userExists(id));
 
+				System.out.println("new user");
 				obj = in.readObject();
 				User user = (User)obj;
-
+				System.out.println("add to list");
 				allUsers.put(user.getId(), user);
 				if(user.isSub())
 					add_removeSub(user, true);

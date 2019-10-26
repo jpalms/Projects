@@ -34,20 +34,12 @@ public class TCPClient extends Thread{
                 out = new ObjectOutputStream(s.getOutputStream());
                 in = new ObjectInputStream(s.getInputStream());
 
-
             } catch (UnknownHostException e) {
                 System.out.println("Sock:" + e.getMessage());
             } catch (EOFException e) {
                 System.out.println("EOF:" + e.getMessage());
             } catch (IOException e) {
                 System.out.println("IO:" + e.getMessage());
-            } finally {
-                if (s != null)
-                    try {
-                        s.close();
-                    } catch (IOException e) {
-                        System.out.println("close:" + e.getMessage());
-                    }
             }
         }
 
