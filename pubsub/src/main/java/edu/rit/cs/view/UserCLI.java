@@ -1,15 +1,10 @@
 package edu.rit.cs.view;
 
+import edu.rit.cs.controller.TCPClient;
 import edu.rit.cs.model.Event;
 import edu.rit.cs.model.Topic;
 import edu.rit.cs.model.User;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.*;
 
 /**

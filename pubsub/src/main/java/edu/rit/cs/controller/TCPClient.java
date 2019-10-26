@@ -1,4 +1,4 @@
-package edu.rit.cs.view;
+package edu.rit.cs.controller;
 
 import edu.rit.cs.model.Event;
 import edu.rit.cs.model.Topic;
