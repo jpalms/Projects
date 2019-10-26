@@ -420,8 +420,6 @@ public class UserCLI {
 
         TCPClient thread = new TCPClient(server, currUser, password);
 
-        connections.add(thread);
-
         List<Topic> topicList = thread.getTopicList();
         List<String> keywords = thread.getKeywords();
 
@@ -438,6 +436,8 @@ public class UserCLI {
         Topic new_topic = new Topic(key_list, t_name);
 
         thread.sendObject(new_topic);
+
+        connections.add(thread);
         //currUser.advertise(new_topic);
     }
 

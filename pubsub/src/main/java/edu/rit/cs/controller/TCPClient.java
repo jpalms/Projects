@@ -63,13 +63,6 @@ public class TCPClient extends Thread{
                 System.out.println("EOF:" + e.getMessage());
             } catch (IOException e) {
                 System.out.println("IO:" + e.getMessage());
-            } finally {
-                if (s != null)
-                    try {
-                        s.close();
-                    } catch (IOException e) {
-                        System.out.println("close:" + e.getMessage());
-                    }
             }
         }
 
