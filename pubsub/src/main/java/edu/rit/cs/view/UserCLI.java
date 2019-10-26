@@ -23,7 +23,6 @@ public class UserCLI {
 
     private static String password;
     private static ArrayList<TCPClient> connections;
-    private static Stack<Object> updates;
 
     private static void turnOff(){
         for (TCPClient tcp: connections) {
@@ -235,13 +234,14 @@ public class UserCLI {
 
     }
 
-    public static void infoUpdate(User currUser, String server, String password){
+    public static void infoUpdate() {
 
         TCPClient receiverThread = connections.get(0);
-        receiverThread.
+        Stack<Object> updates = receiverThread.getUpdates();
+        receiverThread.emptyUpdates();
 
         System.out.println("Updates:\n");
-        if (updates.empty()){
+        if (updates.empty()) {
             System.out.println("No new updates.\n");
         } else {
             for (Object obj : updates) {
@@ -356,7 +356,7 @@ public class UserCLI {
                     currUser.listSubscribedTopics();
                     break;
                 case "i":
-                    infoUpdate(currUser, server, password);
+                    infoUpdate();
                     break;
                 case "q":
                     exit_flag = false;
@@ -476,7 +476,7 @@ public class UserCLI {
                     pubAdv(currUser, server, password);
                     break;
                 case "i":
-                    infoUpdate(currUser, server, password);
+                    infoUpdate();
                     break;
                 case "q":
                     exit_flag = false;

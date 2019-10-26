@@ -11,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Stack;
 
 public class TCPClient extends Thread{
 
@@ -20,8 +21,9 @@ public class TCPClient extends Thread{
         private Socket s;
         private List<Topic> topicList;
         private List<String> keywords;
+        private Stack<Object> updates;
 
-        public TCPClient(String addr) {
+    public TCPClient(String addr) {
             String server_address = addr;
             s = null;
             try {
@@ -148,15 +150,14 @@ public class TCPClient extends Thread{
             while (running){
                 try {
                     Object obj = in.readObject();
+
                     if(obj instanceof Event){
-                        // @TODO display event - when user is not inputting anything
-                        obj.toString();
+                        updates.add((Event) (obj));
 
                     }else if(obj instanceof Topic){
-                        // @TODO display topic - when user is not inputting anything
-                        obj.toString();
-
+                        updates.add((Topic)(obj));
                     }
+
                 } catch (IOException e){
                     System.err.println("IO: " + e.getMessage());
                 } catch (ClassNotFoundException e){
@@ -173,6 +174,14 @@ public class TCPClient extends Thread{
                 e.printStackTrace();
             }
 
+        }
+
+        public Stack<Object> getUpdates() {
+            return updates;
+        }
+
+        public void emptyUpdates() {
+            updates.clear();
         }
     }
 
