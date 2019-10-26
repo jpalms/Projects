@@ -1,11 +1,10 @@
-package edu.rit.cs;
+package edu.rit.cs.view;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import edu.rit.cs.controller.TCPClient;
+import edu.rit.cs.model.Event;
+import edu.rit.cs.model.Topic;
+import edu.rit.cs.model.User;
+
 import java.util.*;
 
 /**
@@ -181,15 +180,13 @@ public class UserCLI {
                 "or by keyword (\"k\")\n");
         String sub_imp = subscribe.nextLine();
 
-        TCPClient thread = new TCPClient(server);
+        TCPClient thread = new TCPClient(server, currUser, password);
 
         connections.add(thread);
-        thread.autoLogin(currUser, password);
-        currUser = (User) thread.readObject();
-        thread.sendBool(true);
 
-        List<Topic> topicList = (List<Topic>) thread.readObject();
-        List<String> keywords = (List<String>) thread.readObject();
+        List<Topic> topicList = thread.getTopicList();
+        List<String> keywords = thread.getKeywords();
+
         if (sub_imp.equals("t")) {
             System.out.println("What topic would you like to subscribe to?\n");
             String topic_str = subscribe.nextLine();
@@ -252,15 +249,12 @@ public class UserCLI {
         String unsub_imp = unsubscribe.nextLine();
         if (unsub_imp.equals("a")){
             System.out.println("Removing all subscriptions...\n");
-            TCPClient thread = new TCPClient(server);
+            TCPClient thread = new TCPClient(server, currUser, password);
 
             connections.add(thread);
-            thread.autoLogin(currUser, password);
-            currUser = (User) thread.readObject();
-            thread.sendBool(true);
 
-            List<Topic> topicList = (List<Topic>) thread.readObject();
-            List<String> keywords = (List<String>) thread.readObject();
+            List<Topic> topicList = thread.getTopicList();
+            List<String> keywords = thread.getKeywords();
 
             thread.sendObject(new Topic(new ArrayList<>(), ""));
             thread.sendBool(false);
@@ -270,15 +264,12 @@ public class UserCLI {
             System.out.println("What topic would you like to unsubscribe from?\n");
             System.out.println("Available topics: ");
 
-            TCPClient thread = new TCPClient(server);
+            TCPClient thread = new TCPClient(server, currUser, password);
+
             connections.add(thread);
 
-            thread.autoLogin(currUser, password);
-            currUser = (User) thread.readObject();
-            thread.sendBool(true);
-
-            List<Topic> topicList = (List<Topic>) thread.readObject();
-            List<String> keywords = (List<String>) thread.readObject();
+            List<Topic> topicList = thread.getTopicList();
+            List<String> keywords = thread.getKeywords();
 
             // print topicList
             String topic_str = unsubscribe.nextLine();
@@ -334,14 +325,12 @@ public class UserCLI {
                     subUnsub(currUser, server, password);
                     break;
                 case "l":
-                    TCPClient thread = new TCPClient(server);
-                    connections.add(thread);
-                    thread.autoLogin(currUser, password);
-                    currUser = (User) thread.readObject();
-                    thread.sendBool(true);
+                    TCPClient thread = new TCPClient(server, currUser, password);
 
-                    List<Topic> topicList = (List<Topic>) thread.readObject();
-                    List<String> keywords = (List<String>) thread.readObject();
+                    connections.add(thread);
+
+                    List<Topic> topicList = thread.getTopicList();
+                    List<String> keywords = thread.getKeywords();
 
                     thread.sendObject(new Topic(new ArrayList<>(), ""));
                     thread.sendBool(true);
@@ -370,15 +359,12 @@ public class UserCLI {
         System.out.println("Title of your event: ");
         String e_title = publish.nextLine();
 
-        TCPClient thread = new TCPClient(server);
+        TCPClient thread = new TCPClient(server, currUser, password);
+
         connections.add(thread);
 
-        thread.autoLogin(currUser, password);
-        currUser = (User) thread.readObject();
-        thread.sendBool(true);
-
-        List<Topic> topicList = (List<Topic>) thread.readObject();
-        List<String> keywords = (List<String>) thread.readObject();
+        List<Topic> topicList = thread.getTopicList();
+        List<String> keywords = thread.getKeywords();
 
         Topic chk_top = null;
 
@@ -420,16 +406,12 @@ public class UserCLI {
         System.out.println("Name of your topic: ");
         String t_name = advertise.nextLine();
 
-        TCPClient thread = new TCPClient(server);
+        TCPClient thread = new TCPClient(server, currUser, password);
 
         connections.add(thread);
 
-        thread.autoLogin(currUser, password);
-        currUser = (User) thread.readObject();
-        thread.sendBool(true);
-
-        List<Topic> topicList = (List<Topic>) thread.readObject();
-        List<String> keywords = (List<String>) thread.readObject();
+        List<Topic> topicList = thread.getTopicList();
+        List<String> keywords = thread.getKeywords();
 
         List<String> key_list = new ArrayList<String>();
         String keyword;
@@ -499,116 +481,6 @@ public class UserCLI {
         }
     }
 
-    public static class
-    TCPClient extends Thread {
-
-        ObjectInputStream in;
-        ObjectOutputStream out;
-        boolean running;
-        Socket s;
-
-        public TCPClient(String addr) {
-            String server_address = addr;
-            s = null;
-            try {
-                // create connection
-                int serverPort = 7896;
-                s = new Socket(server_address, serverPort);
-
-                out = new ObjectOutputStream(s.getOutputStream());
-                in = new ObjectInputStream(s.getInputStream());
-
-
-            } catch (UnknownHostException e) {
-                System.out.println("Sock:" + e.getMessage());
-            } catch (EOFException e) {
-                System.out.println("EOF:" + e.getMessage());
-            } catch (IOException e) {
-                System.out.println("IO:" + e.getMessage());
-            } finally {
-                if (s != null)
-                    try {
-                        s.close();
-                    } catch (IOException e) {
-                        System.out.println("close:" + e.getMessage());
-                    }
-            }
-        }
-
-        public void autoLogin(User user, String password){
-            try {
-                out.writeBoolean(false);
-                out.writeObject(user.getId());
-                out.writeObject(password);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        public void sendObject(Object obj){
-            try {
-                out.writeObject(obj);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public Object readObject(){
-            try {
-                return in.readObject();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-            return new Object();
-        }
-
-        public void sendBool(boolean bool){
-            try {
-                out.writeBoolean(bool);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public boolean readBool(){
-            try {
-                return in.readBoolean();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return false;
-        }
-
-        public void reciever(){
-            running = true;
-            while (running){
-                try {
-                    Object obj = in.readObject();
-                    if(obj instanceof Event){
-                        // @TODO display event
-                    }else if(obj instanceof Topic){
-                        // @TODO display topic
-                    }
-                } catch (IOException e){
-                    System.err.println("IO: " + e.getMessage());
-                } catch (ClassNotFoundException e){
-                    System.err.println("CLASS: " + e.getMessage());
-                }
-            }
-        }
-
-        public void turnOff(){
-            running = false;
-            try {
-                s.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-
-    }
     public static void main(String[] args) {
         String server = args[0];
         startCLI(server);

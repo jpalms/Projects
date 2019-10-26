@@ -1,9 +1,9 @@
-package edu.rit.cs;
+package edu.rit.cs.model;
 
 
 import java.util.ArrayList;
 
-public abstract class PubSubAgent implements Publisher, Subscriber{
+public abstract class PubSubAgent implements Publisher, Subscriber {
 
 	/**
 	 * Function to get a Topic based on a given string.

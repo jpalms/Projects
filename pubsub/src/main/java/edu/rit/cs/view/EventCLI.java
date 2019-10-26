@@ -1,4 +1,8 @@
-package edu.rit.cs;
+package edu.rit.cs.view;
+
+import edu.rit.cs.controller.EventManager;
+import edu.rit.cs.model.Topic;
+import edu.rit.cs.model.User;
 
 import java.util.HashMap;
 import java.util.Scanner;

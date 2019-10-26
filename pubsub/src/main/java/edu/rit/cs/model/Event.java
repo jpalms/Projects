@@ -1,4 +1,4 @@
-package edu.rit.cs;
+package edu.rit.cs.model;
 
 /**
  * Class of Events that Publisher's publish and Subscriber's read

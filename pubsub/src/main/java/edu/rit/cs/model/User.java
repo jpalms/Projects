@@ -1,9 +1,9 @@
-package edu.rit.cs;
+package edu.rit.cs.model;
 
 /**
  * User Class, which represents a Publisher or Subscriber
  */
-public class User extends PubSubAgent{
+public class User extends PubSubAgent {
 
     /**
      * Enum to indicate whether the instance is a Publisher or Subscriber
