@@ -49,14 +49,10 @@ public class UserCLI {
                 User temp = usrCreate(firstThread);
                 usrSignin(firstThread);
 
-                connections.add(firstThread);
-                firstThread.receiver();
                 return temp;
             } else if (checkOpt.equals("signin")) {
-                firstThread.sendBool(false);
-                firstThread.receiver();
+                firstThread.sendObject("false");
 
-                connections.add(firstThread);
                 return usrSignin(firstThread);
             } else {
                 System.out.println("Does not match either of the commands.\n");
@@ -83,13 +79,13 @@ public class UserCLI {
         User.pubOrSub role = null;
         boolean uniqueId = false;
 
-        firstThread.sendBool(true);
+        firstThread.sendObject("true");
         do{
             System.out.println("\nPlease enter in a new username: ");
             user = create.nextLine();
             firstThread.sendObject(user);
             System.out.println("recieving bool");
-            if (firstThread.readObject().equals(true)){
+            if (firstThread.readObject().equals("true")){
                 System.out.println("Username is taken already.\n");
             } else {
                 System.out.println("Username is valid");
@@ -144,16 +140,17 @@ public class UserCLI {
             String user = user_input.nextLine();
             String pass = "";
             firstThread.sendObject(user);
-            if (firstThread.readBool()) {
+            if (firstThread.readObject().equals("true")) {
                 while (true) {
                     System.out.println("Enter password: ");
                     pass = user_input.nextLine();
                     firstThread.sendObject(pass);
                     int pass_tries = 0;
-                    if (firstThread.readBool()) {
+                    if (firstThread.readObject().equals("true")) {
                         User user_node = (User)firstThread.readObject();
-                        firstThread.sendBool(false);
+                        firstThread.sendObject(false);
                         password = pass;
+                        connections.add(firstThread);
                         return user_node;
                     } else {
                         if (pass_tries > 3) {

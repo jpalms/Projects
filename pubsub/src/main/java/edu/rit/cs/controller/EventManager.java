@@ -460,7 +460,7 @@ public class EventManager{
 			@Override
 			public void run() {
 				try {
-					boolean newUser = in.readBoolean();
+					boolean newUser = in.readObject().equals("true");
 					if(newUser){
 						newLogin();
 					}
@@ -531,7 +531,7 @@ public class EventManager{
 					obj = in.readObject();
 					id = (String) obj;
 					System.out.println("write bool");
-					out.writeObject(userExists(id));
+					out.writeObject(userExists(id) + "");
 				}while(userExists(id));
 
 				System.out.println("new user");

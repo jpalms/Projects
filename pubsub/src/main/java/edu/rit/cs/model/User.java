@@ -1,9 +1,11 @@
 package edu.rit.cs.model;
 
+import java.io.Serializable;
+
 /**
  * User Class, which represents a Publisher or Subscriber
  */
-public class User extends PubSubAgent {
+public class User extends PubSubAgent implements Serializable {
 
     /**
      * Enum to indicate whether the instance is a Publisher or Subscriber
