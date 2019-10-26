@@ -234,8 +234,11 @@ public class EventManager{
 	 *
 	 * @return - list of all topics
 	 */
-	private synchronized Collection<Topic> getTopicList(){
-		return this.topics.values();
+	private synchronized ArrayList<Topic> getTopicList(){
+		ArrayList<Topic> list = new ArrayList();
+		for(Topic top: topics.values())
+			list.add(top);
+		return list;
 	}
 
 	/**
@@ -252,8 +255,12 @@ public class EventManager{
 	 *
 	 * @return - returns a list of all keywords
 	 **/
-	private synchronized Collection<String> getKeywords(){
-		return this.keyToTopics.keySet();
+	private synchronized ArrayList<String> getKeywords(){
+		ArrayList<String> key = new ArrayList<>();
+		for (String obj: keyToTopics.keySet()) {
+			key.add(obj);
+		}
+		return key;
 	}
 
 	private synchronized boolean userExists(String id){
@@ -489,7 +496,7 @@ public class EventManager{
 								onlinePublishers.put(user.getId(), this);
 							running = true;
 							while(running){
-								wait();
+								this.wait();
 
 								while(!eventsToSend.isEmpty()){
 									out.writeObject(eventsToSend.remove(0));

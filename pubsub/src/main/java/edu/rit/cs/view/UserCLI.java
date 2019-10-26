@@ -377,12 +377,14 @@ public class UserCLI {
         List<String> keywords = thread.getKeywords();
 
         Topic chk_top = null;
-
-        String topic_str = publish.nextLine();
         Topic topic = null;
         while (topic == null) {
+            System.out.println("Enter Topic");
+            String topic_str = publish.nextLine();
+
             for (Topic top : topicList) {
                 if (top.getName().equals(topic_str)) {
+                    System.out.println("Valid topic");
                     topic = top;
                     break;
                 }

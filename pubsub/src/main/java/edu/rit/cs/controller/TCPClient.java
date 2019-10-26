@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -55,9 +56,6 @@ public class TCPClient extends Thread{
                 in = new ObjectInputStream(s.getInputStream());
 
                 this.autoLogin(user, password);
-                this.sendBool(true);
-                this.setTopicList((List<Topic>)this.readObject());
-                this.setKeywords((List<String>) this.readObject());
 
             } catch (UnknownHostException e) {
                 System.out.println("Sock:" + e.getMessage());
@@ -93,10 +91,19 @@ public class TCPClient extends Thread{
 
         public void autoLogin(User user, String password){
             try {
-                out.writeBoolean(false);
+                out.writeObject("false");
                 out.writeObject(user.getId());
+                in.readObject();
+
                 out.writeObject(password);
+                in.readObject();
+
+                this.sendObject("true");
+                this.setTopicList((ArrayList<Topic>)this.readObject());
+                this.setKeywords((ArrayList<String>) this.readObject());
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e){
                 e.printStackTrace();
             }
         }
