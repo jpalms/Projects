@@ -13,9 +13,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!-- pubsub -->
-    <groupId>edu.rit.cs.pubsub</groupId>
+    <groupId>edu.rit.cs</groupId>
     <artifactId>pubsub</artifactId>
-    <version>1.0</version>
+    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
 </project>
