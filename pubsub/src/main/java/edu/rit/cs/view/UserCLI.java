@@ -196,8 +196,8 @@ public class UserCLI {
             }
 
             thread.sendObject(topic);
-            thread.sendBool(true);
-            thread.sendBool(false);
+            thread.sendObject("true");
+            thread.sendObject("false");
         } else if (sub_imp.equals("k")){
             System.out.println("Please enter a keyword that you would like to search by: ");
             String keyword = subscribe.nextLine();
@@ -215,8 +215,8 @@ public class UserCLI {
                 }
             }
             thread.sendObject(keyword);
-            thread.sendBool(false);
-            thread.sendBool(false);
+            thread.sendObject("false");
+            thread.sendObject("false");
             currUser.subscribe(keyword);
         } else {
             System.out.println("Input does not match available options.\n" +
@@ -265,12 +265,13 @@ public class UserCLI {
             List<String> keywords = thread.getKeywords();
 
             thread.sendObject(new Topic(new ArrayList<>(), ""));
-            thread.sendBool(false);
-            thread.sendBool(true);
+            thread.sendObject("false");
+            thread.sendObject("true");
             currUser.unsubscribe();
         } else if (unsub_imp.equals("o")){
             System.out.println("What topic would you like to unsubscribe from?\n");
             System.out.println("Available topics: ");
+
 
             TCPClient thread = new TCPClient(server, currUser, password);
 
@@ -278,8 +279,11 @@ public class UserCLI {
 
             List<Topic> topicList = thread.getTopicList();
             List<String> keywords = thread.getKeywords();
-
-            // print topicList
+            
+            System.out.println("\n");
+            for (Topic topic : topicList) {
+                System.out.println(topic.getName() + "\n");
+            }
             String topic_str = unsubscribe.nextLine();
             Topic topic = null;
             while (topic == null) {
@@ -296,8 +300,8 @@ public class UserCLI {
             }
 
             thread.sendObject(topic);
-            thread.sendBool(false);
-            thread.sendBool(false);
+            thread.sendObject("false");
+            thread.sendObject("false");
             //currUser.unsubscribe(topic);
         } else {
             System.out.println("Input does not match available options.\n" +
