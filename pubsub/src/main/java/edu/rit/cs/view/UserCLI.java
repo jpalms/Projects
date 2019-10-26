@@ -284,9 +284,10 @@ public class UserCLI {
             for (Topic topic : topicList) {
                 System.out.println(topic.getName() + "\n");
             }
-            String topic_str = unsubscribe.nextLine();
+
             Topic topic = null;
             while (topic == null) {
+                String topic_str = unsubscribe.nextLine();
                 for (Topic top : topicList) {
                     if (top.getName().equals(topic_str)) {
                         topic = top;
