@@ -52,6 +52,12 @@ public class EventManager{
 	public void stopService(Handler h) {
 		h.turnOff();
 	}
+// ___________________________________________________________
+
+	/**
+	 * Write Operations
+	 */
+
 
 	/**
 	 * notify all subscribers of new event
@@ -81,7 +87,15 @@ public class EventManager{
 		}
 		advertise.add(topic);
 	}
-	
+
+	private synchronized void add_removeSub(User user, boolean addOrRemove){
+		if(addOrRemove){
+			addSubscriber(user);
+		}
+		else{
+			removeSubscriber(user);
+		}
+	}
 	/**
 	 * add subscriber to the internal list
 	 *
@@ -103,7 +117,78 @@ public class EventManager{
 		    topic.removeSub(user.getId());
         }
 	}
-	
+
+	private synchronized void subUnsubTopic(User user, Object obj, boolean subOrUnsub){
+
+		if(obj instanceof Topic)
+			if(subOrUnsub)
+				subscribeToTopic(user, (Topic) obj);
+			else
+				unSubscribeFromTopic(user, (Topic) obj);
+		else if(obj instanceof String){
+			if(subOrUnsub)
+				subscribeToTopic(user, (String) obj);
+			else
+				unSubscribeFromAll(user);
+		}
+	}
+
+	/**
+	 * adds a subscriber to a Topic
+	 *
+	 * @param user - Subscriber instance of User component
+	 * @param topic - Topic component
+	 **/
+
+	private synchronized void subscribeToTopic(User user, Topic topic){
+		this.topics.get(topic.getName()).addSub(user.getId(), user);
+	}
+
+	/**
+	 * add a subscriber to Topics with a certain keyword
+	 *
+	 * @param user - Subscriber instance of User component
+	 * @param keyword - keyword associated with Topics that the subscriber subscribes to
+	 */
+	private synchronized void subscribeToTopic(User user, String keyword){
+		List<Topic> topicList = this.keyToTopics.get(keyword);
+
+		for(Topic topic: topicList){
+			this.topics.get(topic.getName()).addSub(user.getId(), user);
+		}
+	}
+
+	/**
+	 * Unsubscribe's a user from a Topic
+	 *
+	 * @param user - Subscriber instance of User component
+	 * @param topic - Topic component
+	 **/
+	private synchronized void unSubscribeFromTopic(User user, Topic topic){
+		this.topics.get(topic.getName()).removeSub(user.getId());
+	}
+
+
+	/**
+	 * Unsubscribe's a user from all topics
+	 * @param user
+	 */
+	private synchronized void unSubscribeFromAll(User user){
+		for(Topic topic:topics.values()){
+			if(topic.hasSub(user)){
+				unSubscribeFromTopic(user, topic);
+			}
+		}
+
+	}
+
+// _________________________________________________________
+
+	/**
+	 *  Read Operations
+ 	 */
+
+
 	/**
 	 * show the list of subscriber for a specified topic
 	 *
@@ -168,51 +253,12 @@ public class EventManager{
 		return this.keyToTopics.keySet();
 	}
 
-	/**
-	 * adds a subscriber to a Topic
-	 *
-	 * @param user - Subscriber instance of User component
-	 * @param topic - Topic component
-	 **/
-	private synchronized void subscribeToTopic(User user, Topic topic){
-		this.topics.get(topic.getName()).addSub(user.getId(), user);
+	private synchronized boolean userExists(String id){
+		return this.allUsers.containsKey(id);
 	}
 
-	/**
-	 * add a subscriber to Topics with a certain keyword
-	 *
-	 * @param user - Subscriber instance of User component
-	 * @param keyword - keyword associated with Topics that the subscriber subscribes to
-	 */
-	private synchronized void subscribeToTopic(User user, String keyword){
-		List<Topic> topicList = this.keyToTopics.get(keyword);
-
-		for(Topic topic: topicList){
-			this.topics.get(topic.getName()).addSub(user.getId(), user);
-		}
-	}
-
-	/**
-	 * Unsubscribe's a user from a Topic
-	 *
-	 * @param user - Subscriber instance of User component
-	 * @param topic - Topic component
-	 **/
-	private synchronized void unSubscribeFromTopic(User user, Topic topic){
-		this.topics.get(topic.getName()).removeSub(user.getId());
-	}
-
-	/**
-	 * Unsubscribe's a user from all topics
-	 * @param user
-	 */
-	private synchronized void unSubscribeFromAll(User user){
-		for(Topic topic:topics.values()){
-			if(topic.hasSub(user)){
-				unSubscribeFromTopic(user, topic);
-			}
-		}
-
+	private synchronized User getUser(String id){
+		return allUsers.get(id);
 	}
 	/**
 	 * Main function which is run and starts the program
@@ -417,7 +463,7 @@ public class EventManager{
 						newLogin();
 					}
 					if(login()) {
-						User user = allUsers.get(username);
+						User user = getUser(username);
 						out.writeObject(user);
 						boolean sending = in.readBoolean();
 						if (sending) {
@@ -433,7 +479,7 @@ public class EventManager{
 						}
 						else{
 							if(user.isSub())
-								onlineUsers.put(user.getId(), this);
+								add_removeSub(user, true);
 							else
 								onlinePublishers.put(user.getId(), this);
 							running = true;
@@ -481,15 +527,15 @@ public class EventManager{
 				do {
 					obj = in.readObject();
 					id = (String) obj;
-					out.writeBoolean(allUsers.containsKey(id));
-				}while(allUsers.containsKey(id));
+					out.writeBoolean(userExists(id));
+				}while(userExists(id));
 
 				obj = in.readObject();
 				User user = (User)obj;
 
 				allUsers.put(user.getId(), user);
 				if(user.isSub())
-					subscribers.put(user.getId(), user);
+					add_removeSub(user, true);
 			}
 
 			/**
@@ -505,15 +551,14 @@ public class EventManager{
 				do{
 					obj = in.readObject();
 					id = (String) obj;
-					out.writeBoolean(allUsers.containsKey(id));
-				} while(!allUsers.containsKey(id));
+					out.writeBoolean(userExists(id));
+				} while(!userExists(id));
 
 				obj = in.readObject();
 				password = (String) obj;
 				setUsername(id);
-				// ask partner if this should loop till password is correct
 
-				return allUsers.containsKey(id) && 	allUsers.get(id).isCorrectPassord(password);
+				return userExists(id) && 	allUsers.get(id).isCorrectPassord(password);
 			}
 
 			/**
@@ -579,19 +624,20 @@ public class EventManager{
 						if(listOrUnsubAll){
 							out.writeObject(getSubscribedTopics(user));
 						}else {
-							subscribeToTopic(user, t);
+							subUnsubTopic(user, t, true);
 						}
 					}else {
 						if(listOrUnsubAll){
+							subUnsubTopic(user, "", false);
 							unSubscribeFromAll(user);
 						}
 						else {
-							unSubscribeFromTopic(user, t);
+							subUnsubTopic(user, t, false);
 						}
 					}
 				} else if(obj instanceof String){
 					String key = (String) obj;
-					subscribeToTopic(user, key);
+					subUnsubTopic(user, key, true);
 				}
 			}
 
