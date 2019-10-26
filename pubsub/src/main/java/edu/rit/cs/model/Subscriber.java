@@ -1,4 +1,6 @@
-package edu.rit.cs;
+package edu.rit.cs.model;
+
+import edu.rit.cs.model.Topic;
 
 public interface Subscriber {
 	/*

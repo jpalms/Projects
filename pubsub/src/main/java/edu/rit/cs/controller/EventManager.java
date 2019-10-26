@@ -1,5 +1,10 @@
-package edu.rit.cs;
+package edu.rit.cs.controller;
 
+
+import edu.rit.cs.model.Event;
+import edu.rit.cs.model.Topic;
+import edu.rit.cs.model.User;
+import edu.rit.cs.view.EventCLI;
 
 import java.io.EOFException;
 import java.io.IOException;

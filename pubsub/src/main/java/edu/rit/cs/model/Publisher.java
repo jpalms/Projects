@@ -1,4 +1,7 @@
-package edu.rit.cs;
+package edu.rit.cs.model;
+
+import edu.rit.cs.model.Event;
+import edu.rit.cs.model.Topic;
 
 public interface Publisher {
 	/*

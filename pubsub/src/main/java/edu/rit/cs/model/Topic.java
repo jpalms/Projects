@@ -1,4 +1,4 @@
-package edu.rit.cs;
+package edu.rit.cs.model;
 
 import java.io.Serializable;
 import java.util.List;
