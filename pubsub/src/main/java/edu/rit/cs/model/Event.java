@@ -67,4 +67,12 @@ public class Event {
 	public void setContent(String content) {
         this.content = content;
     }
+
+	@Override
+	public String toString() {
+		return "Event: " + this.getTitle() +
+				"\n\tid: " + this.getId() +
+				"\ttopic: " + this.getTopic() +
+				"\n\tcontent: " + this.getContent();
+		}
 }
