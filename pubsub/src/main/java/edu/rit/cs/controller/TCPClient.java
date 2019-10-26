@@ -149,9 +149,13 @@ public class TCPClient extends Thread{
                 try {
                     Object obj = in.readObject();
                     if(obj instanceof Event){
-                        // @TODO display event
+                        // @TODO display event - when user is not inputting anything
+                        obj.toString();
+
                     }else if(obj instanceof Topic){
-                        // @TODO display topic
+                        // @TODO display topic - when user is not inputting anything
+                        obj.toString();
+
                     }
                 } catch (IOException e){
                     System.err.println("IO: " + e.getMessage());

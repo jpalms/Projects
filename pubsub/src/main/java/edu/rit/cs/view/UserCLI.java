@@ -23,6 +23,7 @@ public class UserCLI {
 
     private static String password;
     private static ArrayList<TCPClient> connections;
+    private static Stack<Object> updates;
 
     private static void turnOff(){
         for (TCPClient tcp: connections) {
@@ -234,6 +235,22 @@ public class UserCLI {
 
     }
 
+    public static void infoUpdate(User currUser, String server, String password){
+
+        TCPClient receiverThread = connections.get(0);
+        receiverThread.
+
+        System.out.println("Updates:\n");
+        if (updates.empty()){
+            System.out.println("No new updates.\n");
+        } else {
+            for (Object obj : updates) {
+                System.out.println(obj.toString() + "\n");
+                System.out.println("-----------------------------\n");
+            }
+        }
+    }
+
     /**
      * Function to unsubscribe from a topic.
      * Takes in the User object associated with the node.
@@ -314,6 +331,7 @@ public class UserCLI {
                     "Subscribe (\"s\") \t" +
                     "Unsubscribe (\"u\") \t" +
                     "List Subscribed Topics (\"l\") \t" +
+                    "Show New Information (\"i\")) \t" +
                     "Quit (\"q\")\n"
             );
             String command = sub_input.nextLine();
@@ -336,6 +354,9 @@ public class UserCLI {
                     thread.sendBool(true);
                     thread.sendBool(true);
                     currUser.listSubscribedTopics();
+                    break;
+                case "i":
+                    infoUpdate(currUser, server, password);
                     break;
                 case "q":
                     exit_flag = false;
@@ -443,6 +464,7 @@ public class UserCLI {
             System.out.println("Commands available to subscribers: \n" +
                     "Publish (\"p\") \t" +
                     "Advertise (\"a\") \t" +
+                    "Show New Information (\"i\")) \t" +
                     "Quit (\"q\")\n"
             );
             String command = pub_input.nextLine();
@@ -452,6 +474,9 @@ public class UserCLI {
                     break;
                 case "a":
                     pubAdv(currUser, server, password);
+                    break;
+                case "i":
+                    infoUpdate(currUser, server, password);
                     break;
                 case "q":
                     exit_flag = false;
