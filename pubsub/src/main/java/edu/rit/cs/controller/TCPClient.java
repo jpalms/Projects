@@ -22,7 +22,7 @@ public class TCPClient extends Thread{
         private Socket s;
         private List<Topic> topicList;
         private List<String> keywords;
-        private Stack<Object> updates;
+        private Stack<Object> updates = new Stack<>();
 
     public TCPClient(String addr) {
             String server_address = addr;
