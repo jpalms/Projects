@@ -146,7 +146,7 @@ public class UserCLI {
                     pass = user_input.nextLine();
                     firstThread.sendObject(pass);
                     int pass_tries = 0;
-                    if (firstThread.readObject().equals("true")) {
+                    if (pass == password) {
                         User user_node = (User)firstThread.readObject();
                         firstThread.sendObject(false);
                         password = pass;

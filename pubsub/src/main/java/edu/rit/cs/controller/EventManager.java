@@ -556,14 +556,14 @@ public class EventManager{
 				do{
 					obj = in.readObject();
 					id = (String) obj;
-					out.writeObject(userExists(id));
+					out.writeObject(userExists(id) + "");
 				} while(!userExists(id));
 
 				obj = in.readObject();
 				password = (String) obj;
 				setUsername(id);
 
-				return userExists(id) && 	allUsers.get(id).isCorrectPassord(password);
+				return userExists(id) && 	getUser(id).isCorrectPassord(password);
 			}
 
 			/**
