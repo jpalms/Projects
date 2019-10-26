@@ -637,6 +637,7 @@ public class EventManager{
 					Topic t = (Topic) obj;
 					if (subOrUnsubAction) {
 						if(listOrUnsubAll){
+							System.out.println("send to Sub");
 							out.writeObject(getSubscribedTopics(user));
 						}else {
 							subUnsubTopic(user, t, true);

@@ -342,12 +342,14 @@ public class UserCLI {
                     List<String> keywords = thread.getKeywords();
 
                     thread.sendObject(new Topic(new ArrayList<>(), ""));
-                    thread.sendBool(true);
-                    thread.sendBool(true);
+                    thread.sendObject("true");
+                    thread.sendObject("true");
                     //currUser.listSubscribedTopics();
 
+                    ArrayList<Topic> subList = (ArrayList<Topic>)thread.readObject();
+
                     System.out.println("Currently Subscribed: \n");
-                    for (Topic topic : topicList){
+                    for (Topic topic : subList){
                         if (topic.hasSub(currUser)) {
                             System.out.println(topic.toString() + "\n" +
                                     "-----------------------------\n");
