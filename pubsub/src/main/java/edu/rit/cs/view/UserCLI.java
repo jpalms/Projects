@@ -49,11 +49,11 @@ public class UserCLI {
             if (checkOpt.equals("create")) {
                 User temp = usrCreate(firstThread);
                 usrSignin(firstThread);
-                firstThread.reciever();
+                firstThread.receiver();
                 return temp;
             } else if (checkOpt.equals("signin")) {
                 firstThread.sendBool(false);
-                firstThread.reciever();
+                firstThread.receiver();
                 return usrSignin(firstThread);
             } else {
                 System.out.println("Does not match either of the commands.\n");

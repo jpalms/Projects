@@ -143,7 +143,7 @@ public class TCPClient extends Thread{
             return false;
         }
 
-        public void reciever(){
+        public void receiver(){
             running = true;
             while (running){
                 try {
