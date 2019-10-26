@@ -179,9 +179,10 @@ public class UserCLI {
 
         if (sub_imp.equals("t")) {
             System.out.println("What topic would you like to subscribe to?\n");
-            String topic_str = subscribe.nextLine();
             Topic topic = null;
             while (topic == null) {
+                String topic_str = subscribe.nextLine();
+
                 for (Topic top : topicList) {
                     if (top.getName().equals(topic_str)) {
                         topic = top;
