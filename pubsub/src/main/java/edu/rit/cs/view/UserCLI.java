@@ -31,6 +31,7 @@ public class UserCLI {
             connections.remove(tcp);
         }
     }
+
     private static User CLIBegin(String server) {
         Scanner initial = new Scanner(System.in);
 
@@ -342,7 +343,14 @@ public class UserCLI {
                     thread.sendObject(new Topic(new ArrayList<>(), ""));
                     thread.sendBool(true);
                     thread.sendBool(true);
-                    currUser.listSubscribedTopics();
+                    //currUser.listSubscribedTopics();
+
+                    System.out.println("Currently Subscribed: \n");
+                    for (Topic topic : topicList){
+                        System.out.println(topic.toString() + "\n" +
+                                            "-----------------------------\n");
+                    }
+
                     break;
                 case "i":
                     infoUpdate();
@@ -379,7 +387,7 @@ public class UserCLI {
         Topic chk_top = null;
         Topic topic = null;
         while (topic == null) {
-            System.out.println("Enter Topic");
+            System.out.println("Enter Topic: ");
             String topic_str = publish.nextLine();
 
             for (Topic top : topicList) {
@@ -452,10 +460,10 @@ public class UserCLI {
         Scanner pub_input = new Scanner(System.in);
         boolean exit_flag = true;
         do{
-            System.out.println("Commands available to subscribers: \n" +
+            System.out.println("Commands available to publishers: \n" +
                     "Publish (\"p\") \t" +
                     "Advertise (\"a\") \t" +
-                    "Show New Information (\"i\")) \t" +
+                    "Show New Information (\"i\") \t" +
                     "Quit (\"q\")\n"
             );
             String command = pub_input.nextLine();
