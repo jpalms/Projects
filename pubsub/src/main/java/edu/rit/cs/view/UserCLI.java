@@ -347,8 +347,10 @@ public class UserCLI {
 
                     System.out.println("Currently Subscribed: \n");
                     for (Topic topic : topicList){
-                        System.out.println(topic.toString() + "\n" +
-                                            "-----------------------------\n");
+                        if (topic.hasSub(currUser)) {
+                            System.out.println(topic.toString() + "\n" +
+                                    "-----------------------------\n");
+                        }
                     }
 
                     break;
