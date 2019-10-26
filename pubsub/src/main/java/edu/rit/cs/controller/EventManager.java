@@ -467,7 +467,7 @@ public class EventManager{
 					if(login()) {
 						User user = getUser(username);
 						out.writeObject(user);
-						boolean sending = in.readBoolean();
+						boolean sending = in.readObject().equals("true");
 						if (sending) {
 
 							out.writeObject(getTopicList());
@@ -531,7 +531,7 @@ public class EventManager{
 					obj = in.readObject();
 					id = (String) obj;
 					System.out.println("write bool");
-					out.writeBoolean(userExists(id));
+					out.writeObject(userExists(id));
 				}while(userExists(id));
 
 				System.out.println("new user");
@@ -556,7 +556,7 @@ public class EventManager{
 				do{
 					obj = in.readObject();
 					id = (String) obj;
-					out.writeBoolean(userExists(id));
+					out.writeObject(userExists(id));
 				} while(!userExists(id));
 
 				obj = in.readObject();
@@ -621,8 +621,8 @@ public class EventManager{
 			public void receivedFromSub(User user) throws IOException, ClassNotFoundException{
 				Object obj;
 				obj = in.readObject();
-				boolean subOrUnsubAction = in.readBoolean();
-				boolean listOrUnsubAll = in.readBoolean();
+				boolean subOrUnsubAction = in.readObject().equals("true");
+				boolean listOrUnsubAll = in.readObject().equals("true");
 				if(obj instanceof Topic) {
 					Topic t = (Topic) obj;
 					if (subOrUnsubAction) {

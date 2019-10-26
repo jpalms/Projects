@@ -89,8 +89,7 @@ public class UserCLI {
             user = create.nextLine();
             firstThread.sendObject(user);
             System.out.println("recieving bool");
-            boolean bool = firstThread.readBool();
-            if (bool){
+            if (firstThread.readObject().equals(true)){
                 System.out.println("Username is taken already.\n");
             } else {
                 System.out.println("Username is valid");
