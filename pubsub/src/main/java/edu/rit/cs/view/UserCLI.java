@@ -5,7 +5,9 @@ import edu.rit.cs.model.Event;
 import edu.rit.cs.model.Topic;
 import edu.rit.cs.model.User;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * Class to run on publisher / subscriber nodes.
@@ -26,10 +28,12 @@ public class UserCLI {
 
 
     private static void turnOff(){
-        for (TCPClient tcp: connections) {
-            tcp.turnOff();
-            connections.remove(tcp);
+        while (connections.size() > 1) {
+            connections.get(1).turnOff();
+            connections.remove(1);
         }
+        connections.get(0).turnOffFirst();
+        System.exit(1);
     }
 
     private static User CLIBegin(String server) {
@@ -373,6 +377,7 @@ public class UserCLI {
                     infoUpdate();
                     break;
                 case "q":
+                    turnOff();
                     exit_flag = false;
                     break;
                 default:
@@ -501,6 +506,7 @@ public class UserCLI {
                     infoUpdate();
                     break;
                 case "q":
+                    turnOff();
                     exit_flag = false;
                     break;
                 default:

@@ -169,7 +169,15 @@ public class TCPClient extends Thread{
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
 
+        public void turnOffFirst(){
+            running = false;
+            try {
+                s.close();
+            } catch (IOException e) {
+                //e.printStackTrace();
+            }
         }
 
         public Stack<Object> getUpdates() {
