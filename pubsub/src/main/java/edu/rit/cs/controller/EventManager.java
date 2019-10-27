@@ -507,7 +507,7 @@ public class EventManager{
 								while (!newTopics.isEmpty()) {
 									out.writeObject(newTopics.remove(0));
 								}
-
+								out.writeObject(new Topic(new ArrayList<>(), "Test"));
 								// wait till notified, then send Events
 							}
 						}
