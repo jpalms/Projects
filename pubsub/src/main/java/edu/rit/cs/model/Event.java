@@ -1,9 +1,11 @@
 package edu.rit.cs.model;
 
+import java.io.Serializable;
+
 /**
  * Class of Events that Publisher's publish and Subscriber's read
  */
-public class Event {
+public class Event implements Serializable {
 	private int id;
 	private Topic topic;
 	private String title;
