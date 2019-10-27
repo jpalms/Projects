@@ -137,19 +137,23 @@ public class TCPClient extends Thread{
             return false;
         }
 
+        public void run(){
+            this.receiver();
+        }
         public void receiver(){
             running = true;
             while (running){
                 try {
-                    Object obj = in.readObject();
+                    if(s.isConnected()) {
+                        Object obj = in.readObject();
 
-                    if(obj instanceof Event){
-                        updates.add((Event) (obj));
+                        if (obj instanceof Event) {
+                            updates.add((Event) (obj));
 
-                    }else if(obj instanceof Topic){
-                        updates.add((Topic)(obj));
+                        } else if (obj instanceof Topic) {
+                            updates.add((Topic) (obj));
+                        }
                     }
-
                 } catch (IOException e){
                     System.err.println("IO: " + e.getMessage());
                 } catch (ClassNotFoundException e){

@@ -150,6 +150,7 @@ public class UserCLI {
                 firstThread.sendObject(false);
                 password = pass;
                 connections.add(firstThread);
+                firstThread.start();
                 return user_node;
             } else {
                 System.out.println("Username does not exist. Please try again. \n ");

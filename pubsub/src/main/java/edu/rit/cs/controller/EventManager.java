@@ -369,7 +369,7 @@ public class EventManager{
 						for(String id: onlinePublishers.keySet()){
 							try {
 								onlinePublishers.get(id).queueTopics(advertise);
-								onlinePublishers.get(id).notify();
+									//onlinePublishers.get(id).notify();
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
@@ -377,7 +377,8 @@ public class EventManager{
 						for(String id: onlineUsers.keySet()){
 							try {
 								onlineUsers.get(id).queueTopics(advertise);
-								onlineUsers.get(id).notify();
+									//onlineUsers.get(id).notify();
+
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
@@ -390,7 +391,7 @@ public class EventManager{
 							if(onlineUsers.containsKey(id)){
 								try {
 									onlineUsers.get(id).queueEvents(unNotified.get(id));
-									onlineUsers.get(id).notify();
+										//onlineUsers.get(id).notify();
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
@@ -406,7 +407,7 @@ public class EventManager{
 										ArrayList<Event> events = new ArrayList<>();
 										events.add(e);
 										onlineUsers.get(user.getId()).queueEvents(events);
-										onlineUsers.get(user.getId()).notify();
+											//onlineUsers.get(user.getId()).notify();
 									} catch (IOException e1) {
 										e1.printStackTrace();
 									}
@@ -442,8 +443,8 @@ public class EventManager{
 			Socket clientSocket;
 			boolean running = false;
 			String username = "";
-			ArrayList<Event> eventsToSend;
-			List<Topic> newTopics;
+			ArrayList<Event> eventsToSend = new ArrayList<>();
+			List<Topic> newTopics = new ArrayList<>();
 
 			/**
 			 * Constructor class for Worker
@@ -468,7 +469,7 @@ public class EventManager{
 			 * Handles communication with client
 			 **/
 			@Override
-			public synchronized void run() {
+			public void run() {
 				try {
 					boolean newUser = in.readObject().equals("true");
 					if(newUser){
@@ -488,24 +489,23 @@ public class EventManager{
 							} else if (user.isSub()) {
 								receivedFromSub(user);
 							}
-						}
-						else{
-							if(user.isSub())
-								add_removeSub(user, true);
+						} else {
+							if (user.isSub())
+								onlineUsers.put(user.getId(), this);//add_removeSub(user, true);
 							else
 								onlinePublishers.put(user.getId(), this);
 							running = true;
-							while(running){
-								this.wait();
+							while (running) {
 
-								while(!eventsToSend.isEmpty()){
+								while (!eventsToSend.isEmpty()) {
 									out.writeObject(eventsToSend.remove(0));
 								}
 								while (!newTopics.isEmpty()) {
 									out.writeObject(newTopics.remove(0));
 								}
+
+								// wait till notified, then send Events
 							}
-							// wait till notified, then send Events
 						}
 					}
 				} catch (EOFException e) {
@@ -514,11 +514,9 @@ public class EventManager{
 					System.err.println("IO:" + e.getMessage());
 				} catch (ClassNotFoundException e){
 					System.err.println("CLASS:" + e.getMessage());
-				} catch (NullPointerException e){
+				} catch (NullPointerException e) {
 					System.err.println("NULL: " + e.getMessage());
-				} catch (InterruptedException e){
-					System.err.println("INTERRUPT: " + e.getMessage());
-				} finally {
+				} finally{
 					try {
 						workers.remove(this);
 						clientSocket.close();
@@ -668,6 +666,10 @@ public class EventManager{
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+			}
+
+			public void notifySoc(){
+				this.notify();
 			}
 		}
 	}
