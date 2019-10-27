@@ -468,7 +468,7 @@ public class EventManager{
 			 * Handles communication with client
 			 **/
 			@Override
-			public void run() {
+			public synchronized void run() {
 				try {
 					boolean newUser = in.readObject().equals("true");
 					if(newUser){
