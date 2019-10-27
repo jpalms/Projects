@@ -22,7 +22,7 @@ public class TCPClient extends Thread{
         private Socket s;
         private List<Topic> topicList;
         private List<String> keywords;
-        private Stack<Object> updates = new Stack<>();
+        private ArrayList<Object> updates = new ArrayList<>();
 
     public TCPClient(String addr) {
             String server_address = addr;
@@ -180,12 +180,12 @@ public class TCPClient extends Thread{
             }
         }
 
-        public Stack<Object> getUpdates() {
+        public ArrayList<Object> getUpdates() {
             return updates;
         }
 
         public void emptyUpdates() {
-            updates.clear();
+            updates = new ArrayList<>();
         }
     }
 

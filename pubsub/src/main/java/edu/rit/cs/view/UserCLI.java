@@ -232,15 +232,18 @@ public class UserCLI {
 
     public static void infoUpdate() {
 
-        TCPClient receiverThread = connections.get(0);
-        Stack<Object> updates = receiverThread.getUpdates();
-        receiverThread.emptyUpdates();
+        ArrayList<Object> updates = connections.get(0).getUpdates();
+        connections.get(0).emptyUpdates();
 
         System.out.println("Updates:\n");
-        if (updates.empty()) {
+        if (updates.isEmpty()) {
             System.out.println("No new updates.\n");
         } else {
             for (Object obj : updates) {
+                if(obj instanceof Topic)
+                    obj = (Topic) obj;
+                else
+                    obj = (Event) obj;
                 System.out.println(obj.toString() + "\n");
                 System.out.println("-----------------------------\n");
             }
