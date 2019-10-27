@@ -365,6 +365,7 @@ public class EventManager{
 			 **/
 			public void run(){
 				while(running){
+					System.out.println("loop");
 					if(!advertise.isEmpty()){
 						for(String id: onlinePublishers.keySet()){
 							try {
@@ -374,15 +375,16 @@ public class EventManager{
 								e.printStackTrace();
 							}
 						}
-						for(String id: onlineUsers.keySet()){
+						for(String id: onlineUsers.keySet()) {
 							try {
 								onlineUsers.get(id).queueTopics(advertise);
-									//onlineUsers.get(id).notify();
+								//onlineUsers.get(id).notify();
 
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
 						}
+						advertise = new ArrayList<>();
 					}
 					// Updates a Subscriber with missed affects
 					// Takes care of asynchronous event update
@@ -391,6 +393,7 @@ public class EventManager{
 							if(onlineUsers.containsKey(id)){
 								try {
 									onlineUsers.get(id).queueEvents(unNotified.get(id));
+									unNotified.remove(unNotified.get(id));
 										//onlineUsers.get(id).notify();
 								} catch (IOException e) {
 									e.printStackTrace();
@@ -424,6 +427,7 @@ public class EventManager{
 								}
 							}
 						}
+						newEvents = new ArrayList<>();
 					}
 				}
 			}
