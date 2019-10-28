@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -149,6 +150,7 @@ public class TCPClient extends Thread{
                 try {
                     if(s.isConnected()) {
                         Object obj = in.readObject();
+                        System.out.println(obj + "\n");
 
                         if (obj instanceof Event) {
                             updates.add((Event) (obj));
