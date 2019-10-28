@@ -642,7 +642,6 @@ public class EventManager {
 					Topic t = (Topic) obj;
 					if (subOrUnsubAction) {
 						if (listOrUnsubAll) {
-							System.out.println("send to Sub");
 							out.writeObject(getSubscribedTopics(user));
 						} else {
 							subUnsubTopic(user, t, true);
@@ -719,7 +718,6 @@ public class EventManager {
 			while (running) {
                 System.out.print("");
                 int size = handler.getSocketsSize();
-                boolean change = false;
 				if (handler.getSocketsSize() > 0 && handler.getWorkersSize() > 0) {
 					ArrayList<Handler.Worker> workers = handler.getWorkers();
 					ArrayList<Object> infoToSend = new ArrayList<>();
@@ -729,11 +727,9 @@ public class EventManager {
 					for (Handler.Worker worker : workers) {
 						if (worker.newInfo() instanceof Event || worker.newInfo() instanceof Topic) {
 							infoToSend.add(worker.newInfo());
-							System.out.println(infoToSend.get(0));
 						}
 					}
 					if(true/*!infoToSend.isEmpty() || change*/){
-                        System.out.println("info");
                         ArrayList<Object> topicArrayList = new ArrayList<>();
                         for(Object obj: infoToSend){
                             if(obj instanceof Topic){
@@ -747,14 +743,12 @@ public class EventManager {
                                     ArrayList<Object> temp = new ArrayList<>();
                                     for(Object obj:infoToSend){
                                         if(obj instanceof Event) {
-											System.out.println(((Event) obj).getTopic().toString() );
 											if (((Event) obj).getTopic().hasSub(allUsers.get(id))) {
 												temp.add(obj);
 											}
 										}
                                     }
 									try {
-                                        System.out.println("Send to Sub: ");
                                         sockets.get(id).queueEvents(temp);
                                         sockets.get(id).queueTopics(topicArrayList);
 
@@ -766,13 +760,11 @@ public class EventManager {
 										sockets.get(id).turnOff();
 										sockets.remove(id);
 										//unNotified
-										System.out.println("UnNotified Sub");
 										unNotified(id, temp, topicArrayList);
 									}
 								}
 								else if(allUsers.get(id).isPub()){
 									try {
-                                        System.out.println("Send to Pub");
                                         sockets.get(id).queueTopics(infoToSend);
 
                                         if(unNotified.containsKey(id)){
@@ -783,7 +775,6 @@ public class EventManager {
 									} catch (IOException e) {
 										sockets.get(id).turnOff();
 										sockets.remove(id);
-                                        System.out.println("UnNotified Pub");
 										//unNotified
 										unNotified(id, infoToSend, topicArrayList);
 									}
@@ -792,16 +783,11 @@ public class EventManager {
 							// offline
 							else {
 								//unNotified
-                                System.out.println("Offline User");
 								unNotified(id, infoToSend, topicArrayList);
 							}
 						}
 					}
 				}
-				if(size != handler.getSocketsSize())
-					change = true;
-				else
-					change = false;
 			}
 		}
 
@@ -817,6 +803,8 @@ public class EventManager {
 					if(allUsers.get(id).isSub()) {
 						for (Object obj : infoToSend)
 							unNotified.get(id).add(obj);
+						for (Object topic: topicArrayList)
+							unNotified.get(id).add(topic);
 					}
 					else{
 						for (Object topic: topicArrayList)
