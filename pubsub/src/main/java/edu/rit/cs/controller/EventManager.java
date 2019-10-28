@@ -22,7 +22,7 @@ public class EventManager {
 	private HashMap<String, User> subscribers;
 	private HashMap<String, User> allUsers;
 	private HashMap<String, Topic> topics;
-	private HashMap<String, ArrayList<Event>> unNotified;
+	private HashMap<String, ArrayList<Object>> unNotified;
 	private HashMap<String, List<Topic>> keyToTopics;
 	private List<Event> newEvents;
 	private List<Topic> advertise;
@@ -380,7 +380,7 @@ public class EventManager {
 			boolean running = false;
 			String username = "";
 			ArrayList<Event> eventsToSend = new ArrayList<>();
-			List<Topic> newTopics = new ArrayList<>();
+			List<Object> newTopics = new ArrayList<>();
 			private Object info = new Object();
 
 			/**
@@ -527,13 +527,13 @@ public class EventManager {
 			 * @param topics - list of Topics to advertise
 			 * @throws IOException
 			 **/
-			public synchronized void queueTopics(ArrayList<Topic> topics) throws IOException {
+			public synchronized void queueTopics(ArrayList<Object> topics) throws IOException {
 				newTopics = topics;
 			}
 
 			public synchronized void queueBoth(ArrayList<Object> objects) throws IOException {
 				ArrayList<Event> events = new ArrayList<>();
-				ArrayList<Topic> topicArrayList = new ArrayList<>();
+				ArrayList<Object> topicArrayList = new ArrayList<>();
 				for (Object obj : objects) {
 					if (obj instanceof Event) {
 						Event e = (Event) obj;
@@ -653,11 +653,13 @@ public class EventManager {
 		 **/
 		public void run() {
 			while (running) {
+				/*
 				System.out.println("Online Pub: " + onlinePublishers.size());
 				System.out.println("Online Sub: " + onlineUsers.size());
 				System.out.println("All Users: " + allUsers.size());
 				System.out.println("Workers: " + handler.getWorkersSize());
 				System.out.println("Soc: " + handler.getSocketsSize());
+				*/
 				if (handler.getSocketsSize() > 0) {
 					ArrayList<Handler.Worker> workers = handler.getWorkers();
 					ArrayList<Object> infoToSend = new ArrayList<>();
@@ -669,119 +671,67 @@ public class EventManager {
 						}
 					}
 					if(infoToSend.size() > 0){
-						for(Object obj: infoToSend){
-							if(obj instanceof Topic){
-								for(String id: allUsers.keySet()){
-									if(sockets.containsKey(id)){
-										try {
-											sockets.get(id).queueBoth(infoToSend);
-											sockets.get(id).sendObj();
-										} catch (IOException e) {
-											sockets.get(id).turnOff();
-											sockets.remove(id);
-											//e.printStackTrace();
-										}
-									}
-									else{
-										// unNotified
-									}
+						for(String id: allUsers.keySet()){
+							ArrayList<Object> topicArrayList = new ArrayList<>();
+							for(Object obj: infoToSend){
+								if(obj instanceof Topic){
+									topicArrayList.add(obj);
 								}
 							}
-							else if (obj instanceof Event){
-
-							}
-						}
-						break;
-					}
-					/*for (Handler.Worker worker : workers) {
-						if (worker.running) {
-							try {
-								worker.queueBoth(infoToSend);
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
-					}*/
-				}
-				/*
-				for(String id: onlineUsers.keySet()){
-					if(onlineUsers.get(id).clientSocket.isClosed())
-						onlineUsers.remove(onlineUsers.get(id));
-				}
-
-				for(String id: onlinePublishers.keySet()){
-					if(onlinePublishers.get(id).clientSocket.isClosed())
-						onlinePublishers.remove(onlinePublishers.get(id));
-				}
-
-				if(!advertise.isEmpty()){
-					for(String id: onlinePublishers.keySet()){
-						try {
-							onlinePublishers.get(id).queueTopics(advertise);
-							//onlinePublishers.get(id).notify();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-					for(String id: onlineUsers.keySet()) {
-						try {
-							onlineUsers.get(id).queueTopics(advertise);
-							//onlineUsers.get(id).notify();
-
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-					advertise = new ArrayList<>();
-				}
-				// Updates a Subscriber with missed affects
-				// Takes care of asynchronous event update
-				if(!unNotified.isEmpty()){
-					for (String id: unNotified.keySet()) {
-						if(onlineUsers.containsKey(id)){
-							try {
-								onlineUsers.get(id).queueEvents(unNotified.get(id));
-								unNotified.remove(unNotified.get(id));
-								//onlineUsers.get(id).notify();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
-					}
-				}
-				// Updates an onlineSubscriber when a new Event is publisheded
-				if(!newEvents.isEmpty()){
-					for (Event e:newEvents) {
-						for(User user: topics.get(e.getTopic()).getSubs().values()){
-							if(onlineUsers.containsKey(user.getId())){
-								try {
-									ArrayList<Event> events = new ArrayList<>();
-									events.add(e);
-									onlineUsers.get(user.getId()).queueEvents(events);
-									//onlineUsers.get(user.getId()).notify();
-								} catch (IOException e1) {
-									e1.printStackTrace();
-								}
-							}
-							else{
-								if(unNotified.containsKey(user.getId())){
-									unNotified.get(user.getId()).add(e);
+							// online
+							if(sockets.containsKey(id)){
+								if(allUsers.get(id).isSub()){
+									try {
+										sockets.get(id).queueBoth(infoToSend);
+										sockets.get(id).sendObj();
+									} catch (IOException e) {
+										sockets.get(id).turnOff();
+										sockets.remove(id);
+										//unNotified
+										unNotified(id, infoToSend, topicArrayList);
+									}
 								}
 								else{
-									ArrayList<Event> events = new ArrayList<>();
-									events.add(e);
-									unNotified.put(user.getId(), events);
+									try {
+										sockets.get(id).queueTopics(topicArrayList);
+										sockets.get(id).sendObj();
+									} catch (IOException e) {
+										sockets.get(id).turnOff();
+										sockets.remove(id);
+										//unNotified
+										unNotified(id, infoToSend, topicArrayList);
+									}
 								}
+							}
+							else {
+								//unNotified
+								unNotified(id, infoToSend, topicArrayList);
 							}
 						}
 					}
-					newEvents = new ArrayList<>();
 				}
-				*/
-				}
-
 			}
 
+		}
+
+			public void unNotified(String id, ArrayList<Object> infoToSend, ArrayList<Object> topicArrayList){
+				if(unNotified.containsKey(id)){
+					if(allUsers.get(id).isSub()) {
+						for (Object obj : infoToSend)
+							unNotified.get(id).add(obj);
+					}
+					else{
+						for (Object topic: topicArrayList)
+							unNotified.get(id).add(topic);
+					}
+				}
+				else{
+					if(allUsers.get(id).isSub())
+						unNotified.put(id, infoToSend);
+					else
+						unNotified.put(id, topicArrayList);
+				}
+			}
 			// stops the loop
 			public void turnOff () {
 				running = false;
