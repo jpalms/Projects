@@ -331,10 +331,10 @@ public class UserCLI {
      */
     private static void subCLI(User currUser, String server, String password){
         Scanner sub_input = new Scanner(System.in);
-
+        boolean duplicate = false;
         boolean exit_flag = true;
         do{
-            boolean duplicate = false;
+
             if(!duplicate)
                 infoUpdate();
             duplicate = false;
@@ -491,8 +491,12 @@ public class UserCLI {
      */
     private static void pubCLI(User currUser, String server, String password){
         Scanner pub_input = new Scanner(System.in);
+        boolean duplicate = false;
         boolean exit_flag = true;
         do{
+            if(!duplicate)
+                infoUpdate();
+            duplicate = false;
             System.out.println("Commands available to publishers: \n" +
                     "Publish (\"p\") \t" +
                     "Advertise (\"a\") \t" +
@@ -508,9 +512,11 @@ public class UserCLI {
                     pubAdv(currUser, server, password);
                     break;
                 case "i":
+                    duplicate = true;
                     infoUpdate();
                     break;
                 case "q":
+                    infoUpdate();
                     turnOff();
                     exit_flag = false;
                     break;
