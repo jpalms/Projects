@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -150,11 +151,13 @@ public class TCPClient extends Thread{
                     if(s.isConnected()) {
                         Object obj = in.readObject();
 
-                        if (obj instanceof Event) {
-                            updates.add((Event) (obj));
 
+                        if (obj instanceof Event) {
+                            System.out.println(obj + "\n");
+                            //updates.add((Event) (obj));
                         } else if (obj instanceof Topic) {
-                            updates.add((Topic) (obj));
+                            System.out.println(obj + "\n");
+                            //updates.add((Topic) (obj));
                         }
                     }
                 } catch (IOException e){
