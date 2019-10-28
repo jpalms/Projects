@@ -22,7 +22,7 @@ public class EventManager {
 	private HashMap<String, User> subscribers;
 	private HashMap<String, User> allUsers;
 	private HashMap<String, Topic> topics;
-	private HashMap<String, ArrayList<Event>> unNotified;
+	private HashMap<String, ArrayList<Object>> unNotified;
 	private HashMap<String, List<Topic>> keyToTopics;
 	private List<Event> newEvents;
 	private List<Topic> advertise;
@@ -380,7 +380,7 @@ public class EventManager {
 			boolean running = false;
 			String username = "";
 			ArrayList<Event> eventsToSend = new ArrayList<>();
-			List<Topic> newTopics = new ArrayList<>();
+			List<Object> newTopics = new ArrayList<>();
 			private Object info = new Object();
 
 			/**
@@ -527,13 +527,13 @@ public class EventManager {
 			 * @param topics - list of Topics to advertise
 			 * @throws IOException
 			 **/
-			public synchronized void queueTopics(ArrayList<Topic> topics) throws IOException {
+			public synchronized void queueTopics(ArrayList<Object> topics) throws IOException {
 				newTopics = topics;
 			}
 
 			public synchronized void queueBoth(ArrayList<Object> objects) throws IOException {
 				ArrayList<Event> events = new ArrayList<>();
-				ArrayList<Topic> topicArrayList = new ArrayList<>();
+				ArrayList<Object> topicArrayList = new ArrayList<>();
 				for (Object obj : objects) {
 					if (obj instanceof Event) {
 						Event e = (Event) obj;
@@ -669,29 +669,57 @@ public class EventManager {
 						}
 					}
 					if(infoToSend.size() > 0){
-						for(Object obj: infoToSend){
-							if(obj instanceof Topic){
-								for(String id: allUsers.keySet()){
-									if(sockets.containsKey(id)){
-										try {
-											sockets.get(id).queueBoth(infoToSend);
-											sockets.get(id).sendObj();
-										} catch (IOException e) {
-											sockets.get(id).turnOff();
-											sockets.remove(id);
-											//e.printStackTrace();
-										}
+						for(String id: allUsers.keySet()){
+							ArrayList<Object> topicArrayList = new ArrayList<>();
+							for(Object obj: infoToSend){
+								if(obj instanceof Topic){
+									topicArrayList.add(obj);
+								}
+							}
+							// online
+							if(sockets.containsKey(id)){
+								if(allUsers.get(id).isSub()){
+									try {
+										sockets.get(id).queueBoth(infoToSend);
+										sockets.get(id).sendObj();
+									} catch (IOException e) {
+										sockets.get(id).turnOff();
+										sockets.remove(id);
+										//unNotified
 									}
-									else{
-										// unNotified
+								}
+								else{
+									try {
+										sockets.get(id).queueTopics(topicArrayList);
+										sockets.get(id).sendObj();
+									} catch (IOException e) {
+										sockets.get(id).turnOff();
+										sockets.remove(id);
+										//unNotified
 									}
 								}
 							}
-							else if (obj instanceof Event){
-
+							else{
+								//unNotified
+								if(unNotified.containsKey(id)){
+									if(allUsers.get(id).isSub()) {
+										for (Object obj : infoToSend)
+											unNotified.get(id).add(obj);
+									}
+									else{
+										for (Object topic: topicArrayList)
+											unNotified.get(id).add(topic);
+									}
+								}
+								else{
+									if(allUsers.get(id).isSub())
+										unNotified.put(id, infoToSend);
+									else
+										unNotified.put(id, topicArrayList);
+								}
 							}
 						}
-						break;
+
 					}
 					/*for (Handler.Worker worker : workers) {
 						if (worker.running) {
