@@ -171,11 +171,11 @@ public class UserCLI {
     private static void infoUpdate() {
 
         TCPClient receiverThread = connections.get(0);
-        Stack<Object> updates = receiverThread.getUpdates();
+        ArrayList<Object> updates = receiverThread.getUpdates();
         receiverThread.emptyUpdates();
 
         System.out.println("Updates:\n");
-        if (updates.empty()) {
+        if (updates.isEmpty()) {
             System.out.println("No new updates.\n");
         } else {
             for (Object obj : updates) {

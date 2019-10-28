@@ -433,7 +433,7 @@ public class EventManager {
 			Socket clientSocket;
 			boolean running = false;
 			String username = "";
-			ArrayList<Event> eventsToSend = new ArrayList<>();
+			ArrayList<Object> eventsToSend = new ArrayList<>();
 			List<Object> newTopics = new ArrayList<>();
 			private Object info = new Object();
 
@@ -571,7 +571,7 @@ public class EventManager {
 			 * @param events - list of events to send to Subscriber
 			 * @throws IOException
 			 **/
-			public synchronized void queueEvents(ArrayList<Event> events) throws IOException {
+			public synchronized void queueEvents(ArrayList<Object> events) throws IOException {
 				eventsToSend = events;
 			}
 
@@ -592,7 +592,7 @@ public class EventManager {
 			 * @throws IOException	thrown when IO functions error
 			 */
 			public synchronized void queueBoth(ArrayList<Object> objects) throws IOException {
-				ArrayList<Event> events = new ArrayList<>();
+				ArrayList<Object> events = new ArrayList<>();
 				ArrayList<Object> topicArrayList = new ArrayList<>();
 				for (Object obj : objects) {
 					if (obj instanceof Event) {
@@ -744,9 +744,16 @@ public class EventManager {
 							// online
 							if(sockets.containsKey(id)){
 								if(allUsers.get(id).isSub()){
+                                    ArrayList<Object> temp = new ArrayList<>();
+                                    for(Object obj:infoToSend){
+                                        if(obj instanceof Event && ((Event) obj).getTopic().hasSub(allUsers.get(id))){
+                                            temp.add((Event)obj);
+                                        }
+                                    }
 									try {
                                         System.out.println("Send to Sub");
-										sockets.get(id).queueBoth(infoToSend);
+                                        sockets.get(id).queueEvents(temp);
+                                        sockets.get(id).queueTopics(topicArrayList);
 
 										if(unNotified.containsKey(id)){
 										    sockets.get(id).queueBoth(unNotified.remove(id));
@@ -756,7 +763,8 @@ public class EventManager {
 										sockets.get(id).turnOff();
 										sockets.remove(id);
 										//unNotified
-										unNotified(id, infoToSend, topicArrayList);
+                                        System.out.println("UnNotified Sub");
+										unNotified(id, temp, topicArrayList);
 									}
 								}
 								else if(allUsers.get(id).isPub()){
@@ -772,6 +780,7 @@ public class EventManager {
 									} catch (IOException e) {
 										sockets.get(id).turnOff();
 										sockets.remove(id);
+                                        System.out.println("UnNotified Pub");
 										//unNotified
 										unNotified(id, infoToSend, topicArrayList);
 									}
@@ -780,6 +789,7 @@ public class EventManager {
 							// offline
 							else {
 								//unNotified
+                                System.out.println("Offline User");
 								unNotified(id, infoToSend, topicArrayList);
 							}
 						}

@@ -89,22 +89,13 @@ public class TCPClient extends Thread{
                 in.readObject();
 
                 out.writeObject(password);
-                boolean usr_flg = false;
-                User usr_hold = null;
-                Object hold = in.readObject();
-                if (hold instanceof User){
-                    usr_hold = (User) hold;
-                    usr_flg = true;
-                }
+                in.readObject();
 
                 this.sendObject("true");
 
-                if (usr_flg){
-                    return usr_hold;
-                }
-
                 this.setTopicList((ArrayList<Topic>)this.readObject());
                 this.setKeywords((ArrayList<String>) this.readObject());
+
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e){
