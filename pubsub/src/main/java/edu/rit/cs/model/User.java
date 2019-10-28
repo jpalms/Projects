@@ -1,6 +1,7 @@
 package edu.rit.cs.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * User Class, which represents a Publisher or Subscriber
