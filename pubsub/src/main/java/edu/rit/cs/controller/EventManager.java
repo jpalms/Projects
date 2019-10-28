@@ -652,9 +652,10 @@ public class EventManager {
 		 * Then tells the workers what to send
 		 **/
 		public void run() {
+			System.out.println("Server is running ...");
 			while (running) {
                 System.out.print("");
-				if (handler.getSocketsSize() > 0) {
+				if (handler.getSocketsSize() > 0 && handler.getWorkersSize() > 0) {
 					ArrayList<Handler.Worker> workers = handler.getWorkers();
 					ArrayList<Object> infoToSend = new ArrayList<>();
 					HashMap<String, Handler.Worker> sockets = handler.getSockets();
