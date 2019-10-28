@@ -88,8 +88,8 @@ public class EventCLI {
                 case "s":
                     showSubs(em);
                     break;
-                case "w":
-                    System.out.println(h.getWorkersSize());
+                //case "w":
+                //    System.out.println(h.getWorkersSize());
                 default:
                     System.out.println("Not an available command for subscribers.\n");
             }

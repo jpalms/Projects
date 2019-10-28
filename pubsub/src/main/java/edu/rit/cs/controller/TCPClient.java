@@ -82,16 +82,27 @@ public class TCPClient extends Thread{
             return keywords;
         }
 
-        public void autoLogin(User user, String password){
+        public User autoLogin(User user, String password){
             try {
                 out.writeObject("false");
                 out.writeObject(user.getId());
                 in.readObject();
 
                 out.writeObject(password);
-                in.readObject();
+                boolean usr_flg = false;
+                User usr_hold = null;
+                Object hold = in.readObject();
+                if (hold instanceof User){
+                    usr_hold = (User) hold;
+                    usr_flg = true;
+                }
 
                 this.sendObject("true");
+
+                if (usr_flg){
+                    return usr_hold;
+                }
+
                 this.setTopicList((ArrayList<Topic>)this.readObject());
                 this.setKeywords((ArrayList<String>) this.readObject());
             } catch (IOException e) {
@@ -99,6 +110,7 @@ public class TCPClient extends Thread{
             } catch (ClassNotFoundException e){
                 e.printStackTrace();
             }
+            return null;
         }
 
         public void sendObject(Object obj){

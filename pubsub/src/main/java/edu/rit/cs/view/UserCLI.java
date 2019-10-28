@@ -139,7 +139,7 @@ public class UserCLI {
      *
      * @return User Object
      */
-    public static User usrSignin(TCPClient firstThread) {
+    private static User usrSignin(TCPClient firstThread) {
         Scanner user_input = new Scanner(System.in);
         while (true){
             System.out.println("Enter username: ");
@@ -163,13 +163,36 @@ public class UserCLI {
     }
 
     /**
+     * Posts a list of Events / Topics that the user needs to be aware of.
+     * If pub, only shows new Topics.
+     * If sub, shows new Topics, and Events that they are subscribed to.
+     * Takes no parameters, does not return, prints stuff out.
+     */
+    private static void infoUpdate() {
+
+        TCPClient receiverThread = connections.get(0);
+        Stack<Object> updates = receiverThread.getUpdates();
+        receiverThread.emptyUpdates();
+
+        System.out.println("Updates:\n");
+        if (updates.empty()) {
+            System.out.println("No new updates.\n");
+        } else {
+            for (Object obj : updates) {
+                System.out.println(obj.toString() + "\n");
+                System.out.println("-----------------------------\n");
+            }
+        }
+    }
+
+    /**
      * Function to subscribe to a Topic.
      * Takes in the User object associated with the node.
      * No return, but adds the User to a 'subscribed' list for the Topic.
      *
      * @param currUser - the node's associated User obj
      */
-    public static void subSub(User currUser, String server, String password) {
+    private static void subSub(User currUser, String server, String password) {
         Scanner subscribe = new Scanner(System.in);
         System.out.println("Choose: subscribe by Topic (\"t\") " +
                 "or by keyword (\"k\")\n");
@@ -230,26 +253,6 @@ public class UserCLI {
 
     }
 
-    public static void infoUpdate() {
-
-        ArrayList<Object> updates = connections.get(0).getUpdates();
-        connections.get(0).emptyUpdates();
-
-        System.out.println("Updates:\n");
-        if (updates.isEmpty()) {
-            System.out.println("No new updates.\n");
-        } else {
-            for (Object obj : updates) {
-                if(obj instanceof Topic)
-                    obj = (Topic) obj;
-                else
-                    obj = (Event) obj;
-                System.out.println(obj.toString() + "\n");
-                System.out.println("-----------------------------\n");
-            }
-        }
-    }
-
     /**
      * Function to unsubscribe from a topic.
      * Takes in the User object associated with the node.
@@ -258,7 +261,7 @@ public class UserCLI {
      *
      * @param currUser - the nodes' associated User obj
      */
-    public static void subUnsub(User currUser, String server, String password){
+    private static void subUnsub(User currUser, String server, String password){
         Scanner unsubscribe = new Scanner(System.in);
         System.out.println("Would you like to unsubscribe from all topics (\"a\")" +
                 "one just one (\"o\") ?\n");
@@ -288,7 +291,7 @@ public class UserCLI {
             List<Topic> topicList = thread.getTopicList();
             List<String> keywords = thread.getKeywords();
             
-            System.out.println("\n");
+            //System.out.println("\n");
             for (Topic topic : topicList) {
                 System.out.println(topic.getName() + "\n");
             }
@@ -326,7 +329,7 @@ public class UserCLI {
      *
      * @param currUser - the nodes' associated User obj.
      */
-    public static void subCLI(User currUser, String server, String password){
+    private static void subCLI(User currUser, String server, String password){
         Scanner sub_input = new Scanner(System.in);
 
         boolean exit_flag = true;
@@ -393,9 +396,6 @@ public class UserCLI {
     private static void pubPub(User currUser, String server, String password) {
         Scanner publish = new Scanner (System.in);
 
-        System.out.println("Title of your event: ");
-        String e_title = publish.nextLine();
-
         TCPClient thread = new TCPClient(server, currUser, password);
 
         connections.add(thread);
@@ -405,31 +405,40 @@ public class UserCLI {
 
         Topic chk_top = null;
         Topic topic = null;
-        while (topic == null) {
-            System.out.println("Enter Topic: ");
-            String topic_str = publish.nextLine();
+        String e_title = "";
+        if (topicList.size() >= 1) {
+            System.out.println("Title of your event: ");
+            e_title = publish.nextLine();
+            while (topic == null) {
+                System.out.println("Enter Topic: ");
+                String topic_str = publish.nextLine();
 
-            for (Topic top : topicList) {
-                if (top.getName().equals(topic_str)) {
-                    System.out.println("Valid topic");
-                    topic = top;
-                    break;
+                for (Topic top : topicList) {
+                    if (top.getName().equals(topic_str)) {
+                        System.out.println("Valid topic");
+                        topic = top;
+                        break;
+                    }
                 }
+                if (topic == null) {
+                    System.out.println("Input does not match available options.\n" +
+                            "Try again\n");
+                }
+
             }
-            if(topic == null) {
-                System.out.println("Input does not match available options.\n" +
-                        "Try again\n");
-            }
+            System.out.println("Content for your event: \n");
+            String e_content = publish.nextLine();
+
+            Event new_event = new Event( -1, chk_top, e_title, e_content);
+
+            thread.sendObject(new_event);
+
+            //currUser.publish(new_event);
+        } else {
+            System.out.println("No topics available; returning to main command prompt...\n");
         }
 
-        System.out.println("Content for your event: \n");
-        String e_content = publish.nextLine();
 
-        Event new_event = new Event( -1, chk_top, e_title, e_content);
-
-        thread.sendObject(new_event);
-
-        //currUser.publish(new_event);
     }
 
     /**
@@ -437,7 +446,7 @@ public class UserCLI {
      * Takes in the User object associated with the node.
      * No return, but creates a new Topic, handled by the EventManager.
      *
-     * @param currUser
+     * @param currUser - user associated with this UserCLI node
      */
     private static void pubAdv(User currUser, String server, String password) {
         Scanner advertise = new Scanner (System.in);
@@ -475,7 +484,7 @@ public class UserCLI {
      *
      * @param currUser - the nodes' associated User obj.
      */
-    public static void pubCLI(User currUser, String server, String password){
+    private static void pubCLI(User currUser, String server, String password){
         Scanner pub_input = new Scanner(System.in);
         boolean exit_flag = true;
         do{
@@ -525,6 +534,10 @@ public class UserCLI {
         }
     }
 
+    /**
+     * Function that runs the UserCLI.
+     * @param args - runs with the IP address of the EventManager
+     */
     public static void main(String[] args) {
         String server = args[0];
         startCLI(server);

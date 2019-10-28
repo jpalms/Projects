@@ -54,6 +54,10 @@ public class EventManager {
 		cli.startCLI(this, handler);
 	}
 
+	/**
+	 *  Stop the repo service
+	 * @param h Handler instance that takes care of shutdown
+	 */
 	public void stopService(Handler h) {
 		h.turnOff();
 	}
@@ -92,6 +96,14 @@ public class EventManager {
 		advertise.add(topic);
 	}
 
+	/**
+	 * Either adds or removes a subscriber from the internal list
+	 * Useful to use with TCPClient inputs
+	 *
+	 * @param user 			Passed user associated UserCLI node
+	 * @param addOrRemove 	determines which function to execute
+	 *                      	true = add, false = remove
+	 */
 	private synchronized void add_removeSub(User user, boolean addOrRemove) {
 		if (addOrRemove) {
 			addSubscriber(user);
@@ -122,6 +134,16 @@ public class EventManager {
 		}
 	}
 
+	/**
+	 * Either subscribes or unsubscribes a User from a given Topic
+	 * Useful to use with TCPClient inputs
+	 *
+	 * @param user 			User to be added / removed from Topic's subscribed list
+	 * @param obj 			Object input to account for different forms of functions
+	 * @param subOrUnsub 	boolean to determine function performed
+	 *                      	true = subscribe, false = unsubscribe
+	 *
+	 */
 	private synchronized void subUnsubTopic(User user, Object obj, boolean subOrUnsub) {
 
 		if (obj instanceof Topic)
@@ -268,12 +290,24 @@ public class EventManager {
 		return key;
 	}
 
+	/**
+	 * Helper function to see whether the given User exists in the internal list
+	 *
+	 * @param id 		name of User
+	 * @return			boolean describing existence of User
+	 */
 	private synchronized boolean userExists(String id) {
 		if (this.allUsers.isEmpty())
 			return false;
 		return this.allUsers.containsKey(id);
 	}
 
+	/**
+	 * Gets one user from the internal list based on internal list
+	 *
+	 * @param id		name of User
+	 * @return			User that was searched for
+	 */
 	private synchronized User getUser(String id) {
 		return allUsers.get(id);
 	}
@@ -338,10 +372,20 @@ public class EventManager {
 			this.running = false;
 		}
 
+		/**
+		 * Helper function to get number of worker thread nodes
+		 *
+		 * @return		size of ArrayList workers
+		 */
 		public int getWorkersSize() {
 			return workers.size();
 		}
 
+		/**
+		 * Shows workers and removes ones that are no longer alive.
+		 *
+		 * @return		returns alive worker threads
+		 */
 		public ArrayList<Worker> getWorkers() {
 			ArrayList<Worker> info = new ArrayList<>();
 			for (int i = 0; i < workers.size() ; i++) {
@@ -353,10 +397,20 @@ public class EventManager {
 			return info;
 		}
 
+		/**
+		 * Gets size of the sockets list
+		 *
+		 * @return		int, size of the sockets list
+		 */
 		public int getSocketsSize(){
 			return sockets.size();
 		}
 
+		/**
+		 * Gets hashmap of sockets
+		 *
+		 * @return		hashmap of sockets
+		 */
 		public HashMap<String, Worker> getSockets(){
 			return sockets;
 		}
@@ -531,6 +585,12 @@ public class EventManager {
 				newTopics = topics;
 			}
 
+			/**
+			 * Takes given values and places it in notify lists
+			 *
+			 * @param objects		this arraylist of stuff to be added to a queue
+			 * @throws IOException	thrown when IO functions error
+			 */
 			public synchronized void queueBoth(ArrayList<Object> objects) throws IOException {
 				ArrayList<Event> events = new ArrayList<>();
 				ArrayList<Object> topicArrayList = new ArrayList<>();
@@ -603,6 +663,11 @@ public class EventManager {
 				}
 			}
 
+			/**
+			 * helper functions to handle sending info back and forth between TCP and EM
+			 *
+			 * @throws IOException
+			 */
 			public void sendObj() throws IOException {
 				while(!eventsToSend.isEmpty()){
 					out.writeObject(eventsToSend.remove(0));
@@ -724,6 +789,13 @@ public class EventManager {
 
 		}
 
+		/**
+		 * helper function to show User nodes which events / new topics then should receive
+		 *
+		 * @param id				name of user
+		 * @param infoToSend		List of objects to send over, in case of subscriber
+		 * @param topicArrayList	List of topics to send over, in case of publisher
+		 */
 			public void unNotified(String id, ArrayList<Object> infoToSend, ArrayList<Object> topicArrayList){
 				if(unNotified.containsKey(id)){
 					if(allUsers.get(id).isSub()) {
