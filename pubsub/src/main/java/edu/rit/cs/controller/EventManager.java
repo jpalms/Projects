@@ -327,7 +327,7 @@ public class EventManager {
 	 **/
 	public class Handler extends Thread {
 		// create a thread to look for new logins
-		private ArrayList<Worker> workers;
+		private ArrayList<Worker> workers = new ArrayList<>();
 		boolean running;
 		private NotifySubs notify;
 		private HashMap<String, Worker> sockets;
@@ -389,7 +389,7 @@ public class EventManager {
 		public ArrayList<Worker> getWorkers() {
 			ArrayList<Worker> info = new ArrayList<>();
 			for (int i = 0; i < workers.size() ; i++) {
-				if (!workers.get(i).isAlive()) {
+				if (workers.get(i) != null && !workers.get(i).isAlive()) {
 					info.add(workers.get(i));
 					workers.remove(workers.get(i));
 				}
@@ -514,17 +514,13 @@ public class EventManager {
 				Object obj;
 				String id;
 				do {
-					System.out.println("read obj");
 					obj = in.readObject();
 					id = (String) obj;
-					System.out.println("write bool");
 					out.writeObject(userExists(id) + "");
 				} while (userExists(id));
 
-				System.out.println("new user");
 				obj = in.readObject();
 				User user = (User) obj;
-				System.out.println("add to list");
 				allUsers.put(user.getId(), user);
 				if (user.isSub())
 					add_removeSub(user, true);
@@ -572,7 +568,8 @@ public class EventManager {
 			 * @throws IOException
 			 **/
 			public synchronized void queueEvents(ArrayList<Object> events) throws IOException {
-				eventsToSend = events;
+				for(Object e: events)
+					eventsToSend.add(e);
 			}
 
 			/**
@@ -582,7 +579,8 @@ public class EventManager {
 			 * @throws IOException
 			 **/
 			public synchronized void queueTopics(ArrayList<Object> topics) throws IOException {
-				newTopics = topics;
+				for(Object t: topics)
+					newTopics.add(t);
 			}
 
 			/**
@@ -720,6 +718,8 @@ public class EventManager {
 			System.out.println("Server is running ...");
 			while (running) {
                 System.out.print("");
+                int size = handler.getSocketsSize();
+                boolean change = false;
 				if (handler.getSocketsSize() > 0 && handler.getWorkersSize() > 0) {
 					ArrayList<Handler.Worker> workers = handler.getWorkers();
 					ArrayList<Object> infoToSend = new ArrayList<>();
@@ -729,10 +729,10 @@ public class EventManager {
 					for (Handler.Worker worker : workers) {
 						if (worker.newInfo() instanceof Event || worker.newInfo() instanceof Topic) {
 							infoToSend.add(worker.newInfo());
-							System.out.println((Topic)infoToSend.get(0));
+							System.out.println(infoToSend.get(0));
 						}
 					}
-					if(!infoToSend.isEmpty()){
+					if(true/*!infoToSend.isEmpty() || change*/){
                         System.out.println("info");
                         ArrayList<Object> topicArrayList = new ArrayList<>();
                         for(Object obj: infoToSend){
@@ -746,12 +746,15 @@ public class EventManager {
 								if(allUsers.get(id).isSub()){
                                     ArrayList<Object> temp = new ArrayList<>();
                                     for(Object obj:infoToSend){
-                                        if(obj instanceof Event && ((Event) obj).getTopic().hasSub(allUsers.get(id))){
-                                            temp.add((Event)obj);
-                                        }
+                                        if(obj instanceof Event) {
+											System.out.println(((Event) obj).getTopic().toString() );
+											if (((Event) obj).getTopic().hasSub(allUsers.get(id))) {
+												temp.add(obj);
+											}
+										}
                                     }
 									try {
-                                        System.out.println("Send to Sub");
+                                        System.out.println("Send to Sub: ");
                                         sockets.get(id).queueEvents(temp);
                                         sockets.get(id).queueTopics(topicArrayList);
 
@@ -763,7 +766,7 @@ public class EventManager {
 										sockets.get(id).turnOff();
 										sockets.remove(id);
 										//unNotified
-                                        System.out.println("UnNotified Sub");
+										System.out.println("UnNotified Sub");
 										unNotified(id, temp, topicArrayList);
 									}
 								}
@@ -795,8 +798,11 @@ public class EventManager {
 						}
 					}
 				}
+				if(size != handler.getSocketsSize())
+					change = true;
+				else
+					change = false;
 			}
-
 		}
 
 		/**
