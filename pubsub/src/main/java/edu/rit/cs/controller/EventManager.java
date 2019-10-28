@@ -653,36 +653,38 @@ public class EventManager {
 		 **/
 		public void run() {
 			while (running) {
-				/*
-				System.out.println("Online Pub: " + onlinePublishers.size());
-				System.out.println("Online Sub: " + onlineUsers.size());
-				System.out.println("All Users: " + allUsers.size());
-				System.out.println("Workers: " + handler.getWorkersSize());
-				System.out.println("Soc: " + handler.getSocketsSize());
-				*/
+                System.out.print("");
 				if (handler.getSocketsSize() > 0) {
 					ArrayList<Handler.Worker> workers = handler.getWorkers();
 					ArrayList<Object> infoToSend = new ArrayList<>();
 					HashMap<String, Handler.Worker> sockets = handler.getSockets();
+
+					//populate infoToSend
 					for (Handler.Worker worker : workers) {
 						if (worker.newInfo() instanceof Event || worker.newInfo() instanceof Topic) {
 							infoToSend.add(worker.newInfo());
 							System.out.println((Topic)infoToSend.get(0));
 						}
 					}
-					if(infoToSend.size() > 0){
+					if(!infoToSend.isEmpty()){
+                        System.out.println("info");
+                        ArrayList<Object> topicArrayList = new ArrayList<>();
+                        for(Object obj: infoToSend){
+                            if(obj instanceof Topic){
+                                topicArrayList.add(obj);
+                            }
+                        }
 						for(String id: allUsers.keySet()){
-							ArrayList<Object> topicArrayList = new ArrayList<>();
-							for(Object obj: infoToSend){
-								if(obj instanceof Topic){
-									topicArrayList.add(obj);
-								}
-							}
 							// online
 							if(sockets.containsKey(id)){
 								if(allUsers.get(id).isSub()){
 									try {
+                                        System.out.println("Send to Sub");
 										sockets.get(id).queueBoth(infoToSend);
+
+										if(unNotified.containsKey(id)){
+										    sockets.get(id).queueBoth(unNotified.remove(id));
+                                        }
 										sockets.get(id).sendObj();
 									} catch (IOException e) {
 										sockets.get(id).turnOff();
@@ -691,9 +693,15 @@ public class EventManager {
 										unNotified(id, infoToSend, topicArrayList);
 									}
 								}
-								else{
+								else if(allUsers.get(id).isPub()){
 									try {
-										sockets.get(id).queueTopics(topicArrayList);
+                                        System.out.println("Send to Pub");
+                                        sockets.get(id).queueTopics(infoToSend);
+
+                                        if(unNotified.containsKey(id)){
+                                            sockets.get(id).queueBoth(unNotified.remove(id));
+                                        }
+
 										sockets.get(id).sendObj();
 									} catch (IOException e) {
 										sockets.get(id).turnOff();
@@ -703,6 +711,7 @@ public class EventManager {
 									}
 								}
 							}
+							// offline
 							else {
 								//unNotified
 								unNotified(id, infoToSend, topicArrayList);
