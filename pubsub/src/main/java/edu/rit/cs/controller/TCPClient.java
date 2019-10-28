@@ -150,13 +150,14 @@ public class TCPClient extends Thread{
                 try {
                     if(s.isConnected()) {
                         Object obj = in.readObject();
-                        System.out.println(obj + "\n");
+
 
                         if (obj instanceof Event) {
-                            updates.add((Event) (obj));
-
+                            System.out.println(obj + "\n");
+                            //updates.add((Event) (obj));
                         } else if (obj instanceof Topic) {
-                            updates.add((Topic) (obj));
+                            System.out.println(obj + "\n");
+                            //updates.add((Topic) (obj));
                         }
                     }
                 } catch (IOException e){
