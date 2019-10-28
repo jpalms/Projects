@@ -22,7 +22,6 @@ public class EventManager {
 	private HashMap<String, User> subscribers;
 	private HashMap<String, User> allUsers;
 	private HashMap<String, Topic> topics;
-	private HashMap<String, ArrayList<Object>> unNotified;
 	private HashMap<String, List<Topic>> keyToTopics;
 	private List<Event> newEvents;
 	private List<Topic> advertise;
@@ -33,7 +32,6 @@ public class EventManager {
 		subscribers = new HashMap<>();
 		allUsers = new HashMap<>();
 		topics = new HashMap<>();
-		unNotified = new HashMap<>();
 		keyToTopics = new HashMap<>();
 		newEvents = new ArrayList<>();
 		advertise = new ArrayList<>();
@@ -112,6 +110,10 @@ public class EventManager {
 		}
 	}
 
+	private synchronized void addUser(User user){
+		allUsers.put(user.getId(), user);
+	}
+
 	/**
 	 * add subscriber to the internal list
 	 *
@@ -132,6 +134,10 @@ public class EventManager {
 		for (Topic topic : topics.values()) {
 			topic.removeSub(user.getId());
 		}
+	}
+
+	private synchronized HashMap<String, User> getAllUsers(){
+		return allUsers;
 	}
 
 	/**
@@ -297,9 +303,10 @@ public class EventManager {
 	 * @return			boolean describing existence of User
 	 */
 	private synchronized boolean userExists(String id) {
-		if (this.allUsers.isEmpty())
+		HashMap<String, User> temp = getAllUsers();
+		if (temp.isEmpty())
 			return false;
-		return this.allUsers.containsKey(id);
+		return temp.containsKey(id);
 	}
 
 	/**
@@ -521,7 +528,7 @@ public class EventManager {
 
 				obj = in.readObject();
 				User user = (User) obj;
-				allUsers.put(user.getId(), user);
+				addUser(user);
 				if (user.isSub())
 					add_removeSub(user, true);
 			}
@@ -700,6 +707,8 @@ public class EventManager {
 	private class NotifySubs extends Thread {
 		private boolean running;
 		private EventManager.Handler handler;
+		private HashMap<String, ArrayList<Object>> unNotified;
+
 
 		/**
 		 * Constructor Class for NotifySubs
@@ -707,6 +716,7 @@ public class EventManager {
 		private NotifySubs(Handler handler) {
 			this.running = true;
 			this.handler = handler;
+			unNotified = new HashMap<>();
 		}
 
 		/**
@@ -715,9 +725,11 @@ public class EventManager {
 		 **/
 		public void run() {
 			System.out.println("Server is running ...");
+			HashMap<String, User> allUsers = new HashMap<>();
 			while (running) {
                 System.out.print("");
                 int size = handler.getSocketsSize();
+                allUsers = getAllUsers();
 				if (handler.getSocketsSize() > 0 && handler.getWorkersSize() > 0) {
 					ArrayList<Handler.Worker> workers = handler.getWorkers();
 					ArrayList<Object> infoToSend = new ArrayList<>();
@@ -760,7 +772,7 @@ public class EventManager {
 										sockets.get(id).turnOff();
 										sockets.remove(id);
 										//unNotified
-										unNotified(id, temp, topicArrayList);
+										unNotified(id, temp, topicArrayList, allUsers);
 									}
 								}
 								else if(allUsers.get(id).isPub()){
@@ -776,14 +788,14 @@ public class EventManager {
 										sockets.get(id).turnOff();
 										sockets.remove(id);
 										//unNotified
-										unNotified(id, infoToSend, topicArrayList);
+										unNotified(id, infoToSend, topicArrayList, allUsers);
 									}
 								}
 							}
 							// offline
 							else {
 								//unNotified
-								unNotified(id, infoToSend, topicArrayList);
+								unNotified(id, infoToSend, topicArrayList, allUsers);
 							}
 						}
 					}
@@ -798,7 +810,7 @@ public class EventManager {
 		 * @param infoToSend		List of objects to send over, in case of subscriber
 		 * @param topicArrayList	List of topics to send over, in case of publisher
 		 */
-			public void unNotified(String id, ArrayList<Object> infoToSend, ArrayList<Object> topicArrayList){
+			public void unNotified(String id, ArrayList<Object> infoToSend, ArrayList<Object> topicArrayList, HashMap<String, User> allUsers){
 				if(unNotified.containsKey(id)){
 					if(allUsers.get(id).isSub()) {
 						for (Object obj : infoToSend)
