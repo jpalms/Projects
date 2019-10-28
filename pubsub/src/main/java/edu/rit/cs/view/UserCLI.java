@@ -338,7 +338,7 @@ public class UserCLI {
                     "Subscribe (\"s\") \t" +
                     "Unsubscribe (\"u\") \t" +
                     "List Subscribed Topics (\"l\") \t" +
-                    "Show New Information (\"i\")) \t" +
+                    "Show New Information (\"i\") \t" +
                     "Quit (\"q\")\n"
             );
             String command = sub_input.nextLine();
