@@ -334,6 +334,10 @@ public class UserCLI {
 
         boolean exit_flag = true;
         do{
+            boolean duplicate = false;
+            if(!duplicate)
+                infoUpdate();
+            duplicate = false;
             System.out.println("Commands available to subscribers: \n" +
                     "Subscribe (\"s\") \t" +
                     "Unsubscribe (\"u\") \t" +
@@ -374,9 +378,11 @@ public class UserCLI {
 
                     break;
                 case "i":
+                    duplicate = true;
                     infoUpdate();
                     break;
                 case "q":
+                    infoUpdate();
                     turnOff();
                     exit_flag = false;
                     break;
@@ -403,7 +409,6 @@ public class UserCLI {
         List<Topic> topicList = thread.getTopicList();
         List<String> keywords = thread.getKeywords();
 
-        Topic chk_top = null;
         Topic topic = null;
         String e_title = "";
         if (topicList.size() >= 1) {
@@ -429,7 +434,7 @@ public class UserCLI {
             System.out.println("Content for your event: \n");
             String e_content = publish.nextLine();
 
-            Event new_event = new Event( -1, chk_top, e_title, e_content);
+            Event new_event = new Event( -1, topic, e_title, e_content);
 
             thread.sendObject(new_event);
 
