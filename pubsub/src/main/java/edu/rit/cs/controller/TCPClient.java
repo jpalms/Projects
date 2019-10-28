@@ -156,8 +156,10 @@ public class TCPClient extends Thread{
                     }
                 } catch (IOException e){
                     System.err.println("IO: " + e.getMessage());
+                    turnOff();
                 } catch (ClassNotFoundException e){
                     System.err.println("CLASS: " + e.getMessage());
+                    turnOff();
                 }
             }
         }
