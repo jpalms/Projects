@@ -777,7 +777,7 @@ public class EventManager {
 								}
 								else if(allUsers.get(id).isPub()){
 									try {
-                                        sockets.get(id).queueTopics(infoToSend);
+                                        sockets.get(id).queueTopics(topicArrayList);
 
                                         if(unNotified.containsKey(id)){
                                             sockets.get(id).queueBoth(unNotified.remove(id));
