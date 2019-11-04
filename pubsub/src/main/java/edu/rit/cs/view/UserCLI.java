@@ -82,15 +82,12 @@ public class UserCLI {
         String user = "";
         String pass = "";
         String roleStr = "";
-        User.pubOrSub role = null;
-        boolean uniqueId = false;
-
+        User.pubOrSub role = User.pubOrSub.SUB;
         firstThread.sendObject("true");
         do{
             System.out.println("\nPlease enter in a new username: ");
             user = create.nextLine();
             firstThread.sendObject(user);
-            // System.out.println("recieving bool");
             if (firstThread.readObject().equals("true")){
                 System.out.println("Username is taken already.\n");
             } else {

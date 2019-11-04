@@ -13,7 +13,6 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -356,14 +355,12 @@ public class EventManager {
 				// start server
 				int serverPort = 7896;
 				ServerSocket listenSocket = new ServerSocket(serverPort);
-				//System.out.println("TCP Server is running and accepting client connections...");
 
 				// look for new connections, then pass it to worker thread
 				while (running) {
 					Socket clientSocket = listenSocket.accept();
 					Worker c = new Worker(clientSocket);
 					workers.add(c);
-					//System.out.println(advertise.size());
 				}
 			} catch (IOException e) {
 				System.out.println("Listen :" + e.getMessage());
@@ -725,10 +722,9 @@ public class EventManager {
 		 **/
 		public void run() {
 			System.out.println("Server is running ...");
-			HashMap<String, User> allUsers = new HashMap<>();
+			HashMap<String, User> allUsers;
 			while (running) {
                 System.out.print("");
-                int size = handler.getSocketsSize();
                 allUsers = getAllUsers();
 				if (handler.getSocketsSize() > 0 && handler.getWorkersSize() > 0) {
 					ArrayList<Handler.Worker> workers = handler.getWorkers();
