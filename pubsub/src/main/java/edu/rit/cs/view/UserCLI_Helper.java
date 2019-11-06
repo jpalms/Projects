@@ -28,6 +28,27 @@ public class UserCLI_Helper {
             connections.remove(0);
         }
     }
+
+    /**
+     * Prints all the topics in the list
+     */
+    private void printTopicList(List<Topic> topicList){
+        System.out.println("Topics:");
+        for(Topic topic: topicList){
+            if(!topic.getName().equals(""))
+                System.out.println("\n" + topic.toString());
+        }
+    }
+
+    /**
+     * Prints all the keys in the list
+     */
+    private void printKeyList(List<String> keyList){
+        System.out.println("Keys:");
+        for(String key: keyList){
+            System.out.println("\n\t" + key);
+        }
+    }
     /*
      * --------------------Publisher-------------------------
      */
@@ -81,6 +102,8 @@ public class UserCLI_Helper {
 
         List<Topic> topicList = thread.getTopicList();
         List<String> keywords = thread.getKeywords();
+
+        printTopicList(topicList);
 
         Topic topic = null;
         String e_title = "";
@@ -141,6 +164,7 @@ public class UserCLI_Helper {
         if (sub_imp.equals("t")) {
             System.out.println("What topic would you like to subscribe to?\n");
             Topic topic = null;
+            printTopicList(topicList);
             while (topic == null) {
                 String topic_str = subscribe.nextLine();
 
@@ -160,9 +184,11 @@ public class UserCLI_Helper {
             thread.sendObject("true");
             thread.sendObject("false");
         } else if (sub_imp.equals("k")){
+            printKeyList(keywords);
             System.out.println("Please enter a keyword that you would like to search by: ");
             String keyword = subscribe.nextLine();
             boolean match = false;
+
             while (!match) {
                 for (String key : keywords) {
                     if (key.equals(keyword)) {
@@ -209,8 +235,6 @@ public class UserCLI_Helper {
                 thread.sendObject("true");
             } else if (unsub_imp.equals("o")){
                 System.out.println("What topic would you like to unsubscribe from?\n");
-                System.out.println("Available topics: ");
-
 
                 TCPClient thread = new TCPClient(server, user, password);
 
@@ -219,10 +243,7 @@ public class UserCLI_Helper {
                 List<Topic> topicList = thread.getTopicList();
                 List<String> keywords = thread.getKeywords();
 
-                //System.out.println("\n");
-                for (Topic topic : topicList) {
-                    System.out.println(topic.getName() + "\n");
-                }
+                printTopicList(topicList);
 
                 Topic topic = null;
                 while (topic == null) {

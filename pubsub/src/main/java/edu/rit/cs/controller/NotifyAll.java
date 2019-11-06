@@ -135,10 +135,14 @@ public class NotifyAll extends Thread {
             }
         }
         else{
-            if(allUsers.get(id).isSub())
+            if(allUsers.get(id).isSub()) {
                 unNotified.put(id, infoToSend);
-            else
+                for (Object topic: topicArrayList)
+                    unNotified.get(id).add(topic);
+            }
+            else {
                 unNotified.put(id, topicArrayList);
+            }
         }
     }
     // stops the loop

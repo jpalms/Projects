@@ -67,7 +67,7 @@ public class Event implements Serializable {
 	@Override
 	public String toString() {
 		return "Event: " + this.getTitle() +
-				"\ttopic: " + this.getTopic() +
+				"\n\t" + this.getTopic() +
 				"\n\tcontent: " + this.getContent();
 		}
 }
