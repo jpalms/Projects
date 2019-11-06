@@ -178,7 +178,6 @@ public class UserCLI_Helper {
             thread.sendObject(keyword);
             thread.sendObject("false");
             thread.sendObject("false");
-            user.subscribe(keyword);
         } else {
             System.out.println("Input does not match available options.\n" +
                     "Returning to command list...\n");
@@ -208,7 +207,6 @@ public class UserCLI_Helper {
                 thread.sendObject(new Topic(new ArrayList<>(), ""));
                 thread.sendObject("false");
                 thread.sendObject("true");
-                user.unsubscribe();
             } else if (unsub_imp.equals("o")){
                 System.out.println("What topic would you like to unsubscribe from?\n");
                 System.out.println("Available topics: ");

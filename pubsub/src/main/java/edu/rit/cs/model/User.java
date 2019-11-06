@@ -6,7 +6,7 @@ import java.util.ArrayList;
 /**
  * User Class, which represents a Publisher or Subscriber
  */
-public class User extends PubSubAgent implements Serializable {
+public class User implements Serializable {
 
     /**
      * Enum to indicate whether the instance is a Publisher or Subscriber

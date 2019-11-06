@@ -331,5 +331,4 @@ public class EventManager {
 		new EventManager().startService();
 		// start command line
 	}
-
-	}
+}

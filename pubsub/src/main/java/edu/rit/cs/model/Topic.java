@@ -65,7 +65,7 @@ public class Topic implements Serializable {
 	/**
 	 * Getter method for name
 	 *
-	 * @return - returns nume of the Topic
+	 * @return - returns name of the Topic
 	 */
 	public String getName() {
 		return name;

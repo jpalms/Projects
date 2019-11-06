@@ -59,6 +59,11 @@ public class Event implements Serializable {
         this.content = content;
     }
 
+    /**
+     * toString function
+     *
+     * @return - String representation of Topic
+     */
 	@Override
 	public String toString() {
 		return "Event: " + this.getTitle() +
