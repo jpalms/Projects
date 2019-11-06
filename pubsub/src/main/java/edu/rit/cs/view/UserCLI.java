@@ -328,13 +328,9 @@ public class UserCLI {
      */
     private static void subCLI(User currUser, String server, String password){
         Scanner sub_input = new Scanner(System.in);
-        boolean duplicate = false;
         boolean exit_flag = true;
         do{
 
-            if(!duplicate)
-                infoUpdate();
-            duplicate = false;
             System.out.println("Commands available to subscribers: \n" +
                     "Subscribe (\"s\") \t" +
                     "Unsubscribe (\"u\") \t" +
@@ -361,7 +357,6 @@ public class UserCLI {
                     thread.sendObject(new Topic(new ArrayList<>(), ""));
                     thread.sendObject("true");
                     thread.sendObject("true");
-                    //currUser.listSubscribedTopics();
 
                     ArrayList<Topic> subList = (ArrayList<Topic>)thread.readObject();
 
@@ -373,10 +368,6 @@ public class UserCLI {
                         }
                     }
 
-                    break;
-                case "i":
-                    duplicate = true;
-                    infoUpdate();
                     break;
                 case "q":
                     infoUpdate();
@@ -488,16 +479,11 @@ public class UserCLI {
      */
     private static void pubCLI(User currUser, String server, String password){
         Scanner pub_input = new Scanner(System.in);
-        boolean duplicate = false;
         boolean exit_flag = true;
         do{
-            if(!duplicate)
-                infoUpdate();
-            duplicate = false;
             System.out.println("Commands available to publishers: \n" +
                     "Publish (\"p\") \t" +
                     "Advertise (\"a\") \t" +
-                    "Show New Information (\"i\") \t" +
                     "Quit (\"q\")\n"
             );
             String command = pub_input.nextLine();
@@ -507,10 +493,6 @@ public class UserCLI {
                     break;
                 case "a":
                     pubAdv(currUser, server, password);
-                    break;
-                case "i":
-                    duplicate = true;
-                    infoUpdate();
                     break;
                 case "q":
                     infoUpdate();

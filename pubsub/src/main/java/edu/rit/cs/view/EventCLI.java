@@ -1,6 +1,7 @@
 package edu.rit.cs.view;
 
 import edu.rit.cs.controller.EventManager;
+import edu.rit.cs.controller.Handler;
 import edu.rit.cs.model.Topic;
 import edu.rit.cs.model.User;
 
@@ -17,7 +18,7 @@ public class EventCLI {
      * @param em - EventHandler passed in, used to call stopService
      * @param h - Handler passed in, used in stopService
      */
-    public static void emTerminate(EventManager em, EventManager.Handler h){
+    public static void emTerminate(EventManager em, Handler h){
         em.stopService(h);
         System.out.println("EventManager has been terminated.");
         System.exit(1);
@@ -65,7 +66,7 @@ public class EventCLI {
      * @param em - EventHandler currently running on the node
      * @param h - Handler from the EventManager to be passed later
      */
-    public void startCLI(EventManager em, EventManager.Handler h){
+    public void startCLI(EventManager em, Handler h){
         System.out.println("============EVENTMANAGER============\n");
 
         Scanner em_input = new Scanner(System.in);

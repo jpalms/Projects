@@ -14,7 +14,7 @@ import java.io.IOException;
  **/
 public class NotifyAll extends Thread {
     private boolean running;
-    private EventManager.Handler handler;
+    private Handler handler;
     private HashMap<String, ArrayList<Object>> unNotified;
     private EventManager eventManager;
 
@@ -22,7 +22,7 @@ public class NotifyAll extends Thread {
     /**
      * Constructor Class for NotifySubs
      **/
-    public NotifyAll(EventManager em, EventManager.Handler handler) {
+    public NotifyAll(EventManager em, Handler handler) {
         this.running = true;
         this.handler = handler;
         unNotified = new HashMap<>();
@@ -40,12 +40,12 @@ public class NotifyAll extends Thread {
             System.out.print("");
             allUsers = eventManager.getAllUsers();
             if (handler.getSocketsSize() > 0 && handler.getWorkersSize() > 0) {
-                ArrayList<EventManager.Handler.Worker> workers = handler.getWorkers();
+                ArrayList<Handler.Worker> workers = handler.getWorkers();
                 ArrayList<Object> infoToSend = new ArrayList<>();
-                HashMap<String, EventManager.Handler.Worker> sockets = handler.getSockets();
+                HashMap<String, Handler.Worker> sockets = handler.getSockets();
 
                 //populate infoToSend
-                for (EventManager.Handler.Worker worker : workers) {
+                for (Handler.Worker worker : workers) {
                     if (worker.newInfo() instanceof Event || worker.newInfo() instanceof Topic) {
                         infoToSend.add(worker.newInfo());
                     }
