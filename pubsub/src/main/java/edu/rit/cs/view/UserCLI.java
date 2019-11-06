@@ -82,7 +82,7 @@ public class UserCLI {
         String user = "";
         String pass = "";
         String roleStr = "";
-        User.pubOrSub role = User.pubOrSub.SUB;
+        User.pubOrSub role = null;
         firstThread.sendObject("true");
         do{
             System.out.println("\nPlease enter in a new username: ");
