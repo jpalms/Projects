@@ -1,26 +1,15 @@
 package edu.rit.cs.view;
 
 import edu.rit.cs.controller.TCPClient;
-import edu.rit.cs.model.Event;
-import edu.rit.cs.model.Topic;
 import edu.rit.cs.model.User;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 /**
  * Class to run on publisher / subscriber nodes.
  * Makes a User object based on input.
  */
 
-/**
- * Function to determine whether a user has an account or is creating one.
- * No parameters, but operates based on user input.
- * Returns a User to be used for the node.
- *
- * @return User Object
- */
 public class UserCLI {
 
     private static String password;
@@ -32,6 +21,13 @@ public class UserCLI {
         System.exit(1);
     }
 
+    /**
+     * Function to determine whether a user has an account or is creating one.
+     * No parameters, but operates based on user input.
+     * Returns a User to be used for the node.
+     *
+     * @return User Object
+     */
     private static User CLIBegin(String server) {
         Scanner initial = new Scanner(System.in);
 
@@ -220,7 +216,7 @@ public class UserCLI {
             String command = pub_input.nextLine();
             switch(command){
                 case "p":
-                    helper.pubPub();
+                    helper.publish();
                     break;
                 case "a":
                     helper.advertise();
@@ -249,8 +245,6 @@ public class UserCLI {
         } else if (currUser.role == User.pubOrSub.PUB){
             System.out.println("============PUBLISHER============");
             pubCLI(currUser, server, password);
-        } else {
-            //error message here
         }
     }
 

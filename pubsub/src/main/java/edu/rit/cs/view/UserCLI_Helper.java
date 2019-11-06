@@ -28,6 +28,9 @@ public class UserCLI_Helper {
             connections.remove(0);
         }
     }
+    /*
+     * --------------------Publisher-------------------------
+     */
     /**
      * Function to advertise a Topic within EventManager.
      * Takes in the User object associated with the node.
@@ -69,7 +72,7 @@ public class UserCLI_Helper {
      * No return, but creates a new Event, handled by the EventManager.
      *
      */
-    public void pubPub() {
+    public void publish() {
         Scanner publish = new Scanner (System.in);
 
         TCPClient thread = new TCPClient(server, user, password);
@@ -104,11 +107,9 @@ public class UserCLI_Helper {
             System.out.println("Content for your event: \n");
             String e_content = publish.nextLine();
 
-            Event new_event = new Event( -1, topic, e_title, e_content);
+            Event new_event = new Event( topic, e_title, e_content);
 
             thread.sendObject(new_event);
-
-            //currUser.publish(new_event);
         } else {
             System.out.println("No topics available; returning to main command prompt...\n");
         }

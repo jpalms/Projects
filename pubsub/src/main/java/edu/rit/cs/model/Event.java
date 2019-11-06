@@ -6,7 +6,6 @@ import java.io.Serializable;
  * Class of Events that Publisher's publish and Subscriber's read
  */
 public class Event implements Serializable {
-	private int id;
 	private Topic topic;
 	private String title;
 	private String content;
@@ -14,24 +13,14 @@ public class Event implements Serializable {
 	/**
 	 * Constructor for Event class
 	 *
-	 * @param id - unique id for Event
 	 * @param topic - topic associated with an Event
 	 * @param title - title of an Event
 	 * @param content - the content of an Event
 	 */
-    public Event(int id, Topic topic, String title, String content) {
-        this.id = id;
+    public Event(Topic topic, String title, String content) {
         this.topic = topic;
         this.title = title;
         this.content = content;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
 	/**
@@ -73,7 +62,6 @@ public class Event implements Serializable {
 	@Override
 	public String toString() {
 		return "Event: " + this.getTitle() +
-				"\n\tid: " + this.getId() +
 				"\ttopic: " + this.getTopic() +
 				"\n\tcontent: " + this.getContent();
 		}
