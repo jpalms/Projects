@@ -18,7 +18,6 @@ import java.util.List;
  * Class to Handle the creations of all threads that communicate with clients
  **/
 public class Handler extends Thread {
-    // create a thread to look for new logins
     private ArrayList<Worker> workers = new ArrayList<>();
     boolean running;
     private HashMap<String, Worker> sockets;
@@ -58,8 +57,8 @@ public class Handler extends Thread {
      * Cleanly stops looking for new connections and closes open socket connections
      **/
     public void turnOff() {
-        this.turnOffWorkers();
         this.running = false;
+        this.turnOffWorkers();
     }
 
     /**
@@ -171,10 +170,8 @@ public class Handler extends Thread {
                             receivedFromSub(user);
                         }
                         this.clientSocket.close();
-                        //workers.remove(this);
                     } else {
                         em.on_offlineUser(username, user, true);
-                        //this.clientSocket.close();
                         sockets.put(username, this);
                     }
                 }
@@ -186,7 +183,6 @@ public class Handler extends Thread {
                 System.err.println("CLASS:" + e.getMessage());
             } catch (NullPointerException e) {
                 System.err.println("NULL: " + e.getMessage());
-            } finally {
             }
         }
 
@@ -244,6 +240,11 @@ public class Handler extends Thread {
             this.username = username;
         }
 
+        /**
+         * returns Object instance of Event or Topic to publish/advertise
+         *
+         * @return - Object instance of Event or Topic
+         */
         public synchronized Object newInfo() {
             return info;
         }

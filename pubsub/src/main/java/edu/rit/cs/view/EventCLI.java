@@ -2,6 +2,7 @@ package edu.rit.cs.view;
 
 import edu.rit.cs.controller.EventManager;
 import edu.rit.cs.controller.Handler;
+import edu.rit.cs.controller.NotifyAll;
 import edu.rit.cs.model.Topic;
 import edu.rit.cs.model.User;
 
@@ -15,11 +16,10 @@ public class EventCLI {
      * Takes an EventManager and a handler
      * No return, but calls System.exit with status (1).
      *
-     * @param em - EventHandler passed in, used to call stopService
-     * @param h - Handler passed in, used in stopService
+     * @param n - Handler passed in, used in stopService
      */
-    public static void emTerminate(EventManager em, Handler h){
-        em.stopService(h);
+    public static void emTerminate(NotifyAll n){
+        n.turnOff();
         System.out.println("EventManager has been terminated.");
         System.exit(1);
     }
@@ -64,9 +64,8 @@ public class EventCLI {
      * No return, but responds based on user input.
      *
      * @param em - EventHandler currently running on the node
-     * @param h - Handler from the EventManager to be passed later
      */
-    public void startCLI(EventManager em, Handler h){
+    public void startCLI(EventManager em, NotifyAll n){
         System.out.println("============EVENTMANAGER============\n");
 
         Scanner em_input = new Scanner(System.in);
@@ -80,7 +79,7 @@ public class EventCLI {
             String command = em_input.nextLine();
             switch(command){
                 case "t":
-                    emTerminate(em, h);
+                    emTerminate(n);
                     exit_flag = false;
                     break;
                 case "a":
@@ -89,8 +88,6 @@ public class EventCLI {
                 case "s":
                     showSubs(em);
                     break;
-                //case "w":
-                //    System.out.println(h.getWorkersSize());
                 default:
                     System.out.println("Not an available command for subscribers.\n");
             }

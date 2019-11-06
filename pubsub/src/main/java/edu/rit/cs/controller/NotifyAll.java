@@ -22,8 +22,10 @@ public class NotifyAll extends Thread {
     /**
      * Constructor Class for NotifySubs
      **/
-    public NotifyAll(EventManager em, Handler handler) {
+    public NotifyAll(EventManager em) {
         this.running = true;
+        Handler handler = new Handler(em);
+        handler.start();
         this.handler = handler;
         unNotified = new HashMap<>();
         this.eventManager = em;
@@ -142,5 +144,6 @@ public class NotifyAll extends Thread {
     // stops the loop
     public void turnOff () {
         running = false;
+        handler.turnOff();
     }
 }

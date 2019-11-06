@@ -37,12 +37,10 @@ public class EventManager {
 	 * Start the repo service
 	 **/
 	private void startService() {
-		Handler handler = new Handler(this);
-		handler.start();
-		NotifyAll notifyAll = new NotifyAll(this, handler);
+		NotifyAll notifyAll = new NotifyAll(this);
 		notifyAll.start();
 		EventCLI cli = new EventCLI();
-		cli.startCLI(this, handler);
+		cli.startCLI(this, notifyAll);
 	}
 
 	/**
