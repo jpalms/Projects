@@ -24,15 +24,11 @@ import java.util.List;
 public class UserCLI {
 
     private static String password;
-    private static ArrayList<TCPClient> connections = new ArrayList<TCPClient>();
+    private static TCPClient firstThread;
 
 
     private static void turnOff(){
-        while (connections.size() > 1) {
-            connections.get(1).turnOff();
-            connections.remove(1);
-        }
-        connections.get(0).turnOffFirst();
+        firstThread.turnOffFirst();
         System.exit(1);
     }
 
@@ -48,18 +44,18 @@ public class UserCLI {
                 "Create User(\"create\")" + "\t\t" +
                 "Sign In(\"signin\")");
 
-        TCPClient firstThread = new TCPClient(server);
+        firstThread = new TCPClient(server);
         while(true) {
             String checkOpt = initial.nextLine(); // Read user's decision
             if (checkOpt.equals("create")) {
-                User temp = usrCreate(firstThread);
-                usrSignin(firstThread);
+                User temp = usrCreate();
+                usrSignin();
 
                 return temp;
             } else if (checkOpt.equals("signin")) {
                 firstThread.sendObject("false");
 
-                return usrSignin(firstThread);
+                return usrSignin();
             } else {
                 System.out.println("Does not match either of the commands.\n");
                 System.out.println("Please enter \"create\" or \"signin\".\n");
@@ -74,7 +70,7 @@ public class UserCLI {
      *
      * @return User Object
      */
-    private static User usrCreate(TCPClient firstThread){
+    private static User usrCreate(){
         // send msg saying new user
 
         Scanner create = new Scanner(System.in);
@@ -136,7 +132,7 @@ public class UserCLI {
      *
      * @return User Object
      */
-    private static User usrSignin(TCPClient firstThread) {
+    private static User usrSignin() {
         Scanner user_input = new Scanner(System.in);
         while (true){
             System.out.println("Enter username: ");
@@ -150,173 +146,12 @@ public class UserCLI {
                 User user_node = (User)firstThread.readObject();
                 firstThread.sendObject(false);
                 password = pass;
-                connections.add(firstThread);
                 firstThread.start();
                 return user_node;
             } else {
                 System.out.println("Username does not exist. Please try again. \n ");
             }
         }
-    }
-
-    /**
-     * Posts a list of Events / Topics that the user needs to be aware of.
-     * If pub, only shows new Topics.
-     * If sub, shows new Topics, and Events that they are subscribed to.
-     * Takes no parameters, does not return, prints stuff out.
-     */
-    private static void infoUpdate() {
-
-        TCPClient receiverThread = connections.get(0);
-        ArrayList<Object> updates = receiverThread.getUpdates();
-        receiverThread.emptyUpdates();
-
-        System.out.println("Updates:\n");
-        if (updates.isEmpty()) {
-            System.out.println("No new updates.\n");
-        } else {
-            for (Object obj : updates) {
-                System.out.println(obj.toString() + "\n");
-                System.out.println("-----------------------------\n");
-            }
-        }
-    }
-
-    /**
-     * Function to subscribe to a Topic.
-     * Takes in the User object associated with the node.
-     * No return, but adds the User to a 'subscribed' list for the Topic.
-     *
-     * @param currUser - the node's associated User obj
-     */
-    private static void subSub(User currUser, String server, String password) {
-        Scanner subscribe = new Scanner(System.in);
-        System.out.println("Choose: subscribe by Topic (\"t\") " +
-                "or by keyword (\"k\")\n");
-        String sub_imp = subscribe.nextLine();
-
-        TCPClient thread = new TCPClient(server, currUser, password);
-
-        connections.add(thread);
-
-        List<Topic> topicList = thread.getTopicList();
-        List<String> keywords = thread.getKeywords();
-
-        if (sub_imp.equals("t")) {
-            System.out.println("What topic would you like to subscribe to?\n");
-            Topic topic = null;
-            while (topic == null) {
-                String topic_str = subscribe.nextLine();
-
-                for (Topic top : topicList) {
-                    if (top.getName().equals(topic_str)) {
-                        topic = top;
-                        break;
-                    }
-                }
-                if(topic == null) {
-                    System.out.println("Input does not match available options.\n" +
-                            "Try again\n");
-                }
-            }
-
-            thread.sendObject(topic);
-            thread.sendObject("true");
-            thread.sendObject("false");
-        } else if (sub_imp.equals("k")){
-            System.out.println("Please enter a keyword that you would like to search by: ");
-            String keyword = subscribe.nextLine();
-            boolean match = false;
-            while (!match) {
-                for (String key : keywords) {
-                    if (key.equals(keyword)) {
-                        match = true;
-                        break;
-                    }
-                }
-                if(!match){
-                    System.out.println("Input does not match available options.\n" +
-                            "Try again\n");
-                }
-            }
-            thread.sendObject(keyword);
-            thread.sendObject("false");
-            thread.sendObject("false");
-            currUser.subscribe(keyword);
-        } else {
-            System.out.println("Input does not match available options.\n" +
-                    "Returning to command list...\n");
-        }
-
-    }
-
-    /**
-     * Function to unsubscribe from a topic.
-     * Takes in the User object associated with the node.
-     * No return, but removes the User from a 'subscribed' list for the Topic.
-     * (Can also remove User from all currently subscribed nodes.)
-     *
-     * @param currUser - the nodes' associated User obj
-     */
-    private static void subUnsub(User currUser, String server, String password){
-        Scanner unsubscribe = new Scanner(System.in);
-        System.out.println("Would you like to unsubscribe from all topics (\"a\")" +
-                "one just one (\"o\") ?\n");
-        String unsub_imp = unsubscribe.nextLine();
-        if (unsub_imp.equals("a")){
-            System.out.println("Removing all subscriptions...\n");
-            TCPClient thread = new TCPClient(server, currUser, password);
-
-            connections.add(thread);
-
-            List<Topic> topicList = thread.getTopicList();
-            List<String> keywords = thread.getKeywords();
-
-            thread.sendObject(new Topic(new ArrayList<>(), ""));
-            thread.sendObject("false");
-            thread.sendObject("true");
-            currUser.unsubscribe();
-        } else if (unsub_imp.equals("o")){
-            System.out.println("What topic would you like to unsubscribe from?\n");
-            System.out.println("Available topics: ");
-
-
-            TCPClient thread = new TCPClient(server, currUser, password);
-
-            connections.add(thread);
-
-            List<Topic> topicList = thread.getTopicList();
-            List<String> keywords = thread.getKeywords();
-            
-            //System.out.println("\n");
-            for (Topic topic : topicList) {
-                System.out.println(topic.getName() + "\n");
-            }
-
-            Topic topic = null;
-            while (topic == null) {
-                String topic_str = unsubscribe.nextLine();
-                for (Topic top : topicList) {
-                    if (top.getName().equals(topic_str)) {
-                        topic = top;
-                        break;
-                    }
-                }
-                if(topic == null) {
-                    System.out.println("Input does not match available options.\n" +
-                            "Try again\n");
-                }
-            }
-
-            thread.sendObject(topic);
-            thread.sendObject("false");
-            thread.sendObject("false");
-            //currUser.unsubscribe(topic);
-        } else {
-            System.out.println("Input does not match available options.\n" +
-                    "Returning to command list...\n");
-        }
-
     }
 
     /**
@@ -329,6 +164,9 @@ public class UserCLI {
     private static void subCLI(User currUser, String server, String password){
         Scanner sub_input = new Scanner(System.in);
         boolean exit_flag = true;
+
+        UserCLI_Helper helper = new UserCLI_Helper(currUser, server, password);
+
         do{
 
             System.out.println("Commands available to subscribers: \n" +
@@ -341,36 +179,17 @@ public class UserCLI {
             String command = sub_input.nextLine();
             switch(command){
                 case "s":
-                    subSub(currUser, server, password);
+                    helper.subcribe();
                     break;
                 case "u":
-                    subUnsub(currUser, server, password);
+                    helper.unSubscribe();
                     break;
                 case "l":
-                    TCPClient thread = new TCPClient(server, currUser, password);
-
-                    connections.add(thread);
-
-                    List<Topic> topicList = thread.getTopicList();
-                    List<String> keywords = thread.getKeywords();
-
-                    thread.sendObject(new Topic(new ArrayList<>(), ""));
-                    thread.sendObject("true");
-                    thread.sendObject("true");
-
-                    ArrayList<Topic> subList = (ArrayList<Topic>)thread.readObject();
-
-                    System.out.println("Currently Subscribed: \n");
-                    for (Topic topic : subList){
-                        if (topic.hasSub(currUser)) {
-                            System.out.println(topic.toString() + "\n" +
-                                    "-----------------------------\n");
-                        }
-                    }
+                    helper.listSubscriptions();
 
                     break;
                 case "q":
-                    infoUpdate();
+                    helper.turnOff();
                     turnOff();
                     exit_flag = false;
                     break;
@@ -378,96 +197,6 @@ public class UserCLI {
                     System.out.println("Not an available command for subscribers.\n");
             }
         } while (exit_flag);
-    }
-
-    /**
-     * Function to publish an Event for use in EventManager.
-     * Takes in the User object associated with the node.
-     * No return, but creates a new Event, handled by the EventManager.
-     *
-     * @param currUser - the nodes' associated User obj.
-     */
-    private static void pubPub(User currUser, String server, String password) {
-        Scanner publish = new Scanner (System.in);
-
-        TCPClient thread = new TCPClient(server, currUser, password);
-
-        connections.add(thread);
-
-        List<Topic> topicList = thread.getTopicList();
-        List<String> keywords = thread.getKeywords();
-
-        Topic topic = null;
-        String e_title = "";
-        if (topicList.size() >= 1) {
-            System.out.println("Title of your event: ");
-            e_title = publish.nextLine();
-            while (topic == null) {
-                System.out.println("Enter Topic: ");
-                String topic_str = publish.nextLine();
-
-                for (Topic top : topicList) {
-                    if (top.getName().equals(topic_str)) {
-                        System.out.println("Valid topic");
-                        topic = top;
-                        break;
-                    }
-                }
-                if (topic == null) {
-                    System.out.println("Input does not match available options.\n" +
-                            "Try again\n");
-                }
-
-            }
-            System.out.println("Content for your event: \n");
-            String e_content = publish.nextLine();
-
-            Event new_event = new Event( -1, topic, e_title, e_content);
-
-            thread.sendObject(new_event);
-
-            //currUser.publish(new_event);
-        } else {
-            System.out.println("No topics available; returning to main command prompt...\n");
-        }
-
-
-    }
-
-    /**
-     * Function to advertise a Topic within EventManager.
-     * Takes in the User object associated with the node.
-     * No return, but creates a new Topic, handled by the EventManager.
-     *
-     * @param currUser - user associated with this UserCLI node
-     */
-    private static void pubAdv(User currUser, String server, String password) {
-        Scanner advertise = new Scanner (System.in);
-
-        System.out.println("Name of your topic: ");
-        String t_name = advertise.nextLine();
-
-        TCPClient thread = new TCPClient(server, currUser, password);
-
-        List<Topic> topicList = thread.getTopicList();
-        List<String> keywords = thread.getKeywords();
-
-        List<String> key_list = new ArrayList<String>();
-        String keyword;
-        do {
-            System.out.println("Input a keyword, or an empty string if you are done.");
-            keyword = advertise.nextLine();
-            if (!(keyword.equals(""))){
-                key_list.add(keyword);
-            }
-        } while(!(keyword.equals("")));
-
-        Topic new_topic = new Topic(key_list, t_name);
-
-        thread.sendObject(new_topic);
-
-        connections.add(thread);
-        //currUser.advertise(new_topic);
     }
 
     /**
@@ -480,6 +209,8 @@ public class UserCLI {
     private static void pubCLI(User currUser, String server, String password){
         Scanner pub_input = new Scanner(System.in);
         boolean exit_flag = true;
+
+        UserCLI_Helper helper = new UserCLI_Helper(currUser, server, password);
         do{
             System.out.println("Commands available to publishers: \n" +
                     "Publish (\"p\") \t" +
@@ -489,13 +220,13 @@ public class UserCLI {
             String command = pub_input.nextLine();
             switch(command){
                 case "p":
-                    pubPub(currUser, server, password);
+                    helper.pubPub();
                     break;
                 case "a":
-                    pubAdv(currUser, server, password);
+                    helper.advertise();
                     break;
                 case "q":
-                    infoUpdate();
+                    helper.turnOff();
                     turnOff();
                     exit_flag = false;
                     break;
@@ -512,7 +243,6 @@ public class UserCLI {
      */
     private static void startCLI(String server) {
         User currUser = CLIBegin(server);
-        // send user to eventmanager
         if (currUser.role == User.pubOrSub.SUB){
             System.out.println("============SUBSCRIBER============");
             subCLI(currUser, server, password);
