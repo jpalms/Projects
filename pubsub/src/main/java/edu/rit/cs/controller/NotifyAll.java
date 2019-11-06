@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.io.IOException;
 
 /**
- * Class of Notifying Subscribers about events
+ * Class of Notifying Subscribers about events and all Users about Topics
  **/
 public class NotifyAll extends Thread {
     private boolean running;

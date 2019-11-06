@@ -10,11 +10,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.sql.SQLOutput;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
+/*
+ * Class for handles User connection to the Server
+ */
 public class TCPClient extends Thread{
 
         private ObjectInputStream in;
@@ -23,8 +25,10 @@ public class TCPClient extends Thread{
         private Socket s;
         private List<Topic> topicList;
         private List<String> keywords;
-        private ArrayList<Object> updates = new ArrayList<>();
-
+     /*
+      * Constructor Class that connects to controller.Handler, then communicates
+      * with controller.Handler.Worker
+      */
     public TCPClient(String addr) {
             String server_address = addr;
             s = null;
@@ -45,6 +49,9 @@ public class TCPClient extends Thread{
             }
         }
 
+        /*
+         * Same setup as the previous constructor, but also handles in the user login
+         */
         public TCPClient(String addr, User user, String password) {
             String server_address = addr;
             s = null;
@@ -67,23 +74,50 @@ public class TCPClient extends Thread{
             }
         }
 
-        private void setTopicList(List<Topic> topics){
+    /**
+     *  Setter method to set topic list
+     *
+     * @param topics - list of Topic objects
+     */
+    private void setTopicList(List<Topic> topics){
             this.topicList = topics;
         }
 
-        private void setKeywords(List<String> keys){
+    /**
+     *  Setter method to set keyword list
+     *
+     * @param keys - list of all unique keywords that relate to a topic
+     */
+    private void setKeywords(List<String> keys){
             this.keywords = keys;
         }
 
+    /**
+     * Getter method to get the topic list
+     *
+     * @return - list of Topic objects
+     */
         public List<Topic> getTopicList() {
             return topicList;
         }
 
+    /**
+     * Getter method to get keyword list
+     *
+     * @return - list of all unique keywords that relate to a topic
+     */
         public List<String> getKeywords() {
             return keywords;
         }
 
-        public User autoLogin(User user, String password){
+    /**
+     * Handles the user login
+     *
+     * @param user - user trying to login
+     * @param password - password to login
+     * @return - the User that signed in
+     */
+        private User autoLogin(User user, String password){
             try {
                 out.writeObject("false");
                 out.writeObject(user.getId());
@@ -105,6 +139,11 @@ public class TCPClient extends Thread{
             return null;
         }
 
+    /**
+     * Function to send objects to the Server
+     *
+     * @param obj - object to send
+     */
         public void sendObject(Object obj){
             try {
                 out.writeObject(obj);
@@ -113,6 +152,11 @@ public class TCPClient extends Thread{
             }
         }
 
+    /**
+     * Function to read objects sent from the Server
+     *
+     * @return
+     */
         public Object readObject(){
             try {
                 return in.readObject();
@@ -124,52 +168,36 @@ public class TCPClient extends Thread{
             return new Object();
         }
 
-        public void sendBool(boolean bool){
+    /**
+     *  Function to look for new notification from the server and prints them
+     */
+    public void run() {
+        running = true;
+        while (running) {
             try {
-                out.writeBoolean(bool);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public boolean readBool(){
-            try {
-                return in.readBoolean();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return false;
-        }
-
-        public void run(){
-            this.receiver();
-        }
-        public void receiver(){
-            running = true;
-            while (running){
-                try {
-                    if(s.isConnected()) {
-                        Object obj = in.readObject();
+                if (s.isConnected()) {
+                    Object obj = in.readObject();
 
 
-                        if (obj instanceof Event) {
-                            System.out.println(obj + "\n");
-                            //updates.add((Event) (obj));
-                        } else if (obj instanceof Topic) {
-                            System.out.println(obj + "\n");
-                            //updates.add((Topic) (obj));
-                        }
+                    if (obj instanceof Event) {
+                        System.out.println(obj + "\n");
+                    } else if (obj instanceof Topic) {
+                        System.out.println(obj + "\n");
                     }
-                } catch (IOException e){
-                    System.err.println("IO: " + e.getMessage());
-                    turnOff();
-                } catch (ClassNotFoundException e){
-                    System.err.println("CLASS: " + e.getMessage());
-                    turnOff();
                 }
+            } catch (IOException e) {
+                System.err.println("IO: " + e.getMessage());
+                turnOff();
+            } catch (ClassNotFoundException e) {
+                System.err.println("CLASS: " + e.getMessage());
+                turnOff();
             }
         }
+    }
 
+    /**
+     * Function to turn off this thread
+     */
         public void turnOff(){
             running = false;
             try {
@@ -179,21 +207,16 @@ public class TCPClient extends Thread{
             }
         }
 
-        public void turnOffFirst(){
+    /**
+     * Function to turn of first thread which recieves objects from the server
+     */
+    public void turnOffFirst(){
             running = false;
             try {
                 s.close();
             } catch (IOException e) {
                 //e.printStackTrace();
             }
-        }
-
-        public ArrayList<Object> getUpdates() {
-            return updates;
-        }
-
-        public void emptyUpdates() {
-            updates = new ArrayList<>();
         }
     }
 

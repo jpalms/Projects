@@ -242,7 +242,6 @@ public class UserCLI_Helper {
                 thread.sendObject(topic);
                 thread.sendObject("false");
                 thread.sendObject("false");
-                //currUser.unsubscribe(topic);
             } else {
                 System.out.println("Input does not match available options.\n" +
                         "Returning to command list...\n");
