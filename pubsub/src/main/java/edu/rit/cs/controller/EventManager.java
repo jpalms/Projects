@@ -58,6 +58,13 @@ public class EventManager {
 	 * Write Operations
 	 */
 
+	/**
+     * Function to add/remove User from lists of currently online Users
+     *
+     * @param id - unique id of User
+     * @param user - User being added/removed
+     * @param on_off - boolean to indicate add or remove
+     */
 	public synchronized void on_offlineUser(String id, User user, boolean on_off){
 		if(on_off){
 			if(user.isSub())
@@ -113,10 +120,6 @@ public class EventManager {
 		}
 	}
 
-	public synchronized void addUser(User user){
-		allUsers.put(user.getId(), user);
-	}
-
 	/**
 	 * add subscriber to the internal list
 	 *
@@ -139,9 +142,14 @@ public class EventManager {
 		}
 	}
 
-	public synchronized HashMap<String, User> getAllUsers(){
-		return allUsers;
-	}
+    /**
+     * adds a user to list of all users that have an account
+     *
+     * @param user
+     */
+    public synchronized void addUser(User user){
+        allUsers.put(user.getId(), user);
+    }
 
 	/**
 	 * Either subscribes or unsubscribes a User from a given Topic
@@ -224,6 +232,14 @@ public class EventManager {
 	 *  Read Operations
 	 */
 
+    /**
+     * retrieve a map of users that have an account
+     *
+     * @return - Map of all Users that have an account
+     */
+    public synchronized HashMap<String, User> getAllUsers(){
+        return allUsers;
+    }
 
 	/**
 	 * show the list of subscriber for a specified topic
@@ -321,6 +337,8 @@ public class EventManager {
 	public synchronized User getUser(String id) {
 		return allUsers.get(id);
 	}
+
+	//_______________________________________________________________________
 
 	/**
 	 * Main function which is run and starts the program
