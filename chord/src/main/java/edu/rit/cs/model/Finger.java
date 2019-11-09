@@ -48,4 +48,8 @@ public class Finger {
         this.ideal = ideal;
     }
 
+    @Override
+    public String toString(){
+        return "index: " + index + "\tideal: " + ideal + "\t successor: " + actual;
+    }
 }

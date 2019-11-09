@@ -29,4 +29,13 @@ public class FingerTable {
     public ArrayList<Finger> getFingers() {
         return fingers;
     }
+
+    @Override
+    public String toString(){
+        String result = "Table:\n";
+        for (int i = 0; i < n; i++) {
+            result += "\t" + fingers.get(i).toString() + "\n";
+        }
+        return result;
+    }
 }
