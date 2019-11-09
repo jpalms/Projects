@@ -13,8 +13,12 @@ public class FingerTable {
         calcIdeal();
     }
 
+    public FingerTable(){
+        this.n = 0;
+        this.index = 0;
+    }
     private int log2(int num){
-        return (int) Math.ceil(((Math.log(num)/Math.log(2))));
+        return (int) Math.ceil(((Math.log(num)/Math.log(2) + 1e-10)));
     }
 
     public void calcIdeal(){

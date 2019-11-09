@@ -2,7 +2,7 @@ package edu.rit.cs.model;
 
 import java.io.File;
 
-public class Node {
+public class Node implements Comparable{
 
     private int id, nextId, prevId;
 
@@ -31,6 +31,13 @@ public class Node {
         this.table = new FingerTable();
     }
 
+    public Node(int id, int maxNumNodes, String ipAdrr, int port){
+        this.id = id;
+        this.ipAddr = ipAdrr;
+        this.port = port;
+        this.table = new FingerTable(id, maxNumNodes);
+    }
+
     //------------------- Getter --------------
 
     public int getId() {
@@ -43,6 +50,14 @@ public class Node {
 
     public int getPrevId() {
         return prevId;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public String getIpAddr() {
+        return ipAddr;
     }
 
     //------------------ Setter -----------------
@@ -68,5 +83,10 @@ public class Node {
 
     public File lookup(String hashCode){
         return null;
+    }
+
+    @Override
+    public int compareTo(Object cmp){
+        return this.id - ((Node)cmp).id;
     }
 }

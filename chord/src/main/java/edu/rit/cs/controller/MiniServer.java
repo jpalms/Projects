@@ -2,6 +2,7 @@ package edu.rit.cs.controller;
 
 import edu.rit.cs.model.Config;
 import edu.rit.cs.model.Connection;
+import edu.rit.cs.model.Node;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -11,7 +12,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Class to Handle the creations of all threads that communicate with clients
@@ -19,7 +20,8 @@ import java.util.List;
 public class MiniServer extends Thread {
     private ArrayList<Worker> workers = new ArrayList<>();
     boolean running;
-    private HashMap<String, Connection> sockets;
+    private TreeMap<String, Connection> sockets;
+    private int maxNodeNum;
     private AnchorNode anchorNode;
 
     /**
@@ -27,7 +29,8 @@ public class MiniServer extends Thread {
      **/
     public MiniServer(AnchorNode anchorNode) {
         this.anchorNode = anchorNode;
-        running = true;
+        this.running = true;
+        this.maxNodeNum = 0;
     }
 
     /**
@@ -35,7 +38,7 @@ public class MiniServer extends Thread {
      **/
     public void run() {
         workers = new ArrayList<>();
-        sockets = new HashMap<>();
+        sockets = new TreeMap<>();
         try {
             // start server
             int serverPort = Config.port;
@@ -90,7 +93,7 @@ public class MiniServer extends Thread {
      *
      * @return		int, size of the sockets list
      */
-    public int getSocketsSize(){
+    public synchronized int getSocketsSize(){
         return sockets.size();
     }
 
@@ -99,7 +102,7 @@ public class MiniServer extends Thread {
      *
      * @return		hashmap of sockets
      */
-    public HashMap<String, Connection> getSockets(){
+    public TreeMap<String, Connection> getSockets(){
         return sockets;
     }
 
@@ -112,6 +115,20 @@ public class MiniServer extends Thread {
         }
     }
 
+    private synchronized void newNode(int id){
+        if(id > maxNodeNum){
+            this.maxNodeNum = id;
+        }
+    }
+
+    private synchronized boolean isOnline(String id){
+        return sockets.containsKey(id);
+    }
+
+    private synchronized int getMaxNodeNum(){
+        return this.maxNodeNum;
+    }
+
     /**
      * Class for Worker threads that handle the communication with clients
      */
@@ -119,11 +136,6 @@ public class MiniServer extends Thread {
         ObjectInputStream in;
         ObjectOutputStream out;
         Socket clientSocket;
-        boolean running = false;
-        String username = "";
-        ArrayList<Object> eventsToSend = new ArrayList<>();
-        List<Object> newTopics = new ArrayList<>();
-        private Object info = new Object();
 
         /**
          * Constructor class for Worker
@@ -150,30 +162,36 @@ public class MiniServer extends Thread {
         @Override
         public void run() {
             try {
-                boolean newUser = in.readObject().equals("true");
-                if (newUser) {
-                    newLogin();
-                }
-                if (login()) {
-                    User user = em.getUser(username);
-                    out.writeObject(user);
-                    boolean sending = in.readObject().equals("true");
-                    if (sending) {
+                Object obj = in.readObject();
 
-                        out.writeObject(em.getTopicList());
-                        out.writeObject(em.getKeywords());
+                if(!(obj instanceof Node)) {
+                    login();
+                }else {
+                    boolean query = in.readObject().equals("true");
+                    if(query) {
+                        // query for actual successors
+                        Node node = (Node) obj;
+                        obj = in.readObject();
+                        Integer integer = (Integer) obj;
+                        int ideal = integer.intValue();
 
-                        if (user.isPub()) {
-                            receivedFromPub();
-                        } else if (user.isSub()) {
-                            receivedFromSub(user);
+                        if (getSocketsSize() == 1) {
+                            out.writeObject(obj);
+                        } else {
+                            TreeMap<String, Connection> tree = getSockets();
+                            String key = tree.higherKey(ideal + "");
+                            if (key != null) {
+                                out.writeObject(key);
+                            } else {
+                                out.writeObject(tree.firstKey());
+                            }
                         }
-                        this.clientSocket.close();
-                    } else {
-                        em.on_offlineUser(username, user, true);
-                        sockets.put(username, this);
+                    } else{
+                        // file stuff
+
                     }
                 }
+
             } catch (EOFException e) {
                 System.err.println("EOF:" + e.getMessage());
             } catch (IOException e) {
@@ -191,67 +209,24 @@ public class MiniServer extends Thread {
          * @throws IOException
          * @throws ClassNotFoundException
          */
-        public void newLogin() throws IOException, ClassNotFoundException {
+        public void login() throws IOException, ClassNotFoundException {
             // loop till unique username is generated
             Object obj;
             String id;
             do {
                 obj = in.readObject();
                 id = (String) obj;
-                out.writeObject(em.userExists(id) + "");
-            } while (em.userExists(id));
+                out.writeObject(isOnline(id) + "");
+            } while (isOnline(id));
 
             obj = in.readObject();
-            User user = (User) obj;
-            em.addUser(user);
-            if (user.isSub())
-                em.add_removeSub(user, true);
+            Node node = (Node) obj;
+
+            sockets.put(id, new Connection(node.getIpAddr(), node.getPort()));
+
+            out.writeObject(new Node(node.getId(), getMaxNodeNum(), node.getIpAddr(), node.getPort()));
         }
 
-        /**
-         * @return true if username is in allUsers and the password matches the user
-         * @throws IOException
-         * @throws ClassNotFoundException
-         **/
-        public boolean login() throws IOException, ClassNotFoundException {
-            String id, password;
-            Object obj;
-            //login
-            do {
-                obj = in.readObject();
-                id = (String) obj;
-                out.writeObject(em.userExists(id) + "");
-            } while (!em.userExists(id));
-
-            obj = in.readObject();
-            password = (String) obj;
-            setUsername(id);
-
-            return em.userExists(id) && em.getUser(id).isCorrectPassord(password);
-        }
-
-        /**
-         * Sets the username for this connections user
-         *
-         * @param username - unique String id for a User
-         */
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        /**
-         * helper functions to handle sending info back and forth between TCP and EM
-         *
-         * @throws IOException
-         */
-        public void sendObj() throws IOException {
-            while(!eventsToSend.isEmpty()){
-                out.writeObject(eventsToSend.remove(0));
-            }
-            while(!newTopics.isEmpty()){
-                out.writeObject(newTopics.remove(0));
-            }
-        }
         /**
          * Turns off the connection and removes itself from the list of active workers
          */
@@ -259,7 +234,6 @@ public class MiniServer extends Thread {
             try {
                 workers.remove(this);
                 clientSocket.close();
-                running = false;
             } catch (IOException e) {
                 e.printStackTrace();
             }
