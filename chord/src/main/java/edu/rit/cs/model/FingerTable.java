@@ -26,6 +26,21 @@ public class FingerTable {
         }
     }
 
+    //------------------- Setters ---------------------------
+
+    public void setSuccessorAtIndex(int i, int successor){
+        fingers.get(i).setActual(successor);
+    }
+
+    //------------------- Getters ---------------------------
+    public int getIdealAtIndex(int i){
+        return fingers.get(i).getIdeal();
+    }
+
+    public int getSuccessorAtIndex(int i){
+        return fingers.get(i).getActual();
+    }
+
     public ArrayList<Finger> getFingers() {
         return fingers;
     }
@@ -33,9 +48,11 @@ public class FingerTable {
     @Override
     public String toString(){
         String result = "Table:\n";
+
         for (int i = 0; i < n; i++) {
             result += "\t" + fingers.get(i).toString() + "\n";
         }
+
         return result;
     }
 }
