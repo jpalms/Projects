@@ -62,6 +62,10 @@ public class Node implements Comparable{
         return ipAddr;
     }
 
+    public FingerTable getTable(){
+        return table;
+    }
+
     //------------------ Setter -----------------
 
     public void setNextId(int nextId) {

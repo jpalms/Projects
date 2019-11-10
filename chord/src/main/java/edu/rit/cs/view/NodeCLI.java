@@ -80,7 +80,9 @@ public class NodeCLI {
         NodeCLI_Helper helper = new NodeCLI_Helper(currNode, server);
 
         System.out.println("Loading Finger Table");
+
         helper.queryAll();
+
         do{
             System.out.println("Commands available to Node: \n" +
                     "Insert File (\"i\") \t" +

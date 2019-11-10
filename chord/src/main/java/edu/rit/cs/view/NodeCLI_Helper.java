@@ -37,13 +37,15 @@ public class NodeCLI_Helper {
      */
     public void queryAll() {
 
-        TCPClientNode thread = new TCPClientNode(server);
-
-        connections.add(thread);
+        for(int i = 0; i < node.getTable().getFingers().size(); i++){
+            query(i);
+        }
     }
 
-    public void query(){
-
+    public void query(int i){
+        int update = 0;
+        // todo
+        node.getTable().setSuccessorAtIndex(i, update);
     }
 
     public void insert(File file){
