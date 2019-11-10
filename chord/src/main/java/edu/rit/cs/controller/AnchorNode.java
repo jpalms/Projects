@@ -103,6 +103,10 @@ public class AnchorNode {
     public synchronized Connection getNode(String id){
 		return onlineNodes.get(id);
 	}
+
+	public synchronized void showAllNode(){
+		System.out.println("Not Done yet");
+	}
 	
 	//_______________________________________________________________________
 

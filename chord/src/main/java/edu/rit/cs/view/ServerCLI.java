@@ -7,6 +7,10 @@ import edu.rit.cs.model.Topic;
 import edu.rit.cs.model.User;
 */
 
+import edu.rit.cs.controller.AnchorNode;
+import edu.rit.cs.controller.MiniServer;
+import edu.rit.cs.controller.NotifyNodes;
+
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -17,32 +21,32 @@ public class ServerCLI {
      * Takes a handler thread (with the connections to the peer nodes of the chords
      * No return, but calls System.exit with status (1).
      *
-     * @param n - Handler passed in, used in stopService
+     * @param  - Handler passed in, used in stopService
      */
-    public static void serverTerminate( /* TODO put something here */){
-        something.turnOff();
-        System.out.println("Server has been terminated.");
+    public static void serverTerminate(NotifyNodes notifyNodes){
+        notifyNodes.turnOff();
+        System.out.println("MiniServer has been terminated.");
         System.exit(1);
     }
 
     /**
-     * Function to show all chord nodes in the Server.
-     * Takes an Server as a parameter.
+     * Function to show all chord nodes in the MiniServer.
+     * Takes an MiniServer as a parameter.
      * No return, but prints the list of subscribers to console.
      */
-    public static void showChord(Server sv){
-        sv.showAllNodes();
+    public static void showChord(AnchorNode sv){
+        sv.showAllNode();
     }
 
     /**
-     * Function to start up the Server's CLI.
-     * Takes an Server and a Handler, to be passed later on.
+     * Function to start up the MiniServer's CLI.
+     * Takes an MiniServer and a Handler, to be passed later on.
      * No return value, but responds based on user input.
      *
-     * @param sv - Server currently running on the node
+     * @param sv - MiniServer currently running on the node
      * @param h - Handler to be passed on later
      */
-    public void startCLI(Server sv, Handler h){
+    public void startCLI(AnchorNode sv, NotifyNodes h){
         System.out.println("============SERVER============\n");
 
         Scanner sv_input = new Scanner(System.in);
@@ -56,7 +60,7 @@ public class ServerCLI {
             String command = sv_input.nextLine();
             switch(command){
                 case "t":
-                    serverTerminate();
+                    serverTerminate(h);
                     exit_flag = false;
                     break;
                 case "a":
