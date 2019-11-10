@@ -1,35 +1,20 @@
 package edu.rit.cs.controller;
 
 
-import edu.rit.cs.model.Event;
-import edu.rit.cs.model.Topic;
-import edu.rit.cs.model.User;
-import edu.rit.cs.view.EventCLI;
+import edu.rit.cs.model.Connection;
+import edu.rit.cs.view.ServerCLI;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.List;
 
 public class AnchorNode {
 
-	private HashMap<String, User> subscribers;
-	private HashMap<String, User> allUsers;
-	private HashMap<String, Topic> topics;
-	private HashMap<String, List<Topic>> keyToTopics;
-	private List<Event> newEvents;
-	private List<Topic> advertise;
-	private HashMap<String, User> onlineUsers, onlinePublishers;
+	private TreeMap<String, Connection> onlineNodes;
 
 
 	public AnchorNode() {
-		subscribers = new HashMap<>();
-		allUsers = new HashMap<>();
-		topics = new HashMap<>();
-		keyToTopics = new HashMap<>();
-		newEvents = new ArrayList<>();
-		advertise = new ArrayList<>();
-		onlinePublishers = new HashMap<>();
-		onlineUsers = new HashMap<>();
+		onlineNodes = new TreeMap<>();
 	}
 	//
 
@@ -37,9 +22,9 @@ public class AnchorNode {
 	 * Start the repo service
 	 **/
 	private void startService() {
-		NotifyAll notifyAll = new NotifyAll(this);
+		NotifyNodes notifyAll = new NotifyNodes(this);
 		notifyAll.start();
-		EventCLI cli = new EventCLI();
+		ServerCLI cli = new ServerCLI();
 		cli.startCLI(this, notifyAll);
 	}
 
@@ -47,7 +32,7 @@ public class AnchorNode {
 	 *  Stop the repo service
 	 * @param h Handler instance that takes care of shutdown
 	 */
-	public void stopService(Handler h) {
+	public void stopService(MiniServer h) {
 		h.turnOff();
 	}
 // ___________________________________________________________
@@ -55,174 +40,17 @@ public class AnchorNode {
 	/**
 	 * Write Operations
 	 */
-
-	/**
-     * Function to add/remove User from lists of currently online Users
-     *
-     * @param id - unique id of User
-     * @param user - User being added/removed
-     * @param on_off - boolean to indicate add or remove
-     */
-	public synchronized void on_offlineUser(String id, User user, boolean on_off){
-		if(on_off){
-			if(user.isSub())
-				onlineUsers.put(id, user);
-			else
-				onlinePublishers.put(id, user);
-		}else {
-			onlineUsers.remove(id);
-			onlinePublishers.remove(id);
-		}
-	}
-	/**
-	 * notify all subscribers of new event
-	 *
-	 * @param event - Event component
-	 **/
-	public synchronized void notifySubscribers(Event event) {
-		newEvents.add(event);
-	}
-
-	/**
-	 * add new topic when received advertisement of new topic
-	 *
-	 * @param topic - Topic component
-	 **/
-	public synchronized void addTopic(Topic topic) {
-		topics.put(topic.getName() + "", topic);
-		for (String keyword : topic.getKeywords()) {
-			if (keyToTopics.containsKey(keyword)) {
-				keyToTopics.get(keyword).add(topic);
-			} else {
-				ArrayList<Topic> list = new ArrayList<>();
-				list.add(topic);
-				keyToTopics.put(keyword, list);
-			}
-		}
-		advertise.add(topic);
-	}
-
-	/**
-	 * Either adds or removes a subscriber from the internal list
-	 * Useful to use with TCPClient inputs
-	 *
-	 * @param user 			Passed user associated UserCLI node
-	 * @param addOrRemove 	determines which function to execute
-	 *                      	true = add, false = remove
-	 */
-	public synchronized void add_removeSub(User user, boolean addOrRemove) {
-		if (addOrRemove) {
-			addSubscriber(user);
-		} else {
-			removeSubscriber(user);
-		}
-	}
-
-	/**
-	 * add subscriber to the internal list
-	 *
-	 * @param user - Subscriber instance of User component
-	 **/
-	private synchronized void addSubscriber(User user) {
-		subscribers.put(user.getId(), user);
-	}
-
-	/**
-	 * remove subscriber from the list
-	 *
-	 * @param user - Subscriber instance of User
-	 **/
-
-	private synchronized void removeSubscriber(User user) {
-		subscribers.remove(user);
-		for (Topic topic : topics.values()) {
-			topic.removeSub(user.getId());
-		}
-	}
+	
+	
 
     /**
      * adds a user to list of all users that have an account
      *
-     * @param user
+     * @param
      */
-    public synchronized void addUser(User user){
-        allUsers.put(user.getId(), user);
-    }
-
-	/**
-	 * Either subscribes or unsubscribes a User from a given Topic
-	 * Useful to use with TCPClient inputs
-	 *
-	 * @param user 			User to be added / removed from Topic's subscribed list
-	 * @param obj 			Object input to account for different forms of functions
-	 * @param subOrUnsub 	boolean to determine function performed
-	 *                      	true = subscribe, false = unsubscribe
-	 *
-	 */
-	public synchronized void subUnsubTopic(User user, Object obj, boolean subOrUnsub) {
-
-		if (obj instanceof Topic)
-			if (subOrUnsub)
-				subscribeToTopic(user, (Topic) obj);
-			else
-				unSubscribeFromTopic(user, (Topic) obj);
-		else if (obj instanceof String) {
-			if (subOrUnsub)
-				subscribeToTopic(user, (String) obj);
-			else
-				unSubscribeFromAll(user);
-		}
-	}
-
-	/**
-	 * adds a subscriber to a Topic
-	 *
-	 * @param user  - Subscriber instance of User component
-	 * @param topic - Topic component
-	 **/
-
-	private synchronized void subscribeToTopic(User user, Topic topic) {
-		this.topics.get(topic.getName()).addSub(user.getId(), user);
-	}
-
-	/**
-	 * add a subscriber to Topics with a certain keyword
-	 *
-	 * @param user    - Subscriber instance of User component
-	 * @param keyword - keyword associated with Topics that the subscriber subscribes to
-	 */
-	private synchronized void subscribeToTopic(User user, String keyword) {
-		List<Topic> topicList = this.keyToTopics.get(keyword);
-
-		for (Topic topic : topicList) {
-			this.topics.get(topic.getName()).addSub(user.getId(), user);
-		}
-	}
-
-	/**
-	 * Unsubscribe's a user from a Topic
-	 *
-	 * @param user  - Subscriber instance of User component
-	 * @param topic - Topic component
-	 **/
-	private synchronized void unSubscribeFromTopic(User user, Topic topic) {
-		this.topics.get(topic.getName()).removeSub(user.getId());
-	}
-
-
-	/**
-	 * Unsubscribe's a user from all topics
-	 *
-	 * @param user
-	 */
-	public synchronized void unSubscribeFromAll(User user) {
-		for (Topic topic : topics.values()) {
-			if (topic.hasSub(user)) {
-				unSubscribeFromTopic(user, topic);
-			}
-		}
-
-	}
+	public synchronized void addNode(String id, Connection conn){
+		onlineNodes.put(id, conn);
+	}    
 
 // _________________________________________________________
 
@@ -230,112 +58,30 @@ public class AnchorNode {
 	 *  Read Operations
 	 */
 
-    /**
-     * retrieve a map of users that have an account
-     *
-     * @return - Map of all Users that have an account
-     */
-    public synchronized HashMap<String, User> getAllUsers(){
-        return allUsers;
-    }
-
 	/**
-	 * show the list of subscriber for a specified topic
+	 * Gets size of the onlineNodes list
 	 *
-	 * @param topic - Topic component
-	 **/
-	public synchronized void showSubscribers(Topic topic) {
-		System.out.println("Subscribers:");
-		for (String id : topic.getSubs().keySet()) {
-			System.out.println("\t" + subscribers.get(id));
-		}
-	}
-
-	/**
-	 * show all subscribers
+	 * @return		int, size of the onlineNodes list
 	 */
-	public synchronized void showAllSubs() {
-		System.out.println("All Subscribers:");
-		for (User user : subscribers.values()) {
-			System.out.println("\t " + user.toString());
-		}
+	public synchronized int getNumOnline(){
+		return onlineNodes.size();
 	}
 
 	/**
-	 * Returns a list of Topics that a User is subscribed to
+	 * Gets TreeMap of onlineNodes
 	 *
-	 * @param user - Subscriber instance of User
-	 * @return - List of Subscribed Topics
+	 * @return		TreeMap of onlineNodes
 	 */
-	public synchronized ArrayList<Topic> getSubscribedTopics(User user) {
-		ArrayList<Topic> topicArrayList = new ArrayList<>();
-
-		for (Topic topic : topics.values()) {
-			if (topic.hasSub(user)) {
-				topicArrayList.add(topic);
-			}
-		}
-
-		return topicArrayList;
+	public TreeMap<String, Connection> getOnlineNodes(){
+		return onlineNodes;
 	}
 
-	/**
-	 * Returns a list of all Topics
-	 *
-	 * @return - list of all topics
-	 */
-	public synchronized ArrayList<Topic> getTopicList() {
-		ArrayList<Topic> list = new ArrayList();
-		for (Topic top : topics.values())
-			list.add(top);
-		return list;
-	}
-
-	/**
-	 * Returns the HashMap of all Topics
-	 *
-	 * @return - HashMap of all topics
-	 */
-	public synchronized HashMap<String, Topic> getTopicMap() {
-		return this.topics;
-	}
-
-	/**
-	 * Returns a list of all keywords
-	 *
-	 * @return - returns a list of all keywords
-	 **/
-	public synchronized ArrayList<String> getKeywords() {
-		ArrayList<String> key = new ArrayList<>();
-		for (String obj : keyToTopics.keySet()) {
-			key.add(obj);
-		}
-		return key;
-	}
-
-	/**
-	 * Helper function to see whether the given User exists in the internal list
-	 *
-	 * @param id 		name of User
-	 * @return			boolean describing existence of User
-	 */
-	public synchronized boolean userExists(String id) {
-		HashMap<String, User> temp = getAllUsers();
-		if (temp.isEmpty())
+	public synchronized boolean isOnline(String id){
+		if(onlineNodes.isEmpty())
 			return false;
-		return temp.containsKey(id);
+		return onlineNodes.containsKey(id);
 	}
-
-	/**
-	 * Gets one user from the internal list based on internal list
-	 *
-	 * @param id		name of User
-	 * @return			User that was searched for
-	 */
-	public synchronized User getUser(String id) {
-		return allUsers.get(id);
-	}
-
+	
 	//_______________________________________________________________________
 
 	/**
@@ -344,7 +90,7 @@ public class AnchorNode {
 	 * @param args
 	 **/
 	public static void main(String[] args) {
-		new EventManager().startService();
+		new AnchorNode().startService();
 		// start command line
 	}
 }

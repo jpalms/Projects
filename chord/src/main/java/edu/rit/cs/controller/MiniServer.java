@@ -11,7 +11,6 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.TreeMap;
 
 /**
@@ -20,7 +19,6 @@ import java.util.TreeMap;
 public class MiniServer extends Thread {
     private ArrayList<Worker> workers = new ArrayList<>();
     boolean running;
-    private TreeMap<String, Connection> sockets;
     private int maxNodeNum;
     private AnchorNode anchorNode;
 
@@ -38,7 +36,6 @@ public class MiniServer extends Thread {
      **/
     public void run() {
         workers = new ArrayList<>();
-        sockets = new TreeMap<>();
         try {
             // start server
             int serverPort = Config.port;
@@ -64,49 +61,6 @@ public class MiniServer extends Thread {
     }
 
     /**
-     * Helper function to get number of worker thread nodes
-     *
-     * @return		size of ArrayList workers
-     */
-    public int getWorkersSize() {
-        return workers.size();
-    }
-
-    /**
-     * Shows workers and removes ones that are no longer alive.
-     *
-     * @return		returns alive worker threads
-     */
-    public ArrayList<Worker> getWorkers() {
-        ArrayList<Worker> info = new ArrayList<>();
-        for (int i = 0; i < workers.size() ; i++) {
-            if (workers.get(i) != null && !workers.get(i).isAlive()) {
-                info.add(workers.get(i));
-                workers.remove(workers.get(i));
-            }
-        }
-        return info;
-    }
-
-    /**
-     * Gets size of the sockets list
-     *
-     * @return		int, size of the sockets list
-     */
-    public synchronized int getSocketsSize(){
-        return sockets.size();
-    }
-
-    /**
-     * Gets hashmap of sockets
-     *
-     * @return		hashmap of sockets
-     */
-    public TreeMap<String, Connection> getSockets(){
-        return sockets;
-    }
-
-    /**
      * Clean turns off all the running worker threads
      */
     private void turnOffWorkers() {
@@ -119,10 +73,6 @@ public class MiniServer extends Thread {
         if(id > maxNodeNum){
             this.maxNodeNum = id;
         }
-    }
-
-    private synchronized boolean isOnline(String id){
-        return sockets.containsKey(id);
     }
 
     private synchronized int getMaxNodeNum(){
@@ -175,10 +125,10 @@ public class MiniServer extends Thread {
                         Integer integer = (Integer) obj;
                         int ideal = integer.intValue();
 
-                        if (getSocketsSize() == 1) {
+                        if (anchorNode.getNumOnline() == 1) {
                             out.writeObject(obj);
                         } else {
-                            TreeMap<String, Connection> tree = getSockets();
+                            TreeMap<String, Connection> tree = anchorNode.getOnlineNodes();
                             String key = tree.higherKey(ideal + "");
                             if (key != null) {
                                 out.writeObject(key);
@@ -216,13 +166,15 @@ public class MiniServer extends Thread {
             do {
                 obj = in.readObject();
                 id = (String) obj;
-                out.writeObject(isOnline(id) + "");
-            } while (isOnline(id));
+                out.writeObject(anchorNode.isOnline(id) + "");
+            } while (anchorNode.isOnline(id));
 
             obj = in.readObject();
             Node node = (Node) obj;
 
-            sockets.put(id, new Connection(node.getIpAddr(), node.getPort()));
+            newNode(node.getId());
+
+            anchorNode.addNode(id, new Connection(node.getIpAddr(), node.getPort()));
 
             out.writeObject(new Node(node.getId(), getMaxNodeNum(), node.getIpAddr(), node.getPort()));
         }
