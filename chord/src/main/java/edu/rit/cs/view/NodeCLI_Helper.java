@@ -6,8 +6,6 @@ import edu.rit.cs.model.Node;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
 public class NodeCLI_Helper {
 
@@ -37,14 +35,14 @@ public class NodeCLI_Helper {
     /**
      *
      */
-    public void queueAll() {
+    public void queryAll() {
 
         TCPClientNode thread = new TCPClientNode(server);
 
         connections.add(thread);
     }
 
-    public void queue(){
+    public void query(){
 
     }
 

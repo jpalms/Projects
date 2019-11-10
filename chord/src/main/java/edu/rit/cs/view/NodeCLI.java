@@ -57,10 +57,9 @@ public class NodeCLI {
             String id = user_input.nextLine();
             firstThread.sendObject(id);
             if (firstThread.readObject().equals("true")) {
-                System.out.println("Loading Finger Table");
-                Node user_node = (Node)firstThread.readObject();
-                firstThread.start();
-                return user_node;
+                Node node = (Node)firstThread.readObject();
+
+                return node;
             } else {
                 System.out.println("Node id already exists\n ");
             }
@@ -79,6 +78,9 @@ public class NodeCLI {
         boolean exit_flag = true;
 
         NodeCLI_Helper helper = new NodeCLI_Helper(currNode, server);
+
+        System.out.println("Loading Finger Table");
+        helper.queryAll();
         do{
             System.out.println("Commands available to Node: \n" +
                     "Insert File (\"i\") \t" +
@@ -121,6 +123,7 @@ public class NodeCLI {
     private static void startCLI(String server) {
         Node currNode = CLIBegin(server);
         System.out.println("============NODE============");
+
         nodeCLI(currNode, server);
     }
 
