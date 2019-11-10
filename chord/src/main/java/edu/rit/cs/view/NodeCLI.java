@@ -79,17 +79,17 @@ public class NodeCLI {
 
         NodeCLI_Helper helper = new NodeCLI_Helper(currNode, server);
         do{
-            System.out.println("Commands available to publishers: \n" +
-                    "Publish (\"p\") \t" +
-                    "Advertise (\"a\") \t" +
+            System.out.println("Commands available to Node: \n" +
+                    "Insert File (\"i\") \t" +
+                    "Lookup File (\"l\") \t" +
                     "Quit (\"q\")\n"
             );
             String command = pub_input.nextLine();
             switch(command){
-                case "p":
+                case "i":
                     //helper.publish();
                     break;
-                case "a":
+                case "l":
                     //helper.advertise();
                     break;
                 case "q":
