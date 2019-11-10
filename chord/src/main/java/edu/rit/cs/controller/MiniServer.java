@@ -125,17 +125,7 @@ public class MiniServer extends Thread {
                         Integer integer = (Integer) obj;
                         int ideal = integer.intValue();
 
-                        if (anchorNode.getNumOnline() == 1) {
-                            out.writeObject(obj);
-                        } else {
-                            TreeMap<String, Connection> tree = anchorNode.getOnlineNodes();
-                            String key = tree.higherKey(ideal + "");
-                            if (key != null) {
-                                out.writeObject(key);
-                            } else {
-                                out.writeObject(tree.firstKey());
-                            }
-                        }
+                        anchorNode.getSuccessor(ideal);
                     } else{
                         // file stuff
 

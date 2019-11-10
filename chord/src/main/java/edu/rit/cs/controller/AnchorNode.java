@@ -81,6 +81,20 @@ public class AnchorNode {
 			return false;
 		return onlineNodes.containsKey(id);
 	}
+
+	public synchronized String getSuccessor(int ideal){
+        if (this.getNumOnline() == 1) {
+            return ideal + "";
+        } else {
+            TreeMap<String, Connection> tree = this.getOnlineNodes();
+            String key = tree.higherKey(ideal + "");
+            if (key != null) {
+                return key;
+            } else {
+                return(tree.firstKey());
+            }
+        }
+    }
 	
 	//_______________________________________________________________________
 
