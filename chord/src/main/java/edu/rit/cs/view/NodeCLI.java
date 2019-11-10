@@ -6,8 +6,8 @@ import edu.rit.cs.model.Node;
 import java.util.Scanner;
 
 /**
- * Class to run on publisher / subscriber nodes.
- * Makes a Node object based on input.
+ * Class to run the chord peer nodes.
+ * Makes a Node object, and based on input, assigns a location.
  */
 
 public class NodeCLI {
