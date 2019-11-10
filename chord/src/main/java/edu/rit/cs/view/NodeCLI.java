@@ -3,6 +3,7 @@ package edu.rit.cs.view;
 import edu.rit.cs.controller.TCPClientNode;
 import edu.rit.cs.model.Node;
 
+import java.io.File;
 import java.util.Scanner;
 
 /**
@@ -74,7 +75,7 @@ public class NodeCLI {
      * @param currNode - the nodes' associated Node obj.
      */
     private static void nodeCLI(Node currNode, String server){
-        Scanner pub_input = new Scanner(System.in);
+        Scanner input = new Scanner(System.in);
         boolean exit_flag = true;
 
         NodeCLI_Helper helper = new NodeCLI_Helper(currNode, server);
@@ -84,21 +85,30 @@ public class NodeCLI {
                     "Lookup File (\"l\") \t" +
                     "Quit (\"q\")\n"
             );
-            String command = pub_input.nextLine();
+            String command = input.nextLine();
             switch(command){
                 case "i":
-                    //helper.publish();
+                    System.out.println("Enter file path: ");
+                    String path = input.nextLine();
+                    File f = new File(path);
+
+                    helper.insert(f);
+
                     break;
                 case "l":
-                    //helper.advertise();
+                    System.out.println("Enter file to lookup: ");
+                    String hash = input.nextLine();
+
+                    helper.lookup(hash);
                     break;
                 case "q":
-                    helper.turnOff();
+                    helper.quit();
+
                     turnOff();
                     exit_flag = false;
                     break;
                 default:
-                    System.out.println("Not an available command for subscribers.\n");
+                    System.out.println("Not an available command for a Node.\n");
             }
         } while (exit_flag);
     }
