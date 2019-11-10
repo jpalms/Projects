@@ -105,7 +105,8 @@ public class AnchorNode {
 	}
 
 	public synchronized void showAllNode(){
-		System.out.println("Not Done yet");
+		for(String node: onlineNodes.keySet())
+		System.out.println("Node: " + node + "\n");
 	}
 	
 	//_______________________________________________________________________
