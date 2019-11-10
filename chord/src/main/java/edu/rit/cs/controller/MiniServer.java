@@ -4,13 +4,11 @@ import edu.rit.cs.model.Config;
 import edu.rit.cs.model.Connection;
 import edu.rit.cs.model.Node;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.TreeMap;
 
 /**
@@ -18,6 +16,7 @@ import java.util.TreeMap;
  **/
 public class MiniServer extends Thread {
     private ArrayList<Worker> workers = new ArrayList<>();
+    private HashMap<String, ArrayList<File>> removedNodes;
     boolean running;
     private int maxNodeNum;
     private AnchorNode anchorNode;
@@ -29,6 +28,7 @@ public class MiniServer extends Thread {
         this.anchorNode = anchorNode;
         this.running = true;
         this.maxNodeNum = 0;
+        this.removedNodes = new HashMap<>();
     }
 
     /**
@@ -79,6 +79,24 @@ public class MiniServer extends Thread {
         return this.maxNodeNum;
     }
 
+    private synchronized void nodeRemoved(Node node, ArrayList<File> files){
+        if(!removedNodes.containsKey(node.getId() + ""))
+            removedNodes.put(node.getId() + "", files);
+        else
+            removedNodes.get(node.getId() + "").addAll(files);
+        anchorNode.removeNode(node.getId() + "");
+    }
+
+    public synchronized boolean update(){
+        return !removedNodes.isEmpty();
+    }
+
+    public synchronized HashMap<String, ArrayList<File>> getRemovedNodes() {
+        HashMap<String, ArrayList<File>> temp = removedNodes;
+        removedNodes = new HashMap<>();
+        return temp;
+    }
+
     /**
      * Class for Worker threads that handle the communication with clients
      */
@@ -117,18 +135,29 @@ public class MiniServer extends Thread {
                 if(!(obj instanceof Node)) {
                     login();
                 }else {
-                    boolean query = in.readObject().equals("true");
-                    if(query) {
+                    Node node = (Node) obj;
+                    obj = in.readObject();
+                    if("query".equals(obj)) {
                         // query for actual successors
-                        Node node = (Node) obj;
                         obj = in.readObject();
                         Integer integer = (Integer) obj;
                         int ideal = integer.intValue();
 
-                        anchorNode.getSuccessor(ideal);
-                    } else{
+                        out.writeObject(anchorNode.getSuccessor(ideal));
+
+                    } else if("file".equals(obj)){
                         // file stuff
 
+                    } else if("quit".equals(obj)){
+                        obj = in.readObject();
+                        int numFiles = ((Integer) obj).intValue();
+
+                        ArrayList<File> files = new ArrayList<>();
+                        for (int i = 0; i < numFiles; i++) {
+                            files.add((File)in.readObject());
+                        }
+
+                        nodeRemoved(node, files);
                     }
                 }
 

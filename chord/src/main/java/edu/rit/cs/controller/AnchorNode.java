@@ -50,7 +50,11 @@ public class AnchorNode {
      */
 	public synchronized void addNode(String id, Connection conn){
 		onlineNodes.put(id, conn);
-	}    
+	}
+
+	public synchronized void removeNode(String id){
+		onlineNodes.remove(id);
+	}
 
 // _________________________________________________________
 
