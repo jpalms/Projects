@@ -99,6 +99,10 @@ public class AnchorNode {
             }
         }
     }
+
+    public synchronized Connection getNode(String id){
+		return onlineNodes.get(id);
+	}
 	
 	//_______________________________________________________________________
 

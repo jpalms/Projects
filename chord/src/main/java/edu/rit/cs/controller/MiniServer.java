@@ -147,6 +147,24 @@ public class MiniServer extends Thread {
 
                     } else if("file".equals(obj)){
                         // file stuff
+                        obj = in.readObject();
+                        if("insert".equals(obj)){
+                            obj = in.readObject();
+                            File f = (File)obj;
+
+                            clientSocket.close();
+                            // todo
+                            // open connection to client to send file too
+
+                        } else if("lookup".equals(obj)){
+                            obj = in.readObject();
+                            String str = (String)obj;
+
+                            str = anchorNode.getSuccessor(Integer.parseInt(str));
+
+                            // return Connection to node
+                            out.writeObject(anchorNode.getNode(str));
+                        }
 
                     } else if("quit".equals(obj)){
                         obj = in.readObject();
@@ -169,6 +187,8 @@ public class MiniServer extends Thread {
                 System.err.println("CLASS:" + e.getMessage());
             } catch (NullPointerException e) {
                 System.err.println("NULL: " + e.getMessage());
+            } finally {
+                turnOff();
             }
         }
 
