@@ -228,7 +228,10 @@ public class MiniServer extends Thread {
 
             anchorNode.addNode(id, new Connection(node.getIpAddr(), node.getPort(), node.getId()));
 
-            out.writeObject(new Node(node.getId(), getMaxNodeNum(), node.getIpAddr(), node.getPort()));
+            int nextId = Integer.parseInt(anchorNode.getSuccessor(node.getId()));
+            int prevId =  Integer.parseInt(anchorNode.getPrev(node.getId()));
+
+            out.writeObject(new Node(node.getId(), getMaxNodeNum(), node.getIpAddr(), node.getPort(),nextId , prevId));
         }
 
         /**

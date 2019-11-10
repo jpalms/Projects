@@ -95,7 +95,7 @@ public class AnchorNode {
             if (key != null) {
                 return key;
             } else {
-                return(tree.firstKey());
+                return tree.firstKey();
             }
         }
     }
@@ -108,7 +108,20 @@ public class AnchorNode {
 		for(String node: onlineNodes.keySet())
 		System.out.println("Node: " + node + "\n");
 	}
-	
+
+	public synchronized String getPrev(int id){
+		if (this.getNumOnline() == 1){
+			return id + "";
+		} else{
+			TreeMap<String, Connection> tree = this.getOnlineNodes();
+			String key = tree.lowerKey(id + "");
+			if(key != null){
+				return key;
+			} else{
+				return tree.lastKey();
+			}
+		}
+	}
 	//_______________________________________________________________________
 
 	/**

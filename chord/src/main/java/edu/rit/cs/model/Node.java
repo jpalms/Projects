@@ -31,11 +31,13 @@ public class Node implements Comparable{
         this.table = new FingerTable();
     }
 
-    public Node(int id, int maxNumNodes, String ipAdrr, int port){
+    public Node(int id, int maxNumNodes, String ipAdrr, int port, int nextId, int prevId){
         this.id = id;
         this.ipAddr = ipAdrr;
         this.port = port;
         this.table = new FingerTable(id, maxNumNodes);
+        this.nextId = nextId;
+        this.prevId = prevId;
     }
 
     //------------------- Getter --------------
@@ -61,11 +63,6 @@ public class Node implements Comparable{
     }
 
     //------------------ Setter -----------------
-
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public void setNextId(int nextId) {
         this.nextId = nextId;

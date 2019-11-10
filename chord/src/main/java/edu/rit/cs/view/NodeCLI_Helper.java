@@ -38,23 +38,8 @@ public class NodeCLI_Helper {
      *
      */
     public void queueAll() {
-        Scanner advertise = new Scanner (System.in);
-
-        System.out.println("Name of your topic: ");
-        String t_name = advertise.nextLine();
 
         TCPClientNode thread = new TCPClientNode(server);
-
-
-        List<String> key_list = new ArrayList<String>();
-        String keyword;
-        do {
-            System.out.println("Input a keyword, or an empty string if you are done.");
-            keyword = advertise.nextLine();
-            if (!(keyword.equals(""))){
-                key_list.add(keyword);
-            }
-        } while(!(keyword.equals("")));
 
         connections.add(thread);
     }
