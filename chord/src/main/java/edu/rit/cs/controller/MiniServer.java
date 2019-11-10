@@ -9,7 +9,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.TreeMap;
 
 /**
  * Class to Handle the creations of all threads that communicate with clients
@@ -80,11 +79,12 @@ public class MiniServer extends Thread {
     }
 
     private synchronized void nodeRemoved(Node node, ArrayList<File> files){
+        anchorNode.removeNode(node.getId() + "");
+
         if(!removedNodes.containsKey(node.getId() + ""))
             removedNodes.put(node.getId() + "", files);
         else
             removedNodes.get(node.getId() + "").addAll(files);
-        anchorNode.removeNode(node.getId() + "");
     }
 
     public synchronized boolean update(){
@@ -151,19 +151,22 @@ public class MiniServer extends Thread {
                         if("insert".equals(obj)){
                             obj = in.readObject();
                             File f = (File)obj;
+                            int maxNodes = getMaxNodeNum();
 
-                            clientSocket.close();
-                            // todo
-                            // open connection to client to send file too
+                            int key = f.hashCode() % (int) Math.ceil(Math.log(maxNodes)/Math.log(2));
+
+                            out.writeObject(anchorNode.getNode(anchorNode.getSuccessor(key)));
+                            // client knows which node to send the file too
 
                         } else if("lookup".equals(obj)){
                             obj = in.readObject();
                             String str = (String)obj;
+                            int maxNodes = getMaxNodeNum();
 
-                            str = anchorNode.getSuccessor(Integer.parseInt(str));
+                            int key = str.hashCode() % (int) Math.ceil(Math.log(maxNodes)/Math.log(2));
 
                             // return Connection to node
-                            out.writeObject(anchorNode.getNode(str));
+                            out.writeObject(anchorNode.getNode(anchorNode.getSuccessor(key)));
                         }
 
                     } else if("quit".equals(obj)){

@@ -6,13 +6,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 
 /*
  * Class for handles User connection to the Server
  */
-public class TCPClientNode extends Thread{
+public class  TCPClientNode extends Thread{
 
         private ObjectInputStream in;
         private ObjectOutputStream out;
