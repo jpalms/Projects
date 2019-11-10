@@ -4,6 +4,7 @@ import edu.rit.cs.controller.TCPClientNode;
 
 import edu.rit.cs.model.Node;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -55,10 +56,22 @@ public class NodeCLI_Helper {
             }
         } while(!(keyword.equals("")));
 
-        //thread.sendObject(new_topic);
-
         connections.add(thread);
-        //currNode.advertise(new_topic);
     }
 
+    public void queue(){
+
+    }
+
+    public void insert(File file){
+
+    }
+
+    public void lookup(String hash){
+
+    }
+
+    public void quit(){
+
+    }
 }
