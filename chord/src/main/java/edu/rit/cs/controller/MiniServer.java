@@ -166,7 +166,7 @@ public class MiniServer extends Thread {
                             int key = f.hashCode() % (int)Math.pow(2, (int) Math.ceil(Math.log(maxNodes)/Math.log(2)));
 
                             out.writeObject(anchorNode.getNode(anchorNode.getSuccessor(key)));
-                            // client knows which node to send the file too
+                            // client knows which node to send the file to
 
                         } else if("lookup".equals(obj)){
                             obj = in.readObject();

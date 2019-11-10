@@ -1,6 +1,7 @@
 package edu.rit.cs.model;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class Node implements Comparable{
 
@@ -10,6 +11,8 @@ public class Node implements Comparable{
     private int port;
 
     private FingerTable table;
+
+    private ArrayList<File> storage;
 
     public Node(int id){
         this.id = id;
@@ -61,6 +64,8 @@ public class Node implements Comparable{
     public String getIpAddr() {
         return ipAddr;
     }
+
+    public ArrayList<File> getStorage() { return storage; }
 
     //------------------ Setter -----------------
 

@@ -15,64 +15,50 @@ public class NodeCLI {
 
     private static TCPClientNode firstThread;
 
-
-    private static void turnOff(){
+    /**
+     * Function for a chord node to gracefully shut down.
+     */
+    private static void turnOff(NodeCLI_Helper nch){
+        // TODO - NCH should notify server, send any files to be rehashed, and clear finger table
+        // call the new function gracefulShutdown()
         firstThread.turnOffFirst();
         System.exit(1);
     }
 
     /**
-     * Function to determine whether a user has an account or is creating one.
-     * No parameters, but operates based on user input.
-     * Returns a Node to be used for the node.
+     * Function for a node to identify its ID and log in.
      *
-     * @return Node Object
+     * @param server - String to connect with the Server thru TCP
+     *
+     * @return Node - acts as the instance's information
      */
-    private static Node CLIBegin(String server) {
-        Scanner initial = new Scanner(System.in);
-
+    private static Node nodeSignin(String server) {
         System.out.println(
                 "=================================\n" +
-                        "            Node Node            \n" +
+                        "            Chord Node            \n" +
                         "=================================\n\n");
-
-        System.out.println("Sign In\n");
-
         firstThread = new TCPClientNode(server);
-
-        return nodeSignin();
-    }
-
-    /**
-     * Function for a node to sign into a previously-created account.
-     * No parameters, but operates on user input, namely creating a Node object based on EventManager info.
-     * Returns a Node for the node. (Called by CLIBegin)
-     *
-     * @return Node Object
-     */
-    private static Node nodeSignin() {
         Scanner user_input = new Scanner(System.in);
         while (true){
             System.out.println("Enter Node id: ");
             String id = user_input.nextLine();
             firstThread.sendObject(id);
             if (firstThread.readObject().equals("true")) {
-                System.out.println("Loading Finger Table");
+                System.out.println("Loading Finger Table...\n");
                 Node user_node = (Node)firstThread.readObject();
                 firstThread.start();
                 return user_node;
             } else {
-                System.out.println("Node id already exists\n ");
+                System.out.println("Node id already exists.\n ");
             }
         }
     }
 
     /**
-     * Function to run the CLI for a publisher node.
-     * Takes in the Node object associated with the node.
-     * No return, but calls other functions based on user input.
+     * Function to run the CLI for a chord node.
      *
      * @param currNode - the nodes' associated Node obj.
+     * @param server - the String to connect to the Server thru TCP
      */
     private static void nodeCLI(Node currNode, String server){
         Scanner input = new Scanner(System.in);
@@ -101,10 +87,13 @@ public class NodeCLI {
 
                     helper.lookup(hash);
                     break;
+                case "s":
+                    // TODO showFTable()
+                    break;
                 case "q":
                     helper.quit();
 
-                    turnOff();
+                    turnOff(helper);
                     exit_flag = false;
                     break;
                 default:
@@ -119,8 +108,7 @@ public class NodeCLI {
      * Calls publisher / subscriber CLI based on user input in CLIBegin.
      */
     private static void startCLI(String server) {
-        Node currNode = CLIBegin(server);
-        System.out.println("============NODE============");
+        Node currNode = nodeSignin(server);
         nodeCLI(currNode, server);
     }
 
