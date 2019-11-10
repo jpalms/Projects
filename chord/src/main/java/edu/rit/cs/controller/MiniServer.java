@@ -16,6 +16,7 @@ import java.util.HashMap;
 public class MiniServer extends Thread {
     private ArrayList<Worker> workers = new ArrayList<>();
     private HashMap<String, ArrayList<File>> removedNodes;
+    private ArrayList<String> newNodes;
     boolean running;
     private int maxNodeNum;
     private AnchorNode anchorNode;
@@ -28,6 +29,7 @@ public class MiniServer extends Thread {
         this.running = true;
         this.maxNodeNum = 0;
         this.removedNodes = new HashMap<>();
+        this.newNodes = new ArrayList<>();
     }
 
     /**
@@ -72,9 +74,17 @@ public class MiniServer extends Thread {
         if(id > maxNodeNum){
             this.maxNodeNum = id;
         }
+
+        newNodes.add(id + "");
     }
 
-    private synchronized int getMaxNodeNum(){
+    public synchronized ArrayList<String> getNewNodes(){
+        ArrayList<String> temp = newNodes;
+        newNodes = new ArrayList<>();
+        return temp;
+    }
+
+    public synchronized int getMaxNodeNum(){
         return this.maxNodeNum;
     }
 
@@ -153,7 +163,7 @@ public class MiniServer extends Thread {
                             File f = (File)obj;
                             int maxNodes = getMaxNodeNum();
 
-                            int key = f.hashCode() % (int) Math.ceil(Math.log(maxNodes)/Math.log(2));
+                            int key = f.hashCode() % (int)Math.pow(2, (int) Math.ceil(Math.log(maxNodes)/Math.log(2)));
 
                             out.writeObject(anchorNode.getNode(anchorNode.getSuccessor(key)));
                             // client knows which node to send the file too
@@ -163,7 +173,7 @@ public class MiniServer extends Thread {
                             String str = (String)obj;
                             int maxNodes = getMaxNodeNum();
 
-                            int key = str.hashCode() % (int) Math.ceil(Math.log(maxNodes)/Math.log(2));
+                            int key = str.hashCode() % (int)Math.pow(2, (int) Math.ceil(Math.log(maxNodes)/Math.log(2)));
 
                             // return Connection to node
                             out.writeObject(anchorNode.getNode(anchorNode.getSuccessor(key)));
@@ -216,7 +226,7 @@ public class MiniServer extends Thread {
 
             newNode(node.getId());
 
-            anchorNode.addNode(id, new Connection(node.getIpAddr(), node.getPort()));
+            anchorNode.addNode(id, new Connection(node.getIpAddr(), node.getPort(), node.getId()));
 
             out.writeObject(new Node(node.getId(), getMaxNodeNum(), node.getIpAddr(), node.getPort()));
         }
