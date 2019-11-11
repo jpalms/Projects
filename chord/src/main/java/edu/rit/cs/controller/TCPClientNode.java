@@ -110,9 +110,12 @@ public class  TCPClientNode extends Thread{
                         in.readObject();
                     }
                 } else if(str.equals("insert")){
-                    // todo
+                    File file = (File)in.readObject();
+                    System.out.println("Inserting File: " + file.toPath());
+                    // todo add file to node
                 } else if(str.equals("lookup")){
-                    // todo
+                    String hash = (String)in.readObject();
+                    // todo get file from node
                 }
 
             } catch (IOException e) {
