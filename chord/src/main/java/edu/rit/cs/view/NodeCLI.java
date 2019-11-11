@@ -37,6 +37,9 @@ public class NodeCLI {
                 "=================================\n" +
                         "            Chord Node            \n" +
                         "=================================\n\n");
+
+        System.out.println("Sign In\n");
+
         firstThread = new TCPClientNode(server);
         Scanner user_input = new Scanner(System.in);
         while (true){
@@ -65,6 +68,11 @@ public class NodeCLI {
         boolean exit_flag = true;
 
         NodeCLI_Helper helper = new NodeCLI_Helper(currNode, server);
+
+        System.out.println("Loading Finger Table");
+
+        helper.queryAll();
+
         do{
             System.out.println("Commands available to Node: \n" +
                     "Insert File (\"i\") \t" +

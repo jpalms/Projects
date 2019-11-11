@@ -8,8 +8,6 @@ import edu.rit.cs.model.Node;
 import java.io.File;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
 public class NodeCLI_Helper {
 
@@ -48,16 +46,26 @@ public class NodeCLI_Helper {
 
     public void query(int i){
         int update = 0;
-        // todo
+        TCPClientNode clientNode = new TCPClientNode(server);
+        update = Integer.parseInt(clientNode.query(node, node.getTable().getIdealAtIndex(i)));
+
         node.getTable().setSuccessorAtIndex(i, update);
     }
 
     /**
      * Function to insert file into the chord.
      * Sends hash generated per file and sends it to the anchor node to be placed.
-     * @param target
+     * @param file
      */
-    public void insert(File target){
+    public void insert(File file){
+        TCPClientNode clientNode = new TCPClientNode(server);
+        clientNode.insertLocation(node, file);
+    }
+
+    /** This is the code Jeff wrote, not sure if usable or not
+
+
+     public void insert(File target){
         TCPClientNode insertThread = new TCPClientNode(server);
 
         // send notification that an insertion is taking place
@@ -70,8 +78,14 @@ public class NodeCLI_Helper {
         Object obj = insertThread.readObject();
         Integer id = (Integer) obj;
         fileTransfer(id);
-    };
+    }
 
+
+    */
+
+    public File lookup(String hash){
+        TCPClientNode clientNode = new TCPClientNode(server);
+        File f = clientNode.lookupLocation(node, hash);
     /**
      * Function to find right node to send a file to.
      * Either sends to the correct node, or one prior to it.
@@ -79,6 +93,7 @@ public class NodeCLI_Helper {
      */
     public void fileTransfer(Integer id){
 
+        return f;
     }
 
     /**
@@ -108,5 +123,4 @@ public class NodeCLI_Helper {
         }
 
     }
-
 }
