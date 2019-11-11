@@ -125,6 +125,20 @@ public class  TCPClientNode extends Thread{
         }
     }
 
+    public void insert(File file){
+        sendObject("insert");
+        sendObject(file);
+    }
+
+    public File lookup(String hash){
+        File file;
+
+        sendObject("lookup");
+        sendObject(hash);
+        file = (File)readObject();
+
+        return file;
+    }
     /**
      * Function to turn off this thread
      */
