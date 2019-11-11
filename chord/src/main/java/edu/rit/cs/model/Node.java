@@ -65,6 +65,8 @@ public class Node implements Comparable{
         return ipAddr;
     }
 
+    public FingerTable getTable() { return table; }
+
     public ArrayList<File> getStorage() { return storage; }
 
     //------------------ Setter -----------------

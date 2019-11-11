@@ -33,23 +33,23 @@ public class NodeCLI_Helper {
     }
 
 
-
-
     /*
      * --------------------Publisher-------------------------
-     *//*
-    *//**
+     */
+    /**
      *
      */
-    public void queueAll() {
+    public void queryAll() {
 
-        TCPClientNode thread = new TCPClientNode(server);
-
-        connections.add(thread);
+        for(int i = 0; i < node.getTable().getFingers().size(); i++){
+            query(i);
+        }
     }
 
-    public void queue(){
-
+    public void query(int i){
+        int update = 0;
+        // todo
+        node.getTable().setSuccessorAtIndex(i, update);
     }
 
     /**
@@ -69,7 +69,6 @@ public class NodeCLI_Helper {
 
         Object obj = insertThread.readObject();
         Integer id = (Integer) obj;
-        // TODO - send to correct node
         fileTransfer(id);
     };
 
@@ -88,12 +87,6 @@ public class NodeCLI_Helper {
      * @return - hashCode
      */
     public String hash(File target){ return " " ; };
-
-    /**
-     * Looks for file in this node.
-     * @param hash - hashCode of file to be looked for.
-     */
-    public void lookup(String hash){};
 
     /**
      * Gracefully shuts down a peer node.
