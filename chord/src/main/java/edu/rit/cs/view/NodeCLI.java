@@ -19,8 +19,7 @@ public class NodeCLI {
      * Function for a chord node to gracefully shut down.
      */
     private static void turnOff(NodeCLI_Helper nch){
-        // TODO - NCH should notify server, send any files to be rehashed, and clear finger table
-        // call the new function gracefulShutdown()
+        nch.quit();
         firstThread.turnOffFirst();
         System.exit(1);
     }

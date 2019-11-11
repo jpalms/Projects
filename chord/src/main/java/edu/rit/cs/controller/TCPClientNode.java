@@ -114,9 +114,20 @@ public class  TCPClientNode extends Thread{
                     File file = (File)in.readObject();
                     System.out.println("Inserting File: " + file.toPath());
                     // todo add file to node
+                    Object node_in = in.readObject();
+                    Node target = (Node) node_in;
+                    target.getStorage().add(file);
                 } else if(str.equals("lookup")){
                     String hash = (String)in.readObject();
                     // todo get file from node
+                    Object node_in = in.readObject();
+                    Node target = (Node) node_in;
+                    for (File f : target.getStorage()){
+                        if (f.getName().equals(hash)){
+                            sendObject(f);
+                            break;
+                        }
+                    }
                 }
 
             } catch (IOException e) {
@@ -140,12 +151,13 @@ public class  TCPClientNode extends Thread{
 
         TCPClientNode thread = new TCPClientNode(ipAddr);
 
-        thread.insert(file);
+        thread.insert(node, file);
     }
 
-    private void insert(File file){
+    private void insert(Node node, File file){
         sendObject("insert");
         sendObject(file);
+        sendObject(node);
     }
 
     public File lookupLocation(Node node, String hash){
@@ -159,15 +171,17 @@ public class  TCPClientNode extends Thread{
 
         TCPClientNode thread = new TCPClientNode(ipAddr);
 
-        return thread.lookup(hash);
+        return thread.lookup(node, hash);
     }
 
-    private File lookup(String hash){
+    private File lookup(Node node, String hash){
         File file;
 
         sendObject("lookup");
         sendObject(hash);
+        sendObject(node);
         file = (File)readObject();
+
 
         return file;
     }
@@ -192,6 +206,7 @@ public class  TCPClientNode extends Thread{
             sendObject(target);
             node.getStorage().remove(target);
         }
+
 
     }
 
