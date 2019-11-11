@@ -28,7 +28,7 @@ public class  TCPClientNode extends Thread{
             s = null;
             try {
                 // create connection
-                int serverPort = 7896;
+                int serverPort = Config.port;
                 s = new Socket(server_address, serverPort);
 
                 out = new ObjectOutputStream(s.getOutputStream());
@@ -77,7 +77,7 @@ public class  TCPClientNode extends Thread{
      */
     public void run() {
         running = true;
-        int serverPort = Config.port;
+        int serverPort = node.getPort();
         while (running) {
 
             try {

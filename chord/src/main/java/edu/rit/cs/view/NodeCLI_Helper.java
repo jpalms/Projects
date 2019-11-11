@@ -2,6 +2,7 @@ package edu.rit.cs.view;
 
 import edu.rit.cs.controller.TCPClientNode;
 
+import edu.rit.cs.model.Config;
 import edu.rit.cs.model.Node;
 
 import java.io.File;

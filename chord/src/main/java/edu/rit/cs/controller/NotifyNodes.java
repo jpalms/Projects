@@ -53,7 +53,7 @@ public class NotifyNodes extends Thread {
                     if(!newNodes.isEmpty()) {
                         for (Connection conn : onlineNodes.values()) {
                             for(String node: newNodes){
-
+                                newNodeOnline(node, conn);
                             }
                         }
                     }

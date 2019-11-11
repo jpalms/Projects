@@ -1,6 +1,8 @@
 package edu.rit.cs.model;
 
-public class Connection {
+import java.io.Serializable;
+
+public class Connection implements Serializable {
     private String ipAddr;
     private int port, nodeId;
 
