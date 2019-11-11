@@ -161,7 +161,7 @@ public class  TCPClientNode extends Thread{
     private void insert(Node node, File file){
         sendObject("insert");
         sendObject(file);
-        sendObject(node);
+        //sendObject(node);
     }
 
     public File lookupLocation(Node node, String hash){
@@ -183,7 +183,7 @@ public class  TCPClientNode extends Thread{
 
         sendObject("lookup");
         sendObject(hash);
-        sendObject(node);
+        //sendObject(node);
         file = (File)readObject();
 
 
