@@ -62,30 +62,10 @@ public class NodeCLI_Helper {
         clientNode.insertLocation(node, file);
     }
 
-    /** This is the code Jeff wrote, not sure if usable or not
-
-
-     public void insert(File target){
-        TCPClientNode insertThread = new TCPClientNode(server);
-
-        // send notification that an insertion is taking place
-        insertThread.sendObject("file");
-        insertThread.sendObject("insert");
-
-        // send file to be inserted into the Chord
-        insertThread.sendObject(target);
-
-        Object obj = insertThread.readObject();
-        Integer id = (Integer) obj;
-        fileTransfer(id);
-    }
-
-
-    */
-
-    public File lookup(String hash){
+    public File lookup(String hash) {
         TCPClientNode clientNode = new TCPClientNode(server);
         File f = clientNode.lookupLocation(node, hash);
+    }
     /**
      * Function to find right node to send a file to.
      * Either sends to the correct node, or one prior to it.
@@ -97,30 +77,23 @@ public class NodeCLI_Helper {
     }
 
     /**
-     * For use in insert. Creates a hash code based on the file.
-     * @param target - file to be sent
-     * @return - hashCode
-     */
-    public String hash(File target){ return " " ; };
-
-    /**
      * Gracefully shuts down a peer node.
      */
-    public void quit(){
+    public void quit() {
 
-        TCPClientNode quitThread = new TCPClientNode(server);
+            TCPClientNode quitThread = new TCPClientNode(server);
 
-        // send notification to Server that this node is shutting down
-        quitThread.sendObject("quit");
+            // send notification to Server that this node is shutting down
+            quitThread.sendObject("quit");
 
-        // send number of files to server, in preparation
-        quitThread.sendObject(this.node.getStorage().size());
+            // send number of files to server, in preparation
+            quitThread.sendObject(this.node.getStorage().size());
 
-        // send files to server for rehashing, remove from node
-        for(File target: this.node.getStorage()){
-            quitThread.sendObject(target);
-            this.node.getStorage().remove(target);
+            // send files to server for rehashing, remove from node
+            for (File target : this.node.getStorage()) {
+                quitThread.sendObject(target);
+                this.node.getStorage().remove(target);
+            }
         }
-
     }
 }
