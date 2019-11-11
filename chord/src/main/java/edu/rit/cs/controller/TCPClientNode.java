@@ -114,12 +114,15 @@ public class  TCPClientNode extends Thread{
                     File file = (File)in.readObject();
                     System.out.println("Inserting File: " + file.toPath());
                     // todo add file to node
+                    /*
                     Object node_in = in.readObject();
                     Node target = (Node) node_in;
                     target.getStorage().add(file);
+                    */
                 } else if(str.equals("lookup")){
                     String hash = (String)in.readObject();
                     // todo get file from node
+                    /*
                     Object node_in = in.readObject();
                     Node target = (Node) node_in;
                     for (File f : target.getStorage()){
@@ -128,6 +131,7 @@ public class  TCPClientNode extends Thread{
                             break;
                         }
                     }
+                    */
                 }
 
             } catch (IOException e) {
