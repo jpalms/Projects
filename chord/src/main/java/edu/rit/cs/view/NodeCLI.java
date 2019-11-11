@@ -45,7 +45,7 @@ public class NodeCLI {
                     "Insert File (\"i\") \t" +
                     "Lookup File (\"l\") \t" +
                     "Show Finger Table (\"s\") \t" +
-                    "Quit (\"q\")\n"
+                    "Quit (\"q\")"
             );
             String command = input.nextLine();
             switch(command){

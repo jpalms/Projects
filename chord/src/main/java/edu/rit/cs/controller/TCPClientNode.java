@@ -1,6 +1,7 @@
 package edu.rit.cs.controller;
 
 import edu.rit.cs.model.Config;
+import edu.rit.cs.model.Connection;
 import edu.rit.cs.model.Node;
 
 import java.io.*;
@@ -41,7 +42,28 @@ public class  TCPClientNode extends Thread{
             } catch (IOException e) {
                 System.out.println("IO:" + e.getMessage());
             }
+    }
+
+    public TCPClientNode(Connection conn) {
+        String server_address = conn.getIpAddr();
+        s = null;
+        try {
+            // create connection
+            int serverPort = conn.getPort();
+            s = new Socket(server_address, serverPort);
+
+            out = new ObjectOutputStream(s.getOutputStream());
+            in = new ObjectInputStream(s.getInputStream());
+
+        } catch (UnknownHostException e) {
+            System.out.println("Sock:" + e.getMessage());
+        } catch (EOFException e) {
+            System.out.println("EOF:" + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("IO:" + e.getMessage());
         }
+    }
+
 
     /**
      * Function to send objects to the Server
@@ -116,15 +138,16 @@ public class  TCPClientNode extends Thread{
                     node.getStorage().add(file);
                 } else if(str.equals("lookup")){
                     String hash = (String)in.readObject();
-
+                    File temp = new File(hash);
                     for (File f : node.getStorage()){
-                        if (f.getName().equals(hash)){
+                        if (f.equals(temp)){
                             sendObject(f);
                             break;
                         }
                     }
 
                 }
+                clientSocket.close();
 
             } catch (IOException e) {
                 System.err.println("IO: " + e.getMessage());
@@ -143,11 +166,16 @@ public class  TCPClientNode extends Thread{
 
         sendObject(file);
 
-        String ipAddr = (String)readObject();
+        Connection conn = (Connection) readObject();
 
-        TCPClientNode thread = new TCPClientNode(ipAddr);
+        System.out.println(conn.toString());
+        if(conn.getNodeId() == node.getId()){
+            node.getStorage().add(file);
+        } else {
+            TCPClientNode thread = new TCPClientNode(conn);
 
-        thread.insert(node, file);
+            thread.insert(node, file);
+        }
     }
 
     private void insert(Node node, File file){
@@ -162,9 +190,17 @@ public class  TCPClientNode extends Thread{
 
         sendObject(hash);
 
-        String ipAddr = (String)readObject();
+        Connection conn = (Connection)readObject();
 
-        TCPClientNode thread = new TCPClientNode(ipAddr);
+        System.out.println(conn.toString());
+        if(conn.getNodeId() == node.getId()) {
+            for (File f : node.getStorage()){
+                if (f.getName().equals(hash)){
+                    return f;
+                }
+            }
+        }
+        TCPClientNode thread = new TCPClientNode(conn);
 
         return thread.lookup(node, hash);
     }

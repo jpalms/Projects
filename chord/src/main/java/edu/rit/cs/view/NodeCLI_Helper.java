@@ -6,6 +6,9 @@ import edu.rit.cs.model.Config;
 import edu.rit.cs.model.Node;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -96,11 +99,21 @@ public class NodeCLI_Helper {
         clientNode.insertLocation(node, file);
     }
 
-    public File lookup(String hash) {
+    public void lookup(String hash) {
         TCPClientNode clientNode = new TCPClientNode(server);
         File f = clientNode.lookupLocation(node, hash);
 
-        return f;
+        System.out.println("File: " + f.getName());
+        try {
+            FileReader fileReader = new FileReader(f);
+            while(fileReader.ready()){
+                System.out.println(fileReader.read());
+            }
+        } catch(FileNotFoundException e){
+            System.err.println(e.getMessage());
+        } catch (IOException e){
+            System.err.println(e.getMessage());
+        }
     }
 
     public void showTable(){

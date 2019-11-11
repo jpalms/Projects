@@ -8,17 +8,13 @@ public class FingerTable implements Serializable {
     private int n, numFingers, index;
     private ArrayList<Finger> fingers;
 
-    public FingerTable(int numNodes, int index){
+    public FingerTable(int index, int numNodes){
         this.n = numNodes;
         this.numFingers = log2(numNodes);
         this.index = index;
         calcIdeal();
     }
 
-    public FingerTable(){
-        this.n = 0;
-        this.index = 0;
-    }
     private int log2(int num){
         return (int) Math.ceil(((Math.log(num)/Math.log(2) + 1e-10)));
     }
@@ -26,7 +22,7 @@ public class FingerTable implements Serializable {
     public void calcIdeal(){
         fingers = new ArrayList<>();
         for (int i = 0; i < numFingers; i++) {
-            int ideal = (index + (int)Math.pow(2, i)) % n + 1;
+            int ideal = (index - 1 + (int)Math.pow(2, i)) % n + 1;
             Finger f = new Finger(i, ideal);
             fingers.add(f);
         }

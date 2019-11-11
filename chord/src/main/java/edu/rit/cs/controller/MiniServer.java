@@ -226,7 +226,7 @@ public class MiniServer extends Thread {
 
             newNode(Integer.parseInt(id));
 
-            anchorNode.addNode(id, new Connection(node.getIpAddr(), node.getPort() + node.getId(), node.getId()));
+            anchorNode.addNode(id, new Connection(node.getIpAddr(), Config.port + node.getId(), node.getId()));
 
             int nextId = Integer.parseInt(anchorNode.getNext(node.getId()));
             int prevId =  Integer.parseInt(anchorNode.getPrev(node.getId()));

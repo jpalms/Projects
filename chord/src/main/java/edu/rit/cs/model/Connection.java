@@ -29,4 +29,8 @@ public class Connection implements Serializable {
     public int getNodeId() {
         return nodeId;
     }
+
+    public String toString(){
+        return "IP Address: " + ipAddr + " Port: " + port + " Node: " + nodeId;
+    }
 }
