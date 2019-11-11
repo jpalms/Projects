@@ -97,6 +97,7 @@ public class  TCPClientNode extends Thread{
     /**
      *  Function to look for new notification from the server and prints them
      */
+    //todo - refactor this to be similar to handler, TCP_Handler
     public void run() {
         running = true;
         int serverPort = node.getPort();

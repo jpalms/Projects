@@ -50,7 +50,7 @@ public class NotifyNodes extends Thread {
                     // node online
                     ArrayList<String> newNodes = handler.getNewNodes();
 
-                    if(!newNodes.isEmpty()) {
+                    if(newNodes.size() > 0) {
                         for (Connection conn : onlineNodes.values()) {
                             for(String node: newNodes){
                                 newNodeOnline(node, conn);

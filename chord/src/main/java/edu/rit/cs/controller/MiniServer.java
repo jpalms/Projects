@@ -98,7 +98,7 @@ public class MiniServer extends Thread {
     }
 
     public synchronized boolean update(){
-        return !removedNodes.isEmpty();
+        return !removedNodes.isEmpty() || !newNodes.isEmpty();
     }
 
     public synchronized HashMap<String, ArrayList<File>> getRemovedNodes() {
