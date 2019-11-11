@@ -182,6 +182,19 @@ public class  TCPClientNode extends Thread{
         return result;
     }
 
+    public void quit(Node node){
+        sendObject("quit");
+
+        // send number of files to server, in preparation
+        sendObject(node.getStorage().size());
+        // send files to server for rehashing, remove from node
+        for (File target : node.getStorage()) {
+            sendObject(target);
+            node.getStorage().remove(target);
+        }
+
+    }
+
     /**
      * Function to turn off this thread
      */

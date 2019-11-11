@@ -2,11 +2,9 @@ package edu.rit.cs.view;
 
 import edu.rit.cs.controller.TCPClientNode;
 
-import edu.rit.cs.model.FingerTable;
 import edu.rit.cs.model.Node;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class NodeCLI_Helper {
@@ -65,13 +63,6 @@ public class NodeCLI_Helper {
     public File lookup(String hash) {
         TCPClientNode clientNode = new TCPClientNode(server);
         File f = clientNode.lookupLocation(node, hash);
-    }
-    /**
-     * Function to find right node to send a file to.
-     * Either sends to the correct node, or one prior to it.
-     * @param id
-     */
-    public void fileTransfer(Integer id){
 
         return f;
     }
@@ -80,20 +71,9 @@ public class NodeCLI_Helper {
      * Gracefully shuts down a peer node.
      */
     public void quit() {
+        TCPClientNode quitThread = new TCPClientNode(server);
+        // send notification to Server that this node is shutting down
+        quitThread.quit(node);
 
-            TCPClientNode quitThread = new TCPClientNode(server);
-
-            // send notification to Server that this node is shutting down
-            quitThread.sendObject("quit");
-
-            // send number of files to server, in preparation
-            quitThread.sendObject(this.node.getStorage().size());
-
-            // send files to server for rehashing, remove from node
-            for (File target : this.node.getStorage()) {
-                quitThread.sendObject(target);
-                this.node.getStorage().remove(target);
-            }
-        }
     }
 }
