@@ -14,26 +14,6 @@ public class Node implements Comparable{
 
     private ArrayList<File> storage;
 
-    public Node(int id){
-        this.id = id;
-        this.port = Config.port;
-        this.table = new FingerTable();
-    }
-
-    public Node(int id, String ipAdrr){
-        this.id = id;
-        this.ipAddr = ipAdrr;
-        this.port = Config.port;
-        this.table = new FingerTable();
-    }
-
-    public Node(int id, String ipAdrr, int port){
-        this.id = id;
-        this.ipAddr = ipAdrr;
-        this.port = port;
-        this.table = new FingerTable();
-    }
-
     public Node(int id, int maxNumNodes, String ipAdrr, int port, int nextId, int prevId){
         this.id = id;
         this.ipAddr = ipAdrr;
@@ -41,6 +21,7 @@ public class Node implements Comparable{
         this.table = new FingerTable(id, maxNumNodes);
         this.nextId = nextId;
         this.prevId = prevId;
+        this.storage = new ArrayList<>();
     }
 
     //------------------- Getter --------------
@@ -77,16 +58,6 @@ public class Node implements Comparable{
 
     public void setPrevId(int prevId) {
         this.prevId = prevId;
-    }
-
-    // ----------------- TBD -------------------
-
-    public String insert(File file){
-        return "";
-    }
-
-    public File lookup(String hashCode){
-        return null;
     }
 
     @Override
