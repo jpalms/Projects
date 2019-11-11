@@ -44,7 +44,9 @@ public class NodeCLI_Helper {
 
     public void query(int i){
         int update = 0;
-        // todo
+        TCPClientNode clientNode = new TCPClientNode(server);
+        update = Integer.parseInt(clientNode.query(node, node.getTable().getIdealAtIndex(i)));
+
         node.getTable().setSuccessorAtIndex(i, update);
     }
 
