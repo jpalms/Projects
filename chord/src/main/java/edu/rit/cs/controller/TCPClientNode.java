@@ -1,11 +1,12 @@
 package edu.rit.cs.controller;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import edu.rit.cs.model.Config;
+
+import java.io.*;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Set;
 
 /*
  * Class for handles User connection to the Server
@@ -74,18 +75,53 @@ public class  TCPClientNode extends Thread{
      */
     public void run() {
         running = true;
+        int serverPort = Config.port;
         while (running) {
-            /*
+
             try {
                 //todo wait for connection from server
+                ServerSocket listenSocket = new ServerSocket(serverPort);
+
+                Socket clientSocket = listenSocket.accept();
+
+                out = new ObjectOutputStream(s.getOutputStream());
+                in = new ObjectInputStream(s.getInputStream());
+
+                String str = (String)in.readObject();
+
+                if(str.equals("newNode")){
+                    str = (String) in.readObject();
+
+                    System.out.println("New Online Node: " + str);
+
+                    in.readObject();
+                } else if(str.equals("removed")){
+                    Set<String> removed = (Set<String>)in.readObject();
+                    for(String r: removed){
+                        System.out.println("Node has gone offline: " + r);
+                    }
+
+                    Object obj = in.readObject();
+                    File f;
+
+                    while(!(obj instanceof String)){
+                        f = (File)obj;
+                        System.out.println("File added to Node: " + f.toPath());
+                        in.readObject();
+                    }
+                } else if(str.equals("insert")){
+                    // todo
+                } else if(str.equals("lookup")){
+                    // todo
+                }
 
             } catch (IOException e) {
                 System.err.println("IO: " + e.getMessage());
-                turnOff();
+                //turnOff();
             } catch (ClassNotFoundException e) {
                 System.err.println("CLASS: " + e.getMessage());
-                turnOff();
-            }*/
+                //turnOff();
+            }
         }
     }
 
