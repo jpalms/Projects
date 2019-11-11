@@ -49,11 +49,15 @@ public class NodeCLI_Helper {
     }
 
     public void insert(File file){
-
+        TCPClientNode clientNode = new TCPClientNode(server);
+        clientNode.insertLocation(node, file);
     }
 
-    public void lookup(String hash){
+    public File lookup(String hash){
+        TCPClientNode clientNode = new TCPClientNode(server);
+        File f = clientNode.lookupLocation(node, hash);
 
+        return f;
     }
 
     public void quit(){

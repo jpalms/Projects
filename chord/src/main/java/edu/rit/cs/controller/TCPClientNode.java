@@ -1,6 +1,7 @@
 package edu.rit.cs.controller;
 
 import edu.rit.cs.model.Config;
+import edu.rit.cs.model.Node;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -128,12 +129,40 @@ public class  TCPClientNode extends Thread{
         }
     }
 
-    public void insert(File file){
+    public void insertLocation(Node node, File file){
+        sendObject(node);
+        sendObject("file");
+        sendObject("insert");
+
+        sendObject(file);
+
+        String ipAddr = (String)readObject();
+
+        TCPClientNode thread = new TCPClientNode(ipAddr);
+
+        thread.insert(file);
+    }
+
+    private void insert(File file){
         sendObject("insert");
         sendObject(file);
     }
 
-    public File lookup(String hash){
+    public File lookupLocation(Node node, String hash){
+        sendObject(node);
+        sendObject("file");
+        sendObject("lookup");
+
+        sendObject(hash);
+
+        String ipAddr = (String)readObject();
+
+        TCPClientNode thread = new TCPClientNode(ipAddr);
+
+        return thread.lookup(hash);
+    }
+
+    private File lookup(String hash){
         File file;
 
         sendObject("lookup");
