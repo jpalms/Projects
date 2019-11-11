@@ -94,8 +94,6 @@ public class NotifyNodes extends Thread {
             out.writeObject("newNode");
 
             out.writeObject(nodeId);
-
-            out.writeObject("Done");
             // client will then query to update Successor
             clientSocket.close();
         } catch(UnknownHostException e){

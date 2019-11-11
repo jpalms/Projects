@@ -6,19 +6,52 @@ import edu.rit.cs.model.Node;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class NodeCLI_Helper {
 
     private ArrayList<TCPClientNode> connections;
     private Node node;
     private String server;
-    private int nodeId;
+    private TCPClientNode firstThread;
 
-    public NodeCLI_Helper(Node node, String server) {
+    public NodeCLI_Helper(String server) {
         connections = new ArrayList<>();
-        this.node = node;
         this.server = server;
-        this.nodeId = node.getId();
+        this.firstThread = nodeSignin(server);
+
+    }
+
+    /**
+     * Function for a node to identify its ID and log in.
+     *
+     * @param server - String to connect with the Server thru TCP
+     *
+     * @return Node - acts as the instance's information
+     */
+    private TCPClientNode nodeSignin(String server) {
+        System.out.println(
+                "=================================\n" +
+                        "            Chord Node            \n" +
+                        "=================================\n\n");
+
+        System.out.println("Sign In\n");
+
+        TCPClientNode firstThread = new TCPClientNode(server);
+        Scanner input = new Scanner(System.in);
+        while (true){
+            System.out.println("Enter Node id: ");
+            String id = input.nextLine();
+            firstThread.sendObject(id);
+            if (firstThread.readObject().equals("true")) {
+                this.node = (Node)firstThread.readObject();
+                firstThread.setNode(node);
+                firstThread.start();
+                return firstThread;
+            } else {
+                System.out.println("Node id already exists.\n ");
+            }
+        }
     }
 
     public void turnOff() {
@@ -30,7 +63,7 @@ public class NodeCLI_Helper {
 
 
     /*
-     * --------------------Publisher-------------------------
+     * -------------------- Node -------------------------
      */
     /**
      *
@@ -67,6 +100,9 @@ public class NodeCLI_Helper {
         return f;
     }
 
+    public void showTable(){
+        System.out.println(this.node.getTable().toString());
+    }
     /**
      * Gracefully shuts down a peer node.
      */
@@ -74,6 +110,8 @@ public class NodeCLI_Helper {
         TCPClientNode quitThread = new TCPClientNode(server);
         // send notification to Server that this node is shutting down
         quitThread.quit(node);
+
+        firstThread.turnOffFirst();
 
     }
 }

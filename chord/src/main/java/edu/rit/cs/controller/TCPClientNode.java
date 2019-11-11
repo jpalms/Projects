@@ -18,6 +18,7 @@ public class  TCPClientNode extends Thread{
         private ObjectOutputStream out;
         private boolean running;
         private Socket s;
+        private Node node;
      /*
       * Constructor Class that connects to controller.Handler, then communicates
       * with controller.Handler.Worker
@@ -80,7 +81,7 @@ public class  TCPClientNode extends Thread{
         while (running) {
 
             try {
-                //todo wait for connection from server
+                //wait for connection from server
                 ServerSocket listenSocket = new ServerSocket(serverPort);
 
                 Socket clientSocket = listenSocket.accept();
@@ -94,8 +95,6 @@ public class  TCPClientNode extends Thread{
                     str = (String) in.readObject();
 
                     System.out.println("New Online Node: " + str);
-
-                    in.readObject();
                 } else if(str.equals("removed")){
                     Set<String> removed = (Set<String>)in.readObject();
                     for(String r: removed){
@@ -108,30 +107,23 @@ public class  TCPClientNode extends Thread{
                     while(!(obj instanceof String)){
                         f = (File)obj;
                         System.out.println("File added to Node: " + f.toPath());
+                        node.getStorage().add(f);
                         in.readObject();
                     }
                 } else if(str.equals("insert")){
                     File file = (File)in.readObject();
                     System.out.println("Inserting File: " + file.toPath());
-                    // todo add file to node
-                    /*
-                    Object node_in = in.readObject();
-                    Node target = (Node) node_in;
-                    target.getStorage().add(file);
-                    */
+                    node.getStorage().add(file);
                 } else if(str.equals("lookup")){
                     String hash = (String)in.readObject();
-                    // todo get file from node
-                    /*
-                    Object node_in = in.readObject();
-                    Node target = (Node) node_in;
-                    for (File f : target.getStorage()){
+
+                    for (File f : node.getStorage()){
                         if (f.getName().equals(hash)){
                             sendObject(f);
                             break;
                         }
                     }
-                    */
+
                 }
 
             } catch (IOException e) {
@@ -161,7 +153,6 @@ public class  TCPClientNode extends Thread{
     private void insert(Node node, File file){
         sendObject("insert");
         sendObject(file);
-        //sendObject(node);
     }
 
     public File lookupLocation(Node node, String hash){
@@ -183,9 +174,8 @@ public class  TCPClientNode extends Thread{
 
         sendObject("lookup");
         sendObject(hash);
-        //sendObject(node);
-        file = (File)readObject();
 
+        file = (File)readObject();
 
         return file;
     }
@@ -212,6 +202,10 @@ public class  TCPClientNode extends Thread{
         }
 
 
+    }
+
+    public void setNode(Node node) {
+        this.node = node;
     }
 
     /**
