@@ -35,15 +35,17 @@ public class NodeCLI_Helper {
                         "            Chord Node            \n" +
                         "=================================\n\n");
 
-        System.out.println("Sign In\n");
+        System.out.println("Sign In");
 
         TCPClientNode firstThread = new TCPClientNode(server);
         Scanner input = new Scanner(System.in);
+        firstThread.sendObject("");
         while (true){
             System.out.println("Enter Node id: ");
             String id = input.nextLine();
             firstThread.sendObject(id);
-            if (firstThread.readObject().equals("true")) {
+            if (firstThread.readObject().equals("false")) {
+                firstThread.sendObject(new Node(Integer.parseInt(id), 0, firstThread.getIpAddr(), firstThread.getPort(), 0, 0));
                 this.node = (Node)firstThread.readObject();
                 firstThread.setNode(node);
                 firstThread.start();

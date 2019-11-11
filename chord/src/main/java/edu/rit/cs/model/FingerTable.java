@@ -1,14 +1,16 @@
 package edu.rit.cs.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class FingerTable {
+public class FingerTable implements Serializable {
 
-    private int n, index;
+    private int n, numFingers, index;
     private ArrayList<Finger> fingers;
 
     public FingerTable(int numNodes, int index){
-        this.n = log2(numNodes);
+        this.n = numNodes;
+        this.numFingers = log2(numNodes);
         this.index = index;
         calcIdeal();
     }
@@ -23,8 +25,8 @@ public class FingerTable {
 
     public void calcIdeal(){
         fingers = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            int ideal = (index + (int)Math.pow(2, i)) % n;
+        for (int i = 0; i < numFingers; i++) {
+            int ideal = (index + (int)Math.pow(2, i)) % n + 1;
             Finger f = new Finger(i, ideal);
             fingers.add(f);
         }
@@ -53,7 +55,7 @@ public class FingerTable {
     public String toString(){
         String result = "Table:\n";
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < numFingers; i++) {
             result += "\t" + fingers.get(i).toString() + "\n";
         }
 

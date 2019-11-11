@@ -1,6 +1,8 @@
 package edu.rit.cs.model;
 
-public class Finger {
+import java.io.Serializable;
+
+public class Finger implements Serializable {
     private int index, ideal, actual;
 
     public Finger(int index, int ideal, int actual){

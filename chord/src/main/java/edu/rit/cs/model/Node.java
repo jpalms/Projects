@@ -1,9 +1,10 @@
 package edu.rit.cs.model;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Node implements Comparable{
+public class Node implements Comparable, Serializable {
 
     private int id, nextId, prevId;
 

@@ -86,8 +86,8 @@ public class  TCPClientNode extends Thread{
 
                 Socket clientSocket = listenSocket.accept();
 
-                out = new ObjectOutputStream(s.getOutputStream());
-                in = new ObjectInputStream(s.getInputStream());
+                out = new ObjectOutputStream(clientSocket.getOutputStream());
+                in = new ObjectInputStream(clientSocket.getInputStream());
 
                 String str = (String)in.readObject();
 
@@ -128,7 +128,7 @@ public class  TCPClientNode extends Thread{
 
             } catch (IOException e) {
                 System.err.println("IO: " + e.getMessage());
-                //turnOff();
+                turnOff();
             } catch (ClassNotFoundException e) {
                 System.err.println("CLASS: " + e.getMessage());
                 //turnOff();
@@ -206,6 +206,15 @@ public class  TCPClientNode extends Thread{
 
     public void setNode(Node node) {
         this.node = node;
+    }
+
+    public String getIpAddr(){
+        System.out.println(s.getLocalAddress().toString().substring((1)));
+        return s.getLocalAddress().toString().substring(1);
+    }
+
+    public int getPort(){
+        return s.getLocalPort();
     }
 
     /**
