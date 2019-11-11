@@ -69,8 +69,18 @@ public class NodeCLI_Helper {
 
         Object obj = insertThread.readObject();
         Integer id = (Integer) obj;
-        // TODO - figure out the hashing, send to correct node
+        // TODO - send to correct node
+        fileTransfer(id);
     };
+
+    /**
+     * Function to find right node to send a file to.
+     * Either sends to the correct node, or one prior to it.
+     * @param id
+     */
+    public void fileTransfer(Integer id){
+
+    }
 
     /**
      * For use in insert. Creates a hash code based on the file.
