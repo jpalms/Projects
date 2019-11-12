@@ -8,6 +8,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Set;
 
 /*
@@ -20,6 +21,7 @@ public class  TCPClientNode extends Thread{
         private boolean running;
         private Socket s;
         private Node node;
+        private ArrayList<Worker> workers;
      /*
       * Constructor Class that connects to controller.Handler, then communicates
       * with controller.Handler.Worker
@@ -94,69 +96,21 @@ public class  TCPClientNode extends Thread{
             return new Object();
         }
 
-    /**
-     *  Function to look for new notification from the server and prints them
-     */
-    //todo - refactor this to be similar to handler, TCP_Handler
     public void run() {
-        running = true;
-        int serverPort = node.getPort();
-        while (running) {
+        workers = new ArrayList<>();
+        try {
+            // start server
+            int serverPort = node.getPort();
+            ServerSocket listenSocket = new ServerSocket(serverPort);
 
-            try {
-                //wait for connection from server
-                ServerSocket listenSocket = new ServerSocket(serverPort);
-
+            // look for new connections, then pass it to worker thread
+            while (running) {
                 Socket clientSocket = listenSocket.accept();
-
-                out = new ObjectOutputStream(clientSocket.getOutputStream());
-                in = new ObjectInputStream(clientSocket.getInputStream());
-
-                String str = (String)in.readObject();
-
-                if(str.equals("newNode")){
-                    str = (String) in.readObject();
-
-                    System.out.println("New Online Node: " + str);
-                } else if(str.equals("removed")){
-                    Set<String> removed = (Set<String>)in.readObject();
-                    for(String r: removed){
-                        System.out.println("Node has gone offline: " + r);
-                    }
-
-                    Object obj = in.readObject();
-                    File f;
-
-                    while(!(obj instanceof String)){
-                        f = (File)obj;
-                        System.out.println("File added to Node: " + f.toPath());
-                        node.getStorage().add(f);
-                        in.readObject();
-                    }
-                } else if(str.equals("insert")){
-                    File file = (File)in.readObject();
-                    System.out.println("Inserting File: " + file.toPath());
-                    node.getStorage().add(file);
-                } else if(str.equals("lookup")){
-                    String hash = (String)in.readObject();
-                    File temp = new File(hash);
-                    for (File f : node.getStorage()){
-                        if (f.equals(temp)){
-                            sendObject(f);
-                            break;
-                        }
-                    }
-
-                }
-                clientSocket.close();
-
-            } catch (IOException e) {
-                System.err.println("IO: " + e.getMessage());
-                turnOff();
-            } catch (ClassNotFoundException e) {
-                System.err.println("CLASS: " + e.getMessage());
-                //turnOff();
+                Worker c = new Worker(clientSocket);
+                workers.add(c);
             }
+        } catch (IOException e) {
+            System.out.println("Listen :" + e.getMessage());
         }
     }
 
@@ -276,6 +230,83 @@ public class  TCPClientNode extends Thread{
             } catch (IOException e) {
                 //e.printStackTrace();
             }
+    }
+
+    public class Worker extends Thread{
+        ObjectInputStream in;
+        ObjectOutputStream out;
+        Socket clientSocket;
+
+        public Worker(Socket clientSocket){
+            try {
+                this.clientSocket = clientSocket;
+                out = new ObjectOutputStream(clientSocket.getOutputStream());
+                in = new ObjectInputStream(clientSocket.getInputStream());
+
+                running = true;
+                this.start();
+            } catch (IOException e){
+                System.err.println(e.getMessage());
+            }
         }
+
+        /**
+         *  Function to look for new notification from the server and prints them
+         */
+        //todo - refactor this to be similar to handler, TCP_Handler
+        public void run() {
+            while (running) {
+
+                try {
+                    //wait for connection from server
+
+                    String str = (String)in.readObject();
+
+                    if(str.equals("newNode")){
+                        str = (String) in.readObject();
+
+                        System.out.println("New Online Node: " + str);
+                    } else if(str.equals("removed")){
+                        Set<String> removed = (Set<String>)in.readObject();
+                        for(String r: removed){
+                            System.out.println("Node has gone offline: " + r);
+                        }
+
+                        Object obj = in.readObject();
+                        File f;
+
+                        while(!(obj instanceof String)){
+                            f = (File)obj;
+                            System.out.println("File added to Node: " + f.toPath());
+                            node.getStorage().add(f);
+                            in.readObject();
+                        }
+                    } else if(str.equals("insert")){
+                        File file = (File)in.readObject();
+                        System.out.println("Inserting File: " + file.toPath());
+                        node.getStorage().add(file);
+                    } else if(str.equals("lookup")){
+                        String hash = (String)in.readObject();
+                        File temp = new File(hash);
+                        for (File f : node.getStorage()){
+                            if (f.equals(temp)){
+                                sendObject(f);
+                                break;
+                            }
+                        }
+
+                    }
+                    clientSocket.close();
+
+                } catch (IOException e) {
+                    System.err.println("IO: " + e.getMessage());
+                    turnOff();
+                } catch (ClassNotFoundException e) {
+                    System.err.println("CLASS: " + e.getMessage());
+                    //turnOff();
+                }
+            }
+        }
+    }
     }
 
