@@ -9,8 +9,6 @@ import java.util.*;
 
 
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Class of Notifying Subscribers about events and all Users about Topics
@@ -52,8 +50,13 @@ public class NotifyNodes extends Thread {
                     // node online
                     ArrayList<String> newNodes = handler.getNewNodes();
 
-                    checkNodes(newNodes, connections);
-                    // send files from offline to Online nodes
+                    if(newNodes.size() > 0) {
+                        for (Object conn: connections) {
+                            for(String node: newNodes){
+                                newNodeOnline(node, (Connection)conn);
+                            }
+                        }
+                    }                    // send files from offline to Online nodes
                     for(ArrayList<File> files: removedNodes.values()){
                         for(File f: files){
                             int k = f.hashCode() % n;
@@ -73,7 +76,6 @@ public class NotifyNodes extends Thread {
             }
         }
     }
-
 
     //update online node about new Node
     private void newNodeOnline(String nodeId, Connection conn){
@@ -133,21 +135,6 @@ public class NotifyNodes extends Thread {
         }
     }
 
-    private synchronized void checkNodes(ArrayList<String> newNodes, Collection<Connection> onlineNodes){
-        Lock _mutex = new ReentrantLock(true);
-
-        _mutex.lock();
-
-        if(newNodes.size() > 0) {
-            for (Object conn: onlineNodes) {
-                for(String node: newNodes){
-                    newNodeOnline(node, (Connection)conn);
-                }
-            }
-        }
-
-        _mutex.unlock();
-    }
     // stops the loop
     public void turnOff () {
         running = false;
