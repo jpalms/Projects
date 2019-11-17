@@ -66,7 +66,7 @@ public class FingerTable implements Serializable {
                 return f.getActualConnection();
             }
         }
-        return null;
+        return fingers.get(fingers.size() - 1).getActualConnection();
     }
 
     public ArrayList<Finger> getFingers() {

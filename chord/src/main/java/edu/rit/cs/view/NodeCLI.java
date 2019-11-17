@@ -52,9 +52,11 @@ public class NodeCLI {
                     String path = input.nextLine();
                     boolean notFound = false;
                     FileReader fileReader;
+                    java.io.File temp = null;
                     do {
                         try {
-                            fileReader = new FileReader(new java.io.File(path));
+                            temp = new java.io.File(path);
+                            fileReader = new FileReader(temp);
                             notFound = false;
                         } catch (FileNotFoundException e) {
                             notFound = true;
@@ -64,7 +66,6 @@ public class NodeCLI {
                     } while(notFound);
 
                     File f = new File(path);
-                    File temp = new File(path);
 
                     Scanner file = new Scanner(path);
                     String content = "";
@@ -74,7 +75,7 @@ public class NodeCLI {
                     }
 
                     f.setFileContent(content);
-                    f.setFileName(temp.toString());
+                    f.setFileName(temp.getName());
 
                     helper.insert(f);
 

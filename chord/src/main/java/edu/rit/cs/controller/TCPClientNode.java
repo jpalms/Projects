@@ -123,7 +123,7 @@ public class  TCPClientNode extends Thread{
 
     public void insertLocation(Node node, File file){
         // Calculate ideal successor for filename hash
-        int ideal = file.getFileName().hashCode() % node.getTable().getMaxNodes();
+        int ideal = (file.hashCode() % node.getTable().getMaxNodes()) + 1;
 
         // If this is the ideal spot, place it here
         if(node.getId() == ideal){
@@ -157,7 +157,7 @@ public class  TCPClientNode extends Thread{
         }
 
         // Calculate ideal successor for filename hash
-        int ideal = name.hashCode() % node.getTable().getMaxNodes();
+        int ideal = name.length() % node.getTable().getMaxNodes() + 1;
 
         // Get the closest ideal table entry to destination node id
         int localIdeal = node.getTable().getTableIdealGivenDestinationIdeal(ideal);

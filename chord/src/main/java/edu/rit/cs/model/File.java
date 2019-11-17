@@ -1,6 +1,8 @@
 package edu.rit.cs.model;
 
-public class File {
+import java.io.Serializable;
+
+public class File implements Serializable {
 
     private String path;
     private String fileContent, fileName;
@@ -42,6 +44,6 @@ public class File {
 
     @Override
     public int hashCode() {
-        return fileName.hashCode();
+        return fileName.length();
     }
 }
