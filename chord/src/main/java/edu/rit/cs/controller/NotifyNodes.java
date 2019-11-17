@@ -121,9 +121,10 @@ public class NotifyNodes extends Thread {
             out.writeObject("removed");
 
             out.writeObject(removed);
-
-            for (File f:files) {
-                out.writeObject(f);
+            if(!files.isEmpty()) {
+                for (File f : files) {
+                    out.writeObject(f);
+                }
             }
 
             out.writeObject("Done");
