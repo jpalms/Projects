@@ -122,21 +122,24 @@ public class  TCPClientNode extends Thread{
     }
 
     public void insertLocation(Node node, File file){
-        sendObject(node);
-        sendObject("file");
-        sendObject("insert");
+        // Calculate ideal successor for filename hash
+        int ideal = file.getFileName().hashCode() % node.getTable().getMaxNodes();
 
-        sendObject(file);
-
-        Connection conn = (Connection) readObject();
-
-        System.out.println(conn.toString());
-        if(conn.getNodeId() == node.getId()){
+        // If this is the ideal spot, place it here
+        if(node.getId() == ideal){
             node.getStorage().add(file);
-        } else {
-            TCPClientNode thread = new TCPClientNode(conn);
+        }
+        else{
+            // Get the closest ideal table entry to destination node id
+            int localIdeal = node.getTable().getTableIdealGivenDestinationIdeal(ideal);
 
-            thread.insert(node, file);
+            // Get the connection the the ideal node.
+            Connection connection = node.getTable().getSuccessorConnectionGivenIdeal(localIdeal);
+
+            // TODO check to see if file doesn't exist
+            // jumpCOunt < node.getTable().getFingers().size();
+            TCPClientNode nextNode = new TCPClientNode(connection);
+            nextNode.insert(node, file);
         }
     }
 
@@ -306,7 +309,7 @@ public class  TCPClientNode extends Thread{
                     } else if(str.equals("insert")){
                         File file = (File)in.readObject();
                         System.out.println("Inserting File: " + file.getPath());
-                        node.getStorage().add(file);
+                        insertLocation(node,file);
                     } else if(str.equals("lookup")){
                         System.out.println("Looking up File");
                         String hash = (String)in.readObject();
