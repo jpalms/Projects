@@ -2,6 +2,7 @@ package edu.rit.cs.view;
 
 import edu.rit.cs.controller.TCPClientNode;
 
+import edu.rit.cs.model.Connection;
 import edu.rit.cs.model.File;
 import edu.rit.cs.model.Node;
 
@@ -82,9 +83,9 @@ public class NodeCLI_Helper {
      * @param i
      */
     public void query(int i){
-        int update = 0;
+        Connection update;
         TCPClientNode clientNode = new TCPClientNode(server);
-        update = Integer.parseInt(clientNode.query(node, node.getTable().getIdealAtIndex(i)));
+        update = clientNode.query(node, node.getTable().getIdealAtIndex(i));
 
         node.getTable().setSuccessorAtIndex(i, update);
     }

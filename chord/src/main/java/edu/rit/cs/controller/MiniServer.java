@@ -155,30 +155,6 @@ public class MiniServer extends Thread {
 
                         out.writeObject(anchorNode.getSuccessor(ideal));
 
-                    } else if("file".equals(obj)){
-                        // file stuff
-                        obj = in.readObject();
-                        if("insert".equals(obj)){
-                            obj = in.readObject();
-                            File f = (File)obj;
-                            int maxNodes = getMaxNodeNum();
-
-                            int key = f.hashCode() % (int)Math.pow(2, (int) Math.ceil(Math.log(maxNodes)/Math.log(2)));
-
-                            out.writeObject(anchorNode.getNode(anchorNode.getSuccessor(key)));
-                            // client knows which node to send the file to
-
-                        } else if("lookup".equals(obj)){
-                            obj = in.readObject();
-                            String str = (String)obj;
-                            int maxNodes = getMaxNodeNum();
-
-                            int key = str.hashCode() % maxNodes;
-
-                            // return Connection to node
-                            out.writeObject(anchorNode.getNode(anchorNode.getSuccessor(key)));
-                        }
-
                     } else if("quit".equals(obj)){
                         obj = in.readObject();
                         int numFiles = ((Integer) obj).intValue();

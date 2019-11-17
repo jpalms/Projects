@@ -35,10 +35,6 @@ public class Finger implements Serializable {
         return index;
     }
 
-    public int getActual() {
-        return actual;
-    }
-
     public int getIdeal() {
         return ideal;
     }
@@ -51,10 +47,6 @@ public class Finger implements Serializable {
 
     public void setIndex(int index) {
         this.index = index;
-    }
-
-    public void setActual(int actual) {
-        this.actual = actual;
     }
 
     public void setIdeal(int ideal) {

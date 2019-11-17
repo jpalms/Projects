@@ -179,12 +179,12 @@ public class  TCPClientNode extends Thread{
         return file;
     }
 
-    public String query(Node node, int ideal){
+    public Connection query(Node node, int ideal){
         sendObject(node);
         sendObject("query");
         sendObject(new Integer(ideal));
 
-        String result = (String) readObject();
+        Connection result = (Connection) readObject();
 
         return result;
     }

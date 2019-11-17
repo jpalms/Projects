@@ -102,19 +102,19 @@ public class AnchorNode {
         }
     }
 
-    public synchronized String getSuccessor(int ideal){
+    public synchronized Connection getSuccessor(int ideal){
         if (this.getNumOnline() == 1) {
-            return this.getOnlineNodes().firstKey();
+            return this.getOnlineNodes().get(this.getOnlineNodes().firstKey());
         } else {
             ConcurrentSkipListMap<String, Connection> tree = this.getOnlineNodes();
             if(tree.containsKey(ideal + "")){
-                return ideal + "";
+                return tree.get(ideal + "");
             }
             String key = tree.higherKey(ideal + "");
             if (key != null) {
-                return key;
+                return tree.get(key);
             } else {
-                return tree.firstKey();
+                return tree.get(tree.firstKey());
             }
         }
     }
