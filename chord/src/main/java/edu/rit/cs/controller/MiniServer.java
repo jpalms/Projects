@@ -173,7 +173,7 @@ public class MiniServer extends Thread {
                             String str = (String)obj;
                             int maxNodes = getMaxNodeNum();
 
-                            int key = str.hashCode() % (int)Math.pow(2, (int) Math.ceil(Math.log(maxNodes)/Math.log(2)));
+                            int key = str.hashCode() % maxNodes;
 
                             // return Connection to node
                             out.writeObject(anchorNode.getNode(anchorNode.getSuccessor(key)));

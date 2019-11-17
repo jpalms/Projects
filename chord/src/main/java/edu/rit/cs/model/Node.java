@@ -1,6 +1,6 @@
 package edu.rit.cs.model;
 
-import java.io.File;
+import edu.rit.cs.model.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 

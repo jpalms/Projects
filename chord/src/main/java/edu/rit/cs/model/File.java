@@ -13,6 +13,13 @@ public class File {
         return path;
     }
 
+    public String getFileName(){
+        return fileName;
+    }
+
+    public String getFileContent(){
+        return fileContent;
+    }
     public void setFileContent(String fileContent) {
         this.fileContent = fileContent;
     }

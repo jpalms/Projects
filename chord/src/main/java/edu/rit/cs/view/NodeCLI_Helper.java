@@ -2,12 +2,9 @@ package edu.rit.cs.view;
 
 import edu.rit.cs.controller.TCPClientNode;
 
-import edu.rit.cs.model.Config;
+import edu.rit.cs.model.File;
 import edu.rit.cs.model.Node;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -106,17 +103,9 @@ public class NodeCLI_Helper {
         TCPClientNode clientNode = new TCPClientNode(server);
         File f = clientNode.lookupLocation(node, hash);
 
-        System.out.println("File: " + f.getName());
-        try {
-            FileReader fileReader = new FileReader(f);
-            while(fileReader.ready()){
-                System.out.println(fileReader.read());
-            }
-        } catch(FileNotFoundException e){
-            System.err.println(e.getMessage());
-        } catch (IOException e){
-            System.err.println(e.getMessage());
-        }
+        System.out.println(f.toString());
+        System.out.println(f.getFileContent());
+
     }
 
     public void showTable(){

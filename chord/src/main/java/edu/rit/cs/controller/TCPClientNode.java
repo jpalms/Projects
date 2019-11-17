@@ -3,8 +3,13 @@ package edu.rit.cs.controller;
 import edu.rit.cs.model.Config;
 import edu.rit.cs.model.Connection;
 import edu.rit.cs.model.Node;
+import edu.rit.cs.model.File;
 
-import java.io.*;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.IOException;
+import java.io.EOFException;
+
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -152,7 +157,7 @@ public class  TCPClientNode extends Thread{
         System.out.println(conn.toString());
         if(conn.getNodeId() == node.getId()) {
             for (File f : node.getStorage()){
-                if (f.getName().equals(hash)){
+                if (f.getFileName().equals(hash)){
                     return f;
                 }
             }
@@ -283,13 +288,13 @@ public class  TCPClientNode extends Thread{
 
                         while(!(obj instanceof String)){
                             f = (File)obj;
-                            System.out.println("File added to Node: " + f.toPath());
+                            System.out.println("File added to Node: " + f.getPath());
                             node.getStorage().add(f);
                             in.readObject();
                         }
                     } else if(str.equals("insert")){
                         File file = (File)in.readObject();
-                        System.out.println("Inserting File: " + file.toPath());
+                        System.out.println("Inserting File: " + file.getPath());
                         node.getStorage().add(file);
                     } else if(str.equals("lookup")){
                         System.out.println("Looking up File");
