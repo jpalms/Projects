@@ -1,9 +1,10 @@
 package edu.rit.cs.view;
 
 import edu.rit.cs.controller.TCPClientNode;
-import edu.rit.cs.model.Node;
+import edu.rit.cs.model.File;
 
-import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.Scanner;
 
 /**
@@ -52,13 +53,35 @@ public class NodeCLI {
                 case "i":
                     System.out.println("Enter file path: ");
                     String path = input.nextLine();
+                    boolean notFound = false;
+                    FileReader fileReader;
+                    do {
+                        try {
+                            fileReader = new FileReader(path);
+                            notFound = false;
+                        } catch (FileNotFoundException e) {
+                            notFound = true;
+                        }
+                    } while(notFound);
+
                     File f = new File(path);
+                    File temp = new File(path);
+
+                    Scanner file = new Scanner(path);
+                    String content = "";
+
+                    while(file.hasNextLine()) {
+                        content += file.nextLine() + "\n";
+                    }
+
+                    f.setFileContent(content);
+                    f.setFileName(temp.toString());
 
                     helper.insert(f);
 
                     break;
                 case "l":
-                    System.out.println("Enter file to lookup: ");
+                    System.out.println("Enter file name to lookup: ");
                     String hash = input.nextLine();
 
                     helper.lookup(hash);
