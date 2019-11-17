@@ -154,7 +154,7 @@ public class  TCPClientNode extends Thread{
         }
 
         // Calculate ideal successor for filename hash
-        int ideal = Integer.parseInt(name) % node.getTable().getMaxNodes();
+        int ideal = name.hashCode() % node.getTable().getMaxNodes();
 
         // Get the closest ideal table entry to destination node id
         int localIdeal = node.getTable().getTableIdealGivenDestinationIdeal(ideal);

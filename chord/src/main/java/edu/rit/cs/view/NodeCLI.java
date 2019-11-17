@@ -54,10 +54,12 @@ public class NodeCLI {
                     FileReader fileReader;
                     do {
                         try {
-                            fileReader = new FileReader(path);
+                            fileReader = new FileReader(new java.io.File(path));
                             notFound = false;
                         } catch (FileNotFoundException e) {
                             notFound = true;
+                            System.out.println("File Does Not Exist\nEnter file path");
+                            path = input.nextLine();
                         }
                     } while(notFound);
 
