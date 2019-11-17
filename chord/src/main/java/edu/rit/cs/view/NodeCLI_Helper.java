@@ -23,14 +23,13 @@ public class NodeCLI_Helper {
         connections = new ArrayList<>();
         this.server = server;
         this.firstThread = nodeSignin(server);
-
     }
 
     /**
      * Function for a node to identify its ID and log in.
      *
      * @param server - String to connect with the Server thru TCP
-     *
+     *this.server = server;
      * @return Node - acts as the instance's information
      */
     private TCPClientNode nodeSignin(String server) {
@@ -81,6 +80,10 @@ public class NodeCLI_Helper {
         }
     }
 
+    /**
+     * Query initially for a fingertable
+     * @param i
+     */
     public void query(int i){
         int update = 0;
         TCPClientNode clientNode = new TCPClientNode(server);

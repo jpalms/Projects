@@ -34,6 +34,10 @@ public class FingerTable implements Serializable {
         fingers.get(i).setActual(successor);
     }
 
+    public void setSuccessorAtIndex(int i, Connection actualConn){
+        fingers.get(i).setActualConnection(actualConn);
+    }
+
     //------------------- Getters ---------------------------
     public int getIdealAtIndex(int i){
         return fingers.get(i).getIdeal();
@@ -42,6 +46,8 @@ public class FingerTable implements Serializable {
     public int getSuccessorAtIndex(int i){
         return fingers.get(i).getActual();
     }
+
+    public Connection getSuccessorConnectionAtIndex(int i) {return fingers.get(i).getActualConnection();}
 
     public ArrayList<Finger> getFingers() {
         return fingers;
