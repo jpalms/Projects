@@ -145,20 +145,28 @@ public class  TCPClientNode extends Thread{
         sendObject(file);
     }
 
-    public File lookupLocation(Node node, String hash){
-            // Calculate ideal successor for filename hash
-            int ideal = Integer.parseInt(hash) % node.getTable().getMaxNodes();
+    public File lookupLocation(Node node, String name){
+        // Check if this node has the file.
+        for(File f : node.getStorage()){
+            if(f.getFileName().equals(name)){
+                return f;
+            }
+        }
 
-            // Get the closest ideal table entry to destination node id
-            int localIdeal = node.getTable().getTableIdealGivenDestinationIdeal(ideal);
+        // Calculate ideal successor for filename hash
+        int ideal = Integer.parseInt(name) % node.getTable().getMaxNodes();
 
-            // Get the connection the the ideal node.
-            Connection connection = node.getTable().getSuccessorConnectionGivenIdeal(localIdeal);
+        // Get the closest ideal table entry to destination node id
+        int localIdeal = node.getTable().getTableIdealGivenDestinationIdeal(ideal);
 
-            // Hop, check for file hop again (recursive helper?)
+        // Get the connection the the ideal node.
+        Connection connection = node.getTable().getSuccessorConnectionGivenIdeal(localIdeal);
 
-            // TODO
-            return null;
+        // TODO check to see if file doesn't exist
+        // jumpCOunt < node.getTable().getFingers().size();
+        // Tell the next node to lookup this file and give it back to us
+        TCPClientNode nextNode = new TCPClientNode(connection);
+        return nextNode.lookup(node, name);
     }
 
     private File lookup(Node node, String hash){
@@ -302,14 +310,7 @@ public class  TCPClientNode extends Thread{
                     } else if(str.equals("lookup")){
                         System.out.println("Looking up File");
                         String hash = (String)in.readObject();
-                        File temp = new File(hash);
-                        for (File f : node.getStorage()){
-                            if (f.equals(temp)){
-                                sendObject(f);
-                                break;
-                            }
-                        }
-
+                        sendObject(lookupLocation(node, hash));
                     }
 
                     turnOff();
