@@ -4,9 +4,7 @@ package edu.rit.cs.controller;
 import edu.rit.cs.model.Connection;
 import edu.rit.cs.view.ServerCLI;
 
-import java.util.ArrayList;
 import java.util.TreeMap;
-import java.util.List;
 
 public class AnchorNode {
 
@@ -76,14 +74,14 @@ public class AnchorNode {
 	 *
 	 * @return		TreeMap of onlineNodes
 	 */
-	public TreeMap<String, Connection> getOnlineNodes(){
+	public synchronized TreeMap<String, Connection> getOnlineNodes(){
 		return onlineNodes;
 	}
 
 	public synchronized boolean isOnline(String id){
-		if(onlineNodes.isEmpty())
+		if(this.getOnlineNodes().isEmpty())
 			return false;
-		return onlineNodes.containsKey(id);
+		return this.getOnlineNodes().containsKey(id);
 	}
 
 	public synchronized String getNext(int ideal){
@@ -122,7 +120,7 @@ public class AnchorNode {
 	}
 
 	public synchronized void showAllNode(){
-		for(String node: onlineNodes.keySet())
+		for(String node: this.getOnlineNodes().keySet())
 		System.out.println("Node: " + node + "\n");
 	}
 

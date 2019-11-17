@@ -105,7 +105,8 @@ public class  TCPClientNode extends Thread{
             running = true;
             // look for new connections, then pass it to worker thread
             while (running) {
-                System.out.println("Looking for connections");
+                //System.out.println("Looking for connections");
+
                 Socket clientSocket = listenSocket.accept();
                 Worker c = new Worker(clientSocket);
                 workers.add(c);
@@ -238,6 +239,7 @@ public class  TCPClientNode extends Thread{
         ObjectInputStream in;
         ObjectOutputStream out;
         Socket clientSocket;
+        private boolean loop;
 
         public Worker(Socket clientSocket){
             try {
@@ -247,7 +249,7 @@ public class  TCPClientNode extends Thread{
                 in = new ObjectInputStream(clientSocket.getInputStream());
                 out = new ObjectOutputStream(clientSocket.getOutputStream());
 
-                running = true;
+                loop = true;
                 this.start();
             } catch (IOException e){
                 System.err.println(e.getMessage());
@@ -259,7 +261,7 @@ public class  TCPClientNode extends Thread{
          */
         //todo - refactor this to be similar to handler, TCP_Handler
         public void run() {
-            while (running) {
+            while (loop) {
 
                 try {
                     //wait for connection from server
@@ -316,7 +318,7 @@ public class  TCPClientNode extends Thread{
 
         public void turnOff(){
             try {
-                running = false;
+                loop = false;
                 clientSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();

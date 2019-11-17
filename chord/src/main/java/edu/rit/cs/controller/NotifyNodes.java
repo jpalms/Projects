@@ -36,10 +36,9 @@ public class NotifyNodes extends Thread {
      **/
     public void run() {
         System.out.println("Server is running ...");
-        TreeMap<String, Connection> onlineNodes;
         while (running) {
             System.out.print("");
-            onlineNodes = anchorNode.getOnlineNodes();
+            TreeMap<String, Connection> onlineNodes = anchorNode.getOnlineNodes();
             if(!onlineNodes.isEmpty()){
                 if(handler.update()) {
                     HashMap<String, ArrayList<File>> removedNodes = handler.getRemovedNodes();
@@ -51,6 +50,7 @@ public class NotifyNodes extends Thread {
                     ArrayList<String> newNodes = handler.getNewNodes();
 
                     if(newNodes.size() > 0) {
+
                         for (Connection conn : onlineNodes.values()) {
                             for(String node: newNodes){
                                 newNodeOnline(node, conn);
