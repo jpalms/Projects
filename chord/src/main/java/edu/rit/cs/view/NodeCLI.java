@@ -14,14 +14,11 @@ import java.util.Scanner;
 
 public class NodeCLI {
 
-    private static TCPClientNode firstThread;
-
     /**
      * Function for a chord node to gracefully shut down.
      */
     private static void turnOff(NodeCLI_Helper nch){
         nch.quit();
-        firstThread.turnOffFirst();
         System.exit(1);
     }
 

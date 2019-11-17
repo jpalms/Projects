@@ -190,17 +190,16 @@ public class  TCPClientNode extends Thread{
     }
 
     public void quit(Node node){
+        sendObject(node);
         sendObject("quit");
 
         // send number of files to server, in preparation
-        sendObject(node.getStorage().size());
+        sendObject(new Integer(node.getStorage().size()));
         // send files to server for rehashing, remove from node
-        for (File target : node.getStorage()) {
-            sendObject(target);
-            node.getStorage().remove(target);
+        for (File f : node.getStorage()) {
+            sendObject(f);
+            node.getStorage().remove(f);
         }
-
-
     }
 
     public void setNode(Node node) {
@@ -229,14 +228,25 @@ public class  TCPClientNode extends Thread{
         }
 
     /**
+     * Clean turns off all the running worker threads
+     */
+    private void turnOffWorkers() {
+        for (Worker work : workers) {
+            work.turnOff();
+        }
+    }
+    /**
      * Function to turn of first thread which recieves objects from the server
      */
     public void turnOffFirst(){
             running = false;
+            turnOffWorkers();
             try {
                 s.close();
             } catch (IOException e) {
                 //e.printStackTrace();
+            } catch (NullPointerException e){
+
             }
     }
 
