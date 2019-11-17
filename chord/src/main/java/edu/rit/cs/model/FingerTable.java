@@ -39,7 +39,35 @@ public class FingerTable implements Serializable {
         return fingers.get(i).getIdeal();
     }
 
+    public int getMaxNodes(){
+        return this.n;
+    }
+
     public Connection getSuccessorConnectionAtIndex(int i) {return fingers.get(i).getActualConnection();}
+
+    /**
+     * Given a destination node, return the ideal hop closest to that node
+     * @param destinationNode
+     * @return
+     */
+    public int getTableIdealGivenDestinationIdeal(int destinationNode){
+        int maxBeforeIdeal = -1;
+        for(Finger f : fingers){
+            if(f.getIdeal() <= destinationNode && f.getIdeal() > maxBeforeIdeal){
+                maxBeforeIdeal = f.getIdeal();
+            }
+        }
+        return maxBeforeIdeal;
+    }
+
+    public Connection getSuccessorConnectionGivenIdeal(int i){
+        for(Finger f : fingers){
+            if(f.getIdeal() == i){
+                return f.getActualConnection();
+            }
+        }
+        return null;
+    }
 
     public ArrayList<Finger> getFingers() {
         return fingers;
