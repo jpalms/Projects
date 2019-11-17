@@ -56,21 +56,24 @@ public class NotifyNodes extends Thread {
                                 newNodeOnline(node, (Connection)conn);
                             }
                         }
-                    }                    // send files from offline to Online nodes
-                    for(ArrayList<File> files: removedNodes.values()){
-                        for(File f: files){
-                            int k = f.hashCode() % n;
-                            if(filesToNode.containsKey(k)){
-                                ArrayList<File> temp = new ArrayList<>();
-                                temp.add(f);
-                                filesToNode.put(k + "", temp);
-                            } else{
-                                filesToNode.get(k).add(f);
+                    }
+                    if(removedNodes.size() > 0) {
+                        // send files from offline to Online nodes
+                        for (ArrayList<File> files : removedNodes.values()) {
+                            for (File f : files) {
+                                int k = f.hashCode() % n;
+                                if (filesToNode.containsKey(k)) {
+                                    ArrayList<File> temp = new ArrayList<>();
+                                    temp.add(f);
+                                    filesToNode.put(k + "", temp);
+                                } else {
+                                    filesToNode.get(k).add(f);
+                                }
                             }
                         }
-                    }
-                    for(Connection conn: onlineNodes.values()){
-                        sendInfo(conn.getNodeId() + "", removedNodes.keySet(), filesToNode.get(conn.getNodeId()));
+                        for (Connection conn : onlineNodes.values()) {
+                            sendInfo(conn.getNodeId() + "", removedNodes.keySet(), filesToNode.get(conn.getNodeId()));
+                        }
                     }
                 }
             }
