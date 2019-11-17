@@ -5,10 +5,12 @@ import edu.rit.cs.model.Connection;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
+
+
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Class of Notifying Subscribers about events and all Users about Topics
@@ -38,7 +40,8 @@ public class NotifyNodes extends Thread {
         System.out.println("Server is running ...");
         while (running) {
             System.out.print("");
-            TreeMap<String, Connection> onlineNodes = anchorNode.getOnlineNodes();
+            ConcurrentSkipListMap<String, Connection> onlineNodes = anchorNode.getOnlineNodes();
+            Collection<Connection> connections = anchorNode.getOnlineConnections();
             if(!onlineNodes.isEmpty()){
                 if(handler.update()) {
                     HashMap<String, ArrayList<File>> removedNodes = handler.getRemovedNodes();
@@ -49,14 +52,7 @@ public class NotifyNodes extends Thread {
                     // node online
                     ArrayList<String> newNodes = handler.getNewNodes();
 
-                    if(newNodes.size() > 0) {
-
-                        for (Connection conn : onlineNodes.values()) {
-                            for(String node: newNodes){
-                                newNodeOnline(node, conn);
-                            }
-                        }
-                    }
+                    checkNodes(newNodes, connections);
                     // send files from offline to Online nodes
                     for(ArrayList<File> files: removedNodes.values()){
                         for(File f: files){
@@ -135,6 +131,22 @@ public class NotifyNodes extends Thread {
         } catch (IOException e){
 
         }
+    }
+
+    private synchronized void checkNodes(ArrayList<String> newNodes, Collection<Connection> onlineNodes){
+        Lock _mutex = new ReentrantLock(true);
+
+        _mutex.lock();
+
+        if(newNodes.size() > 0) {
+            for (Object conn: onlineNodes) {
+                for(String node: newNodes){
+                    newNodeOnline(node, (Connection)conn);
+                }
+            }
+        }
+
+        _mutex.unlock();
     }
     // stops the loop
     public void turnOff () {

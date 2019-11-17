@@ -4,15 +4,18 @@ package edu.rit.cs.controller;
 import edu.rit.cs.model.Connection;
 import edu.rit.cs.view.ServerCLI;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 public class AnchorNode {
 
-	private TreeMap<String, Connection> onlineNodes;
+	private ConcurrentSkipListMap<String, Connection> onlineNodes;
 
 
 	public AnchorNode() {
-		onlineNodes = new TreeMap<>();
+		onlineNodes = new ConcurrentSkipListMap<>();
 	}
 	//
 
@@ -69,12 +72,15 @@ public class AnchorNode {
 		return onlineNodes.size();
 	}
 
+	public synchronized Collection<Connection> getOnlineConnections(){
+		return this.onlineNodes.values();
+	}
 	/**
 	 * Gets TreeMap of onlineNodes
 	 *
 	 * @return		TreeMap of onlineNodes
 	 */
-	public synchronized TreeMap<String, Connection> getOnlineNodes(){
+	public synchronized ConcurrentSkipListMap<String, Connection> getOnlineNodes(){
 		return onlineNodes;
 	}
 
@@ -88,7 +94,7 @@ public class AnchorNode {
         if (this.getNumOnline() == 1) {
             return this.getOnlineNodes().firstKey();
         } else {
-            TreeMap<String, Connection> tree = this.getOnlineNodes();
+            ConcurrentSkipListMap<String, Connection> tree = this.getOnlineNodes();
             String key = tree.higherKey(ideal + "");
             if (key != null) {
                 return key;
@@ -102,7 +108,7 @@ public class AnchorNode {
         if (this.getNumOnline() == 1) {
             return this.getOnlineNodes().firstKey();
         } else {
-            TreeMap<String, Connection> tree = this.getOnlineNodes();
+            ConcurrentSkipListMap<String, Connection> tree = this.getOnlineNodes();
             if(tree.containsKey(ideal + "")){
                 return ideal + "";
             }
@@ -128,7 +134,7 @@ public class AnchorNode {
 		if (this.getNumOnline() == 1){
 			return id + "";
 		} else{
-			TreeMap<String, Connection> tree = this.getOnlineNodes();
+			ConcurrentSkipListMap<String, Connection> tree = this.getOnlineNodes();
 			String key = tree.lowerKey(id + "");
 			if(key != null){
 				return key;
