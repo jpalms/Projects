@@ -146,26 +146,19 @@ public class  TCPClientNode extends Thread{
     }
 
     public File lookupLocation(Node node, String hash){
-        sendObject(node);
-        sendObject("file");
-        sendObject("lookup");
+            // Calculate ideal successor for filename hash
+            int ideal = Integer.parseInt(hash) % node.getTable().getMaxNodes();
 
-        sendObject(hash);
+            // Get the closest ideal table entry to destination node id
+            int localIdeal = node.getTable().getTableIdealGivenDestinationIdeal(ideal);
 
-        Connection conn = (Connection)readObject();
+            // Get the connection the the ideal node.
+            Connection connection = node.getTable().getSuccessorConnectionGivenIdeal(localIdeal);
 
-        System.out.println(conn.toString());
-        if(conn.getNodeId() == node.getId()) {
-            for (File f : node.getStorage()){
-                if (f.getFileName().equals(hash)){
-                    return f;
-                }
-            }
-            return (File) new Object();
-        }
-        TCPClientNode thread = new TCPClientNode(conn);
+            // Hop, check for file hop again (recursive helper?)
 
-        return thread.lookup(node, hash);
+            // TODO
+            return null;
     }
 
     private File lookup(Node node, String hash){
