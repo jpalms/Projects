@@ -324,6 +324,12 @@ public class  TCPClientNode extends Thread{
                 e.printStackTrace();
             }
         }
+
+        /**
+         * Need to make a new socket connection, no way to reopen.
+         */
+        public void turnOn(){
+        }
     }
     }
 

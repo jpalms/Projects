@@ -4,16 +4,25 @@ import java.io.Serializable;
 
 public class Finger implements Serializable {
     private int index, ideal, actual;
+    private Connection actualConnection;
 
     public Finger(int index, int ideal, int actual){
         this.index = index;
         this.ideal = ideal;
         this.actual = actual;
+        this.actualConnection = null;
+    }
+
+    public Finger(int index, int ideal, Connection actual){
+        this.index = index;
+        this.ideal = ideal;
+        this.actualConnection = actual;
     }
 
     public Finger(int index, int ideal){
         this.index = index;
         this.ideal = ideal;
+        this.actualConnection = null;
     }
 
     //---------------------- Getters -------------------------
@@ -34,6 +43,8 @@ public class Finger implements Serializable {
         return ideal;
     }
 
+    public Connection getActualConnection() {return actualConnection;}
+
 
     //----------------------- Setters -------------------------
 
@@ -49,6 +60,8 @@ public class Finger implements Serializable {
     public void setIdeal(int ideal) {
         this.ideal = ideal;
     }
+
+    public void setActualConnection(Connection actualConnection) {this.actualConnection = actualConnection;}
 
     @Override
     public String toString(){
