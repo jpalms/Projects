@@ -88,8 +88,8 @@ public class NotifyNodes extends Thread {
         try {
             clientSocket = new Socket(conn.getIpAddr(), conn.getPort());
 
-            in = new ObjectInputStream(clientSocket.getInputStream());
             out = new ObjectOutputStream(clientSocket.getOutputStream());
+            in = new ObjectInputStream(clientSocket.getInputStream());
 
             out.writeObject("newNode");
 
@@ -114,8 +114,8 @@ public class NotifyNodes extends Thread {
         try {
             clientSocket = new Socket(conn.getIpAddr(), conn.getPort());
 
-            in = new ObjectInputStream(clientSocket.getInputStream());
             out = new ObjectOutputStream(clientSocket.getOutputStream());
+            in = new ObjectInputStream(clientSocket.getInputStream());
 
             out.writeObject("removed");
 

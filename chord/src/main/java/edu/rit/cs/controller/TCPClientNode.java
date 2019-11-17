@@ -102,9 +102,10 @@ public class  TCPClientNode extends Thread{
             // start server
             int serverPort = node.getPort();
             ServerSocket listenSocket = new ServerSocket(serverPort);
-
+            running = true;
             // look for new connections, then pass it to worker thread
             while (running) {
+                System.out.println("Looking for connections");
                 Socket clientSocket = listenSocket.accept();
                 Worker c = new Worker(clientSocket);
                 workers.add(c);
@@ -154,6 +155,7 @@ public class  TCPClientNode extends Thread{
                     return f;
                 }
             }
+            return (File) new Object();
         }
         TCPClientNode thread = new TCPClientNode(conn);
 
@@ -239,9 +241,11 @@ public class  TCPClientNode extends Thread{
 
         public Worker(Socket clientSocket){
             try {
+                System.out.println("Connection Made");
                 this.clientSocket = clientSocket;
-                out = new ObjectOutputStream(clientSocket.getOutputStream());
+
                 in = new ObjectInputStream(clientSocket.getInputStream());
+                out = new ObjectOutputStream(clientSocket.getOutputStream());
 
                 running = true;
                 this.start();
@@ -286,6 +290,7 @@ public class  TCPClientNode extends Thread{
                         System.out.println("Inserting File: " + file.toPath());
                         node.getStorage().add(file);
                     } else if(str.equals("lookup")){
+                        System.out.println("Looking up File");
                         String hash = (String)in.readObject();
                         File temp = new File(hash);
                         for (File f : node.getStorage()){
@@ -296,15 +301,25 @@ public class  TCPClientNode extends Thread{
                         }
 
                     }
-                    clientSocket.close();
+
+                    turnOff();
 
                 } catch (IOException e) {
                     System.err.println("IO: " + e.getMessage());
                     turnOff();
                 } catch (ClassNotFoundException e) {
                     System.err.println("CLASS: " + e.getMessage());
-                    //turnOff();
+                    turnOff();
                 }
+            }
+        }
+
+        public void turnOff(){
+            try {
+                running = false;
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
