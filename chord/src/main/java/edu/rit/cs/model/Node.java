@@ -28,7 +28,7 @@ public class Node implements Comparable, Serializable {
 
     //------------------- Getter --------------
 
-    public int getId() {
+    public synchronized int getId() {
         return id;
     }
 
@@ -40,7 +40,7 @@ public class Node implements Comparable, Serializable {
         return prevId;
     }
 
-    public int getPort() {
+    public synchronized int getPort() {
         return port;
     }
 
@@ -48,15 +48,15 @@ public class Node implements Comparable, Serializable {
         return ipAddr;
     }
 
-    public FingerTable getTable() { return table; }
+    public synchronized FingerTable getTable() { return table; }
 
-    public ArrayList<File> getStorage() { return storage; }
+    public synchronized ArrayList<File> getStorage() { return storage; }
 
-    public String getServerIp() {
+    public synchronized String getServerIp() {
         return serverIp;
     }
 
-    public boolean rehash(String str){
+    public synchronized boolean rehash(String str){
         int num = Integer.parseInt(str);
         if(num > this.getTable().getMaxNodes()){
             this.table = new FingerTable(this.id, num);
@@ -78,7 +78,7 @@ public class Node implements Comparable, Serializable {
     }
 
     @Override
-    public int compareTo(Object cmp){
+    public synchronized int compareTo(Object cmp){
         return this.id - ((Node)cmp).id;
     }
 }

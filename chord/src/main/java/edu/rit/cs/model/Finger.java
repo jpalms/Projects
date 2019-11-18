@@ -3,15 +3,8 @@ package edu.rit.cs.model;
 import java.io.Serializable;
 
 public class Finger implements Serializable {
-    private int index, ideal, actual;
+    private int index, ideal;
     private Connection actualConnection;
-
-    public Finger(int index, int ideal, int actual){
-        this.index = index;
-        this.ideal = ideal;
-        this.actual = actual;
-        this.actualConnection = null;
-    }
 
     public Finger(int index, int ideal, Connection actual){
         this.index = index;

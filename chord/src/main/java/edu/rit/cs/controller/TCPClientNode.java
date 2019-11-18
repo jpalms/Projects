@@ -119,15 +119,12 @@ public class  TCPClientNode extends Thread{
     }
 
     public void insertLocation(Node node, File file, int hopCounter){
-        if(hopCounter > FingerTable.log2(node.getTable().getMaxNodes())){
-            //TODO return cant insert (would never get here but safety checking)
-        }
 
         // Calculate ideal successor for filename hash
         int ideal = (file.hashCode() % node.getTable().getMaxNodes()) + 1;
 
         // If this is the ideal spot, place it here
-        if(node.getId() == ideal){
+        if(node.getId() == ideal || hopCounter > node.getTable().getFingers().size()){
             node.getStorage().add(file);
         }
         else{
@@ -137,8 +134,6 @@ public class  TCPClientNode extends Thread{
             // Get the connection the the ideal node.
             Connection connection = node.getTable().getSuccessorConnectionGivenIdeal(localIdeal);
 
-            // TODO check to see if file doesn't exist
-            // jumpCOunt < node.getTable().getFingers().size();
             TCPClientNode nextNode = new TCPClientNode(connection);
             nextNode.insert(node, file, hopCounter);
         }
@@ -158,8 +153,8 @@ public class  TCPClientNode extends Thread{
             }
         }
 
-        if(hopCounter > FingerTable.log2(node.getTable().getMaxNodes())){
-            //TODO return cant lookup
+        if(hopCounter > node.getTable().getFingers().size()){
+            return new File("DNE");
         }
 
         // Calculate ideal successor for filename hash
@@ -171,8 +166,6 @@ public class  TCPClientNode extends Thread{
         // Get the connection the the ideal node.
         Connection connection = node.getTable().getSuccessorConnectionGivenIdeal(localIdeal);
 
-        // TODO check to see if file doesn't exist
-        // jumpCOunt < node.getTable().getFingers().size();
         // Tell the next node to lookup this file and give it back to us
         TCPClientNode nextNode = new TCPClientNode(connection);
         return nextNode.lookup(node, name, hopCounter);
@@ -311,7 +304,7 @@ public class  TCPClientNode extends Thread{
                         for(File f: node.getStorage()){
                             if(f.hashCode() % node.getTable().getMaxNodes() != ideal){
                                 node.getStorage().remove(f);
-                                insert(node, f, 0);
+                                insertLocation(node, f, 0);
                             }
                         }
 
@@ -338,15 +331,19 @@ public class  TCPClientNode extends Thread{
 
                     } else if(str.equals(Config.INSERT)){
                         File file = (File)in.readObject();
-                        System.out.println("Inserting File: " + file.getPath());
+
+                        System.out.println("Inserting File Check: " + file.getPath());
                         Integer hopCount = (Integer)in.readObject();
                         System.out.println("# Hops in Lookup: " + hopCount);
+
                         insertLocation(node,file, hopCount+1);
                     } else if(str.equals(Config.LOOKUP)){
                         System.out.println("Looking up File");
+
                         String hash = (String)in.readObject();
                         Integer hopCount = (Integer)in.readObject();
                         System.out.println("# Hops in Lookup: " + hopCount);
+
                         sendObject(lookupLocation(node, hash, hopCount+1));
                     }
 
@@ -370,12 +367,6 @@ public class  TCPClientNode extends Thread{
                 e.printStackTrace();
             }
         }
-
-        /**
-         * Need to make a new socket connection, no way to reopen.
-         */
-        public void turnOn(){
-        }
     }
-    }
+}
 
