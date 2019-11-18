@@ -336,7 +336,7 @@ public class  TCPClientNode extends Thread{
                         Integer hopCount = (Integer)in.readObject();
                         System.out.println("# Hops in Lookup: " + hopCount);
 
-                        insertLocation(node,file, hopCount+1);
+                        insertLocation(node,file, hopCount++);
                     } else if(str.equals(Config.LOOKUP)){
                         System.out.println("Looking up File");
 
@@ -344,7 +344,7 @@ public class  TCPClientNode extends Thread{
                         Integer hopCount = (Integer)in.readObject();
                         System.out.println("# Hops in Lookup: " + hopCount);
 
-                        sendObject(lookupLocation(node, hash, hopCount+1));
+                        sendObject(lookupLocation(node, hash, hopCount++));
                     }
 
                     turnOff();
