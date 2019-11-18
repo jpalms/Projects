@@ -147,7 +147,7 @@ public class MiniServer extends Thread {
                 }else {
                     Node node = (Node) obj;
                     obj = in.readObject();
-                    if("query".equals(obj)) {
+                    if(Config.QUERY.equals(obj)) {
                         // query for actual successors
                         obj = in.readObject();
                         Integer integer = (Integer) obj;
@@ -155,7 +155,7 @@ public class MiniServer extends Thread {
 
                         out.writeObject(anchorNode.getSuccessor(ideal));
 
-                    } else if("quit".equals(obj)){
+                    } else if(Config.QUIT.equals(obj)){
                         obj = in.readObject();
                         int numFiles = ((Integer) obj).intValue();
 
@@ -207,7 +207,7 @@ public class MiniServer extends Thread {
             int nextId = Integer.parseInt(anchorNode.getNext(node.getId()));
             int prevId =  Integer.parseInt(anchorNode.getPrev(node.getId()));
 
-            out.writeObject(new Node(node.getId(), getMaxNodeNum(), node.getIpAddr(), Config.port + node.getId(),nextId , prevId));
+            out.writeObject(new Node(node.getId(), getMaxNodeNum(), node.getIpAddr(), node.getServerIp(), Config.port + node.getId(),nextId , prevId));
         }
 
         /**

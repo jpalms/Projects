@@ -1,5 +1,6 @@
 package edu.rit.cs.controller;
 
+import edu.rit.cs.model.Config;
 import edu.rit.cs.model.Connection;
 
 import java.io.*;
@@ -92,7 +93,7 @@ public class NotifyNodes extends Thread {
             out = new ObjectOutputStream(clientSocket.getOutputStream());
             in = new ObjectInputStream(clientSocket.getInputStream());
 
-            out.writeObject("newNode");
+            out.writeObject(Config.NEW_NODE);
 
             out.writeObject(nodeId);
             // client will then query to update Successor
@@ -118,7 +119,7 @@ public class NotifyNodes extends Thread {
             out = new ObjectOutputStream(clientSocket.getOutputStream());
             in = new ObjectInputStream(clientSocket.getInputStream());
 
-            out.writeObject("removed");
+            out.writeObject(Config.REMOVED);
 
             out.writeObject(removed);
             if(!files.isEmpty()) {
@@ -127,7 +128,7 @@ public class NotifyNodes extends Thread {
                 }
             }
 
-            out.writeObject("Done");
+            out.writeObject(Config.DONE);
             // client will then query to update Successor
             clientSocket.close();
         } catch(UnknownHostException e){

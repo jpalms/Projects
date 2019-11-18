@@ -8,15 +8,17 @@ public class Node implements Comparable, Serializable {
     private int id, nextId, prevId;
 
     private String ipAddr;
+    private String serverIp;
     private int port;
 
     private FingerTable table;
 
     private ArrayList<File> storage;
 
-    public Node(int id, int maxNumNodes, String ipAdrr, int port, int nextId, int prevId){
+    public Node(int id, int maxNumNodes, String ipAdrr, String serverIp, int port, int nextId, int prevId){
         this.id = id;
         this.ipAddr = ipAdrr;
+        this.serverIp = serverIp;
         this.port = port;
         this.table = new FingerTable(id, maxNumNodes);
         this.nextId = nextId;
@@ -49,6 +51,21 @@ public class Node implements Comparable, Serializable {
     public FingerTable getTable() { return table; }
 
     public ArrayList<File> getStorage() { return storage; }
+
+    public String getServerIp() {
+        return serverIp;
+    }
+
+    public boolean rehash(String str){
+        int num = Integer.parseInt(str);
+        if(num > this.getTable().getMaxNodes()){
+            this.table = new FingerTable(this.id, num);
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 
     //------------------ Setter -----------------
 
