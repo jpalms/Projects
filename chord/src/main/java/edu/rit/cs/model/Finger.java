@@ -57,6 +57,6 @@ public class Finger implements Serializable {
 
     @Override
     public String toString(){
-        return "index: " + index + "\tideal: " + ideal + "\t successor: " + actual;
+        return "index: " + index + "\tideal: " + ideal + "\t successor: " + actualConnection.getNodeId();
     }
 }

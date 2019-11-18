@@ -1,9 +1,6 @@
 package edu.rit.cs.controller;
 
-import edu.rit.cs.model.Config;
-import edu.rit.cs.model.Connection;
-import edu.rit.cs.model.Node;
-import edu.rit.cs.model.File;
+import edu.rit.cs.model.*;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -121,7 +118,7 @@ public class  TCPClientNode extends Thread{
         }
     }
 
-    public void insertLocation(Node node, File file){
+    public void insertLocation(Node node, File file, int hopCounter){
         // Calculate ideal successor for filename hash
         int ideal = (file.hashCode() % node.getTable().getMaxNodes()) + 1;
 
@@ -137,18 +134,25 @@ public class  TCPClientNode extends Thread{
             Connection connection = node.getTable().getSuccessorConnectionGivenIdeal(localIdeal);
 
             // TODO check to see if file doesn't exist
-            // jumpCOunt < node.getTable().getFingers().size();
+            // jumpCount < node.getTable().getFingers().size();
             TCPClientNode nextNode = new TCPClientNode(connection);
-            nextNode.insert(node, file);
+            nextNode.insert(node, file, hopCounter);
         }
     }
 
-    private void insert(Node node, File file){
+    private void insert(Node node, File file, int hopCounter){
+        // Check for more than log2(maxNodes) hops
+        // TODO stop insert and return failed
+        if(hopCounter > FingerTable.log2(node.getTable().getMaxNodes())){
+
+        }
+
         sendObject("insert");
         sendObject(file);
+        sendObject(hopCounter);
     }
 
-    public File lookupLocation(Node node, String name){
+    public File lookupLocation(Node node, String name, int hopCounter){
         // Check if this node has the file.
         for(File f : node.getStorage()){
             if(f.getFileName().equals(name)){
@@ -169,14 +173,20 @@ public class  TCPClientNode extends Thread{
         // jumpCOunt < node.getTable().getFingers().size();
         // Tell the next node to lookup this file and give it back to us
         TCPClientNode nextNode = new TCPClientNode(connection);
-        return nextNode.lookup(node, name);
+        return nextNode.lookup(node, name, hopCounter);
     }
 
-    private File lookup(Node node, String hash){
+    private File lookup(Node node, String hash, int hopCounter){
+        // Check for more than log2(maxNodes) hops
+        if(hopCounter > FingerTable.log2(node.getTable().getMaxNodes())){
+            return new File(null);
+        }
+
         File file;
 
         sendObject("lookup");
         sendObject(hash);
+        sendObject(hopCounter);
 
         file = (File)readObject();
 
@@ -307,13 +317,21 @@ public class  TCPClientNode extends Thread{
                             in.readObject();
                         }
                     } else if(str.equals("insert")){
+                        // TODO add hop check and send back to caller
                         File file = (File)in.readObject();
                         System.out.println("Inserting File: " + file.getPath());
-                        insertLocation(node,file);
+                        Integer hopCounter = (Integer)in.readObject();
+
+                        System.out.println("Number of Hops in Insert: " + hopCounter);
+                        insertLocation(node,file, hopCounter + 1);
                     } else if(str.equals("lookup")){
-                        System.out.println("Looking up File");
+                        // TODO add hop check and send back to caller
+                        System.out.println("Looking up File in Node " + node.getId());
                         String hash = (String)in.readObject();
-                        sendObject(lookupLocation(node, hash));
+                        Integer hopCounter = (Integer)in.readObject();
+
+                        System.out.println("Number of Hops in Lookup: " + hopCounter);
+                        sendObject(lookupLocation(node, hash, hopCounter + 1));
                     }
 
                     turnOff();

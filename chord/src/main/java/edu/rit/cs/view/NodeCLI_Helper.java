@@ -97,12 +97,12 @@ public class NodeCLI_Helper {
      */
     public void insert(File file){
         TCPClientNode clientNode = new TCPClientNode(server);
-        clientNode.insertLocation(node, file);
+        clientNode.insertLocation(node, file, 0);
     }
 
     public void lookup(String hash) {
         TCPClientNode clientNode = new TCPClientNode(server);
-        File f = clientNode.lookupLocation(node, hash);
+        File f = clientNode.lookupLocation(node, hash, 0);
 
         System.out.println(f.toString());
         System.out.println(f.getFileContent());

@@ -15,7 +15,7 @@ public class FingerTable implements Serializable {
         calcIdeal();
     }
 
-    private int log2(int num){
+    public static int log2(int num){
         return (int) Math.ceil(((Math.log(num)/Math.log(2) + 1e-10)));
     }
 
