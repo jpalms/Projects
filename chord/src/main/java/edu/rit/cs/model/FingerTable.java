@@ -11,12 +11,14 @@ public class FingerTable implements Serializable {
     public FingerTable(int index, int numNodes){
         this.n = numNodes;
         this.numFingers = log2(numNodes);
+        if(this.numFingers == 0)
+            this.numFingers = 1;
         this.index = index;
         calcIdeal();
     }
 
     private int log2(int num){
-        return (int) Math.ceil(((Math.log(num)/Math.log(2) + 1e-10)));
+        return (int) Math.ceil(((Math.log(num-1)/Math.log(2) + 1e-10)));
     }
 
     public void calcIdeal(){
