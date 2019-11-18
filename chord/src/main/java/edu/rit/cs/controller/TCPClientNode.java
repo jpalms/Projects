@@ -291,6 +291,14 @@ public class  TCPClientNode extends Thread{
                         str = (String) in.readObject();
 
                         System.out.println("New Online Node: " + str);
+
+                        if(node.rehash(str)){
+                            for (int i = 0; i < node.getTable().getFingers().size(); i++) {
+                                TCPClientNode clientNode = new TCPClientNode(node.getServerIp());
+                                Connection conn = clientNode.query(node, node.getTable().getIdealAtIndex(i));
+                                node.getTable().setSuccessorAtIndex(i, conn);
+                            }
+                        }
                     } else if(str.equals(Config.REMOVED)){
                         Set<String> removed = (Set<String>)in.readObject();
                         for(String r: removed){
@@ -299,13 +307,19 @@ public class  TCPClientNode extends Thread{
 
                         Object obj = in.readObject();
                         File f;
-
                         while(!(obj instanceof String)){
                             f = (File)obj;
                             System.out.println("File added to Node: " + f.getPath());
                             node.getStorage().add(f);
                             in.readObject();
                         }
+
+                        for (int i = 0; i < node.getTable().getFingers().size(); i++) {
+                            TCPClientNode clientNode = new TCPClientNode(node.getServerIp());
+                            Connection conn = clientNode.query(node, node.getTable().getIdealAtIndex(i));
+                            node.getTable().setSuccessorAtIndex(i, conn);
+                        }
+
                     } else if(str.equals(Config.INSERT)){
                         File file = (File)in.readObject();
                         System.out.println("Inserting File: " + file.getPath());
