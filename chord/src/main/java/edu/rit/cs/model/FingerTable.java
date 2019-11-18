@@ -11,6 +11,9 @@ public class FingerTable implements Serializable {
     public FingerTable(int index, int numNodes){
         this.n = numNodes;
         this.numFingers = log2(numNodes);
+        if(numFingers == 0){
+            numFingers = 1;
+        }
         this.index = index;
         calcIdeal();
     }
