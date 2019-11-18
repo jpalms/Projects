@@ -300,11 +300,21 @@ public class  TCPClientNode extends Thread{
                         System.out.println("New Online Node: " + str);
 
                         node.rehash(str);
-                            for (int i = 0; i < node.getTable().getFingers().size(); i++) {
-                                TCPClientNode clientNode = new TCPClientNode(node.getServerIp());
-                                Connection conn = clientNode.query(node, node.getTable().getIdealAtIndex(i));
-                                node.getTable().setSuccessorAtIndex(i, conn);
+                        for (int i = 0; i < node.getTable().getFingers().size(); i++) {
+                            TCPClientNode clientNode = new TCPClientNode(node.getServerIp());
+                            Connection conn = clientNode.query(node, node.getTable().getIdealAtIndex(i));
+                            node.getTable().setSuccessorAtIndex(i, conn);
+                        }
+
+                        int ideal = Integer.parseInt(str);
+
+                        for(File f: node.getStorage()){
+                            if(f.hashCode() % node.getTable().getMaxNodes() != ideal){
+                                node.getStorage().remove(f);
+                                insert(node, f, 0);
                             }
+                        }
+
                     } else if(str.equals(Config.REMOVED)){
                         Set<String> removed = (Set<String>)in.readObject();
                         for(String r: removed){
