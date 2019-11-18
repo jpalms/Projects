@@ -292,13 +292,12 @@ public class  TCPClientNode extends Thread{
 
                         System.out.println("New Online Node: " + str);
 
-                        if(node.rehash(str)){
+                        node.rehash(str);
                             for (int i = 0; i < node.getTable().getFingers().size(); i++) {
                                 TCPClientNode clientNode = new TCPClientNode(node.getServerIp());
                                 Connection conn = clientNode.query(node, node.getTable().getIdealAtIndex(i));
                                 node.getTable().setSuccessorAtIndex(i, conn);
                             }
-                        }
                     } else if(str.equals(Config.REMOVED)){
                         Set<String> removed = (Set<String>)in.readObject();
                         for(String r: removed){
