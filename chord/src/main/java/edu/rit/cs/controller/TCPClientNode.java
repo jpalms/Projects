@@ -144,7 +144,7 @@ public class  TCPClientNode extends Thread{
     }
 
     private void insert(Node node, File file){
-        sendObject("insert");
+        sendObject(Config.INSERT);
         sendObject(file);
     }
 
@@ -175,7 +175,7 @@ public class  TCPClientNode extends Thread{
     private File lookup(Node node, String hash){
         File file;
 
-        sendObject("lookup");
+        sendObject(Config.LOOKUP);
         sendObject(hash);
 
         file = (File)readObject();
@@ -185,7 +185,7 @@ public class  TCPClientNode extends Thread{
 
     public Connection query(Node node, int ideal){
         sendObject(node);
-        sendObject("query");
+        sendObject(Config.QUERY);
         sendObject(new Integer(ideal));
 
         Connection result = (Connection) readObject();
@@ -195,7 +195,7 @@ public class  TCPClientNode extends Thread{
 
     public void quit(Node node){
         sendObject(node);
-        sendObject("quit");
+        sendObject(Config.QUIT);
 
         // send number of files to server, in preparation
         sendObject(new Integer(node.getStorage().size()));
@@ -287,11 +287,11 @@ public class  TCPClientNode extends Thread{
 
                     String str = (String)in.readObject();
 
-                    if(str.equals("newNode")){
+                    if(str.equals(Config.NEW_NODE)){
                         str = (String) in.readObject();
 
                         System.out.println("New Online Node: " + str);
-                    } else if(str.equals("removed")){
+                    } else if(str.equals(Config.REMOVED)){
                         Set<String> removed = (Set<String>)in.readObject();
                         for(String r: removed){
                             System.out.println("Node has gone offline: " + r);
@@ -306,11 +306,11 @@ public class  TCPClientNode extends Thread{
                             node.getStorage().add(f);
                             in.readObject();
                         }
-                    } else if(str.equals("insert")){
+                    } else if(str.equals(Config.INSERT)){
                         File file = (File)in.readObject();
                         System.out.println("Inserting File: " + file.getPath());
                         insertLocation(node,file);
-                    } else if(str.equals("lookup")){
+                    } else if(str.equals(Config.LOOKUP)){
                         System.out.println("Looking up File");
                         String hash = (String)in.readObject();
                         sendObject(lookupLocation(node, hash));
