@@ -64,7 +64,7 @@ public class NotifyNodes extends Thread {
                     // notify nodes of node that has gone offline
                     if(removedNodes.size() > 0) {
                         for (Connection conn : onlineNodes.values()) {
-                            sendInfo(conn.getNodeId() + "", removedNodes);
+                            sendInfo(conn, removedNodes);
                         }
                     }
 
@@ -107,8 +107,7 @@ public class NotifyNodes extends Thread {
 
         }
     }
-    private void sendInfo(String nodeId, ArrayList<String> removed){
-        Connection conn = anchorNode.getOnlineNodes().get(nodeId);
+    private void sendInfo(Connection conn, ArrayList<String> removed){
 
         ObjectInputStream in;
         ObjectOutputStream out;

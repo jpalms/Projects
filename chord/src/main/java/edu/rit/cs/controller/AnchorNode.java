@@ -52,7 +52,7 @@ public class AnchorNode {
 	}
 
 	public synchronized void removeNode(String id){
-		onlineNodes.remove(id);
+		onlineNodes.remove(new Integer(id));
 	}
 
 // _________________________________________________________
