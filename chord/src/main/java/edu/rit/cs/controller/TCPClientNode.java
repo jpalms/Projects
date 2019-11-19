@@ -145,17 +145,17 @@ public class  TCPClientNode extends Thread{
         int destination = (file.hashCode() % node.getTable().getMaxNodes()) + 1;
 
         // If this is the ideal spot, place it here
-        if(this.node.getId() == destination || hopCounter > this.node.getTable().getFingers().size()){
-            insert(node, file, hopCounter);
-            // node.getStorage().add(file);
+        if(node.getId() == destination || hopCounter > node.getTable().getFingers().size()){
+            //insert(node, file, hopCounter);
+            node.getStorage().add(file);
         }
         else{
             // Get the next biggest hop connection to the destination from ourselves
-            Connection connection = this.node.getTable().getConnectionGivenStartAndDestinationID(this.node.getId(), destination);
+            Connection connection = node.getTable().getConnectionGivenStartAndDestinationID(node.getId(), destination);
 
-            this.turnOff();
+
             TCPClientNode nextNode = new TCPClientNode(connection);
-            nextNode.insertLocation(this.node, file, hopCounter++);
+            nextNode.insert(node, file, hopCounter++);
         }
     }
 
@@ -370,6 +370,8 @@ public class  TCPClientNode extends Thread{
                         System.out.println("Inserting File Check: " + file.getPath());
                         Integer hopCount = (Integer)in.readObject();
                         System.out.println("# Hops in Lookup: " + hopCount);
+
+                        insertLocation(node, file, hopCount);
 
                     } else if(str.equals(Config.REORDER)) {
 
