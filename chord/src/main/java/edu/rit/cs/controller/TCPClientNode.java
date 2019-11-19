@@ -18,16 +18,21 @@ import java.util.Set;
  */
 public class  TCPClientNode extends Thread{
 
-        private ObjectInputStream in;
-        private ObjectOutputStream out;
-        private boolean running;
-        private Socket s;
-        private Node node;
-        private ArrayList<Worker> workers;
-     /*
-      * Constructor Class that connects to controller.Handler, then communicates
-      * with controller.Handler.Worker
-      */
+    /*
+    Class Variables
+     */
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
+    private boolean running;
+    private Socket s;
+    private Node node;
+    private ArrayList<Worker> workers;
+
+    /**
+     * Constructor Class that connects to controller.Handler, then communicates
+     * with controller.Handler.Worker
+     * @param addr address of the server to connect to
+     */
     public TCPClientNode(String addr) {
             String server_address = addr;
             s = null;
@@ -48,6 +53,11 @@ public class  TCPClientNode extends Thread{
             }
     }
 
+    /**
+     * Overloaded Constructor to use a Connection data structure
+     * Creates a client connection to an existing server
+     * @param conn Connection data structure
+     */
     public TCPClientNode(Connection conn) {
         String server_address = conn.getIpAddr();
         s = null;
@@ -98,6 +108,10 @@ public class  TCPClientNode extends Thread{
             return new Object();
         }
 
+    /**
+     * Starts a listen server and dispatches all incoming connection
+     * to Worker Threads
+     */
     public void run() {
         workers = new ArrayList<>();
         try {
@@ -118,6 +132,13 @@ public class  TCPClientNode extends Thread{
         }
     }
 
+    /**
+     * Calculates the ideal node to store a file in based on a hash
+     * Will either place in node, or forward using a helper function
+     * @param node Node we are considering to place the file in
+     * @param file a File we are transfering
+     * @param hopCounter Number of hops before failure (# of fingers)
+     */
     public void insertLocation(Node node, File file, int hopCounter){
 
         // Calculate ideal successor for filename hash
@@ -139,12 +160,25 @@ public class  TCPClientNode extends Thread{
         }
     }
 
+    /**
+     * Helper function for insertLocation. Sends the objects over TCP
+     * @param node Node we are talking about
+     * @param file File to send over network
+     * @param hopCounter hops to make over network
+     */
     private void insert(Node node, File file, int hopCounter){
         sendObject(Config.INSERT);
         sendObject(file);
         sendObject(hopCounter);
     }
 
+    /**
+     * Lookup a file given name of file
+     * @param node Node we are at
+     * @param name File name to look up
+     * @param hopCounter hops to make over network
+     * @return File being looked up. Can Return DNE
+     */
     public File lookupLocation(Node node, String name, int hopCounter){
         // Check if this node has the file.
         for(File f : node.getStorage()){
@@ -171,6 +205,12 @@ public class  TCPClientNode extends Thread{
         return nextNode.lookup(node, name, hopCounter);
     }
 
+    /**
+     * Helper function for lookupLocation. Sends the objects over TCP
+     * @param node Node we are talking about
+     * @param hash hash of the file we are looking up
+     * @param hopCounter hops to make over network
+     */
     private File lookup(Node node, String hash, int hopCounter){
         File file;
 
@@ -210,11 +250,19 @@ public class  TCPClientNode extends Thread{
         this.node = node;
     }
 
+    /**
+     * Returns the user's IP as a String
+     * @return user IP
+     */
     public String getIpAddr(){
         System.out.println(s.getLocalAddress().toString().substring((1)));
         return s.getLocalAddress().toString().substring(1);
     }
 
+    /**
+     * Returns the local port
+     * @return local port
+     */
     public int getPort(){
         return s.getLocalPort();
     }
@@ -240,7 +288,7 @@ public class  TCPClientNode extends Thread{
         }
     }
     /**
-     * Function to turn of first thread which recieves objects from the server
+     * Function to turn of first thread which receives objects from the server
      */
     public void turnOffFirst(){
             running = false;
@@ -254,12 +302,20 @@ public class  TCPClientNode extends Thread{
             }
     }
 
+    /**
+     * Worker Thread. Dispatched to from TCPClientNode
+     * Handles commands in a switch case.
+     */
     public class Worker extends Thread{
         ObjectInputStream in;
         ObjectOutputStream out;
         Socket clientSocket;
         private boolean loop;
 
+        /**
+         * Worker constructor. Assigns the socket given and dispatches to commands.
+         * @param clientSocket Socket accepted from TCPClientNode
+         */
         public Worker(Socket clientSocket){
             try {
                 System.out.println("Connection Made");
@@ -299,15 +355,6 @@ public class  TCPClientNode extends Thread{
                             node.getTable().setSuccessorAtIndex(i, conn);
                         }
 
-                        int ideal = Integer.parseInt(str);
-
-                        for(File f: node.getStorage()){
-                            if(f.hashCode() % node.getTable().getMaxNodes() != ideal){
-                                node.getStorage().remove(f);
-                                insertLocation(node, f, 0);
-                            }
-                        }
-
                     } else if(str.equals(Config.REMOVED)){
                         Set<String> removed = (Set<String>)in.readObject();
                         for(String r: removed){
@@ -337,6 +384,15 @@ public class  TCPClientNode extends Thread{
                         System.out.println("# Hops in Lookup: " + hopCount);
 
                         insertLocation(node,file, hopCount++);
+                    } else if(str.equals(Config.REORDER)) {
+                        int ideal = Integer.parseInt(str);
+
+                        for(File f: node.getStorage()){
+                            if(f.hashCode() % node.getTable().getMaxNodes() != ideal){
+                                node.getStorage().remove(f);
+                                insertLocation(node, f, 0);
+                            }
+                        }
                     } else if(str.equals(Config.LOOKUP)){
                         System.out.println("Looking up File");
 
@@ -359,6 +415,9 @@ public class  TCPClientNode extends Thread{
             }
         }
 
+        /**
+         * Close a socket connection
+         */
         public void turnOff(){
             try {
                 loop = false;
