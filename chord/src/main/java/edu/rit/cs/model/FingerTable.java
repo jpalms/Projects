@@ -50,20 +50,45 @@ public class FingerTable implements Serializable {
 
     /**
      * Given a destination node, return the ideal hop closest to that node
-     * @param destinationNode
-     * @return
+     * @param startNode NodeID we are currently at
+     * @param destinationNode NodeID we are trying to reach
+     * @return Connection that is the biggest hop available to destination
      */
-    public int getTableIdealGivenDestinationIdeal(int destinationNode){
-        int maxBeforeIdeal = -1;
-        for(Finger f : fingers){
-            if(f.getIdeal() <= destinationNode && f.getIdeal() > maxBeforeIdeal){
-                maxBeforeIdeal = f.getIdeal();
+    public Connection getConnectionGivenStartAndDestinationID(int startNode, int destinationNode){
+        // Normal Case
+        if(startNode < destinationNode){
+            int maxBeforeIdeal = -1;
+            for(Finger f : fingers){
+                if(f.getIdeal() <= destinationNode && f.getIdeal() > maxBeforeIdeal){
+                    maxBeforeIdeal = f.getIdeal();
+                }
             }
+            return getActualConnectionGivenIdeal(maxBeforeIdeal);
         }
-        return maxBeforeIdeal;
+        // If we pass zero
+        // TODO Add Logic and Test
+        else if(startNode > destinationNode){
+            int maxBeforeIdeal = -1;
+            for(Finger f : fingers){
+                if(f.getIdeal() <= destinationNode && f.getIdeal() > maxBeforeIdeal){
+                    maxBeforeIdeal = f.getIdeal();
+                }
+            }
+            return getActualConnectionGivenIdeal(maxBeforeIdeal % getMaxNodes());
+        }
+        // Should never get here
+        else{
+            return getActualConnectionGivenIdeal(startNode);
+        }
     }
 
-    public Connection getSuccessorConnectionGivenIdeal(int i){
+    /**
+     * Helper function for above. gets the connection given
+     * a correct ideal. Assumed correct
+     * @param i int representing ideal
+     * @return Connection to node
+     */
+    private Connection getActualConnectionGivenIdeal(int i){
         for(Finger f : fingers){
             if(f.getIdeal() == i){
                 return f.getActualConnection();

@@ -142,18 +142,15 @@ public class  TCPClientNode extends Thread{
     public void insertLocation(Node node, File file, int hopCounter){
 
         // Calculate ideal successor for filename hash
-        int ideal = (file.hashCode() % node.getTable().getMaxNodes()) + 1;
+        int destination = (file.hashCode() % node.getTable().getMaxNodes()) + 1;
 
         // If this is the ideal spot, place it here
-        if(node.getId() == ideal || hopCounter > node.getTable().getFingers().size()){
+        if(node.getId() == destination || hopCounter > node.getTable().getFingers().size()){
             node.getStorage().add(file);
         }
         else{
-            // Get the closest ideal table entry to destination node id
-            int localIdeal = node.getTable().getTableIdealGivenDestinationIdeal(ideal);
-
-            // Get the connection the the ideal node.
-            Connection connection = node.getTable().getSuccessorConnectionGivenIdeal(localIdeal);
+            // Get the next biggest hop connection to the destination from ourselves
+            Connection connection = node.getTable().getConnectionGivenStartAndDestinationID(node.getId(), destination);
 
             TCPClientNode nextNode = new TCPClientNode(connection);
             nextNode.insert(node, file, hopCounter);
@@ -192,13 +189,10 @@ public class  TCPClientNode extends Thread{
         }
 
         // Calculate ideal successor for filename hash
-        int ideal = name.length() % node.getTable().getMaxNodes() + 1;
+        int destination = name.length() % node.getTable().getMaxNodes() + 1;
 
-        // Get the closest ideal table entry to destination node id
-        int localIdeal = node.getTable().getTableIdealGivenDestinationIdeal(ideal);
-
-        // Get the connection the the ideal node.
-        Connection connection = node.getTable().getSuccessorConnectionGivenIdeal(localIdeal);
+        // Get the next biggest hop connection to the destination from ourselves
+        Connection connection = node.getTable().getConnectionGivenStartAndDestinationID(node.getId(), destination);
 
         // Tell the next node to lookup this file and give it back to us
         TCPClientNode nextNode = new TCPClientNode(connection);
