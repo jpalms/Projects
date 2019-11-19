@@ -145,15 +145,16 @@ public class  TCPClientNode extends Thread{
         int destination = (file.hashCode() % node.getTable().getMaxNodes()) + 1;
 
         // If this is the ideal spot, place it here
-        if(node.getId() == destination || hopCounter > node.getTable().getFingers().size()){
-            node.getStorage().add(file);
+        if(this.node.getId() == destination || hopCounter > this.node.getTable().getFingers().size()){
+            insert(node, file, hopCounter);
+            // node.getStorage().add(file);
         }
         else{
             // Get the next biggest hop connection to the destination from ourselves
-            Connection connection = node.getTable().getConnectionGivenStartAndDestinationID(node.getId(), destination);
+            Connection connection = this.node.getTable().getConnectionGivenStartAndDestinationID(this.node.getId(), destination);
 
             TCPClientNode nextNode = new TCPClientNode(connection);
-            nextNode.insert(node, file, hopCounter);
+            nextNode.insertLocation(this.node, file, hopCounter++);
         }
     }
 
@@ -177,26 +178,23 @@ public class  TCPClientNode extends Thread{
      * @return File being looked up. Can Return DNE
      */
     public File lookupLocation(Node node, String name, int hopCounter){
-        // Check if this node has the file.
-        for(File f : node.getStorage()){
-            if(f.getFileName().equals(name)){
-                return f;
-            }
-        }
-
-        if(hopCounter > node.getTable().getFingers().size()){
+        if(hopCounter > this.node.getTable().getFingers().size()){
             return new File("DNE");
         }
 
         // Calculate ideal successor for filename hash
-        int destination = name.length() % node.getTable().getMaxNodes() + 1;
+        int destination = name.length() % this.node.getTable().getMaxNodes() + 1;
+
+        if(this.node.getId() == destination){
+            lookup(node, name, hopCounter);
+        }
 
         // Get the next biggest hop connection to the destination from ourselves
-        Connection connection = node.getTable().getConnectionGivenStartAndDestinationID(node.getId(), destination);
+        Connection connection = this.node.getTable().getConnectionGivenStartAndDestinationID(this.node.getId(), destination);
 
         // Tell the next node to lookup this file and give it back to us
         TCPClientNode nextNode = new TCPClientNode(connection);
-        return nextNode.lookup(node, name, hopCounter);
+        return nextNode.lookupLocation(this.node, name, hopCounter++);
     }
 
     /**
@@ -231,15 +229,16 @@ public class  TCPClientNode extends Thread{
         sendObject(node);
         sendObject(Config.QUIT);
 
-        // send number of files to server, in preparation
-        sendObject(new Integer(node.getStorage().size()));
-        // send files to server for rehashing, remove from node
+        // send number of files to next successor
+        sendAllFiles(node);
+    }
+
+    private void sendAllFiles(Node node){
         for (File f : node.getStorage()) {
-            sendObject(f);
+            new TCPClientNode(node.getTable().getFingers().get(0).getActualConnection()).insert(node, f, 0);
             node.getStorage().remove(f);
         }
     }
-
     public void setNode(Node node) {
         this.node = node;
     }
@@ -371,7 +370,6 @@ public class  TCPClientNode extends Thread{
                         Integer hopCount = (Integer)in.readObject();
                         System.out.println("# Hops in Lookup: " + hopCount);
 
-                        insertLocation(node,file, hopCount++);
                     } else if(str.equals(Config.REORDER)) {
 
                         int newNode = Integer.parseInt((String)in.readObject());
