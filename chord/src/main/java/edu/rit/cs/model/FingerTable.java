@@ -11,7 +11,7 @@ public class FingerTable implements Serializable {
     public FingerTable(int index, int numNodes){
         this.n = numNodes;
         this.numFingers = log2(numNodes);
-        if(numFingers == 0){
+        if(this.n ==  1){
             numFingers = 1;
         }
         this.index = index;
@@ -19,7 +19,7 @@ public class FingerTable implements Serializable {
     }
 
     private int log2(int num){
-        return (int) Math.ceil(((Math.log(num)/Math.log(2) + 1e-10)));
+        return (int) Math.ceil(((Math.log(num -1)/Math.log(2) + 1e-10)));
     }
 
     public void calcIdeal(){

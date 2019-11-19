@@ -39,7 +39,7 @@ public class NotifyNodes extends Thread {
         System.out.println("Server is running ...");
         while (running) {
             System.out.print("");
-            ConcurrentSkipListMap<String, Connection> onlineNodes = anchorNode.getOnlineNodes();
+            ConcurrentSkipListMap<Integer, Connection> onlineNodes = anchorNode.getOnlineNodes();
             Collection<Connection> connections = anchorNode.getOnlineConnections();
             if(!onlineNodes.isEmpty()){
                 if(handler.update()) {

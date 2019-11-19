@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 
 public class AnchorNode {
 
-	private ConcurrentSkipListMap<String, Connection> onlineNodes;
+	private ConcurrentSkipListMap<Integer, Connection> onlineNodes;
 
 
 	public AnchorNode() {
@@ -48,7 +48,7 @@ public class AnchorNode {
      * @param
      */
 	public synchronized void addNode(String id, Connection conn){
-		onlineNodes.put(id, conn);
+		onlineNodes.put(new Integer(id), conn);
 	}
 
 	public synchronized void removeNode(String id){
@@ -78,41 +78,42 @@ public class AnchorNode {
 	 *
 	 * @return		TreeMap of onlineNodes
 	 */
-	public synchronized ConcurrentSkipListMap<String, Connection> getOnlineNodes(){
+	public synchronized ConcurrentSkipListMap<Integer, Connection> getOnlineNodes(){
 		return onlineNodes;
 	}
 
 	public synchronized boolean isOnline(String id){
 		if(this.getOnlineNodes().isEmpty())
 			return false;
-		return this.getOnlineNodes().containsKey(id);
+		return this.getOnlineNodes().containsKey(new Integer(id));
 	}
 
 	public synchronized String getNext(int ideal){
         if (this.getNumOnline() == 1) {
-            return this.getOnlineNodes().firstKey();
+            return this.getOnlineNodes().firstKey().toString();
         } else {
-            ConcurrentSkipListMap<String, Connection> tree = this.getOnlineNodes();
-            String key = tree.higherKey(ideal + "");
+            ConcurrentSkipListMap<Integer, Connection> tree = this.getOnlineNodes();
+            Integer key = tree.higherKey(new Integer(ideal));
             if (key != null) {
-                return key;
+                return key.toString();
             } else {
-                return tree.firstKey();
+                return tree.firstKey().toString();
             }
         }
     }
 
     public synchronized Connection getSuccessor(int ideal){
+		Integer id = new Integer(ideal);
         if (this.getNumOnline() == 1) {
             return this.getOnlineNodes().get(this.getOnlineNodes().firstKey());
         } else {
-            ConcurrentSkipListMap<String, Connection> tree = this.getOnlineNodes();
-            if(tree.containsKey(ideal + "")){
-                return tree.get(ideal + "");
+            ConcurrentSkipListMap<Integer, Connection> tree = this.getOnlineNodes();
+            if(tree.containsKey(id)){
+                return tree.get(id);
             }
-            String key = tree.higherKey(ideal + "");
+            String key = tree.higherKey(id).toString();
             if (key != null) {
-                return tree.get(key);
+                return tree.get(new Integer(key));
             } else {
                 return tree.get(tree.firstKey());
             }
@@ -124,7 +125,7 @@ public class AnchorNode {
 	}
 
 	public synchronized void showAllNode(){
-		for(String node: this.getOnlineNodes().keySet())
+		for(Integer node: this.getOnlineNodes().keySet())
 		System.out.println("Node: " + node + "\n");
 	}
 
@@ -132,12 +133,12 @@ public class AnchorNode {
 		if (this.getNumOnline() == 1){
 			return id + "";
 		} else{
-			ConcurrentSkipListMap<String, Connection> tree = this.getOnlineNodes();
-			String key = tree.lowerKey(id + "");
+			ConcurrentSkipListMap<Integer, Connection> tree = this.getOnlineNodes();
+			Integer key = tree.lowerKey(new Integer(id));
 			if(key != null){
-				return key;
+				return key.toString();
 			} else{
-				return tree.lastKey();
+				return tree.lastKey().toString();
 			}
 		}
 	}

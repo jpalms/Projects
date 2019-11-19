@@ -45,7 +45,7 @@ public class NodeCLI_Helper {
             String id = input.nextLine();
             firstThread.sendObject(id);
             if (firstThread.readObject().equals("false")) {
-                firstThread.sendObject(new Node(Integer.parseInt(id), 0, firstThread.getIpAddr(), server, firstThread.getPort(), 0, 0));
+                firstThread.sendObject(new Node(Integer.parseInt(id), 1, firstThread.getIpAddr(), server, firstThread.getPort(), 0, 0));
                 this.node = (Node)firstThread.readObject();
                 firstThread.setNode(node);
                 firstThread.start();
