@@ -81,4 +81,9 @@ public class Node implements Comparable, Serializable {
     public synchronized int compareTo(Object cmp){
         return this.id - ((Node)cmp).id;
     }
+
+    @Override
+    public String toString(){
+        return this.id + "";
+    }
 }

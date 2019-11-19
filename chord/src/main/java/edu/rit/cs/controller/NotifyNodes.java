@@ -2,6 +2,7 @@ package edu.rit.cs.controller;
 
 import edu.rit.cs.model.Config;
 import edu.rit.cs.model.Connection;
+import edu.rit.cs.model.Node;
 
 import java.io.*;
 import java.net.Socket;
@@ -43,7 +44,7 @@ public class NotifyNodes extends Thread {
             Collection<Connection> connections = anchorNode.getOnlineConnections();
             if(!onlineNodes.isEmpty()){
                 if(handler.update()) {
-                    HashMap<String, ArrayList<File>> removedNodes = handler.getRemovedNodes();
+                    ArrayList<String> removedNodes = handler.getRemovedNodes();
                     // send removed Node, Files that they get
                     HashMap<String, ArrayList<File>> filesToNode = new HashMap<>();
                     int n = (int) Math.pow(2, (int)Math.ceil(((int)(Math.log(handler.getMaxNodeNum())/Math.log(2)))));
@@ -51,6 +52,7 @@ public class NotifyNodes extends Thread {
                     // node online
                     ArrayList<String> newNodes = handler.getNewNodes();
 
+                    // notify nodes of new online node
                     if(newNodes.size() > 0) {
                         for (Object conn: connections) {
                             for(String node: newNodes){
@@ -58,24 +60,23 @@ public class NotifyNodes extends Thread {
                             }
                         }
                     }
+
+                    // notify nodes of node that has gone offline
                     if(removedNodes.size() > 0) {
-                        // send files from offline to Online nodes
-                        for (ArrayList<File> files : removedNodes.values()) {
-                            for (File f : files) {
-                                int k = f.hashCode() % n;
-                                if (filesToNode.containsKey(k)) {
-                                    ArrayList<File> temp = new ArrayList<>();
-                                    temp.add(f);
-                                    filesToNode.put(k + "", temp);
-                                } else {
-                                    filesToNode.get(k).add(f);
-                                }
-                            }
-                        }
                         for (Connection conn : onlineNodes.values()) {
-                            sendInfo(conn.getNodeId() + "", removedNodes.keySet(), filesToNode.get(conn.getNodeId()));
+                            sendInfo(conn.getNodeId() + "", removedNodes);
                         }
                     }
+
+                    // tell nodes to update file storage
+                    if(newNodes.size() > 0) {
+                        for (Object conn: connections) {
+                            for(String node: newNodes){
+                                fileRorder(node, (Connection)conn);
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -106,7 +107,7 @@ public class NotifyNodes extends Thread {
 
         }
     }
-    private void sendInfo(String nodeId, Set<String> removed, ArrayList<File> files){
+    private void sendInfo(String nodeId, ArrayList<String> removed){
         Connection conn = anchorNode.getOnlineNodes().get(nodeId);
 
         ObjectInputStream in;
@@ -121,15 +122,38 @@ public class NotifyNodes extends Thread {
 
             out.writeObject(Config.REMOVED);
 
-            out.writeObject(removed);
-            if(!files.isEmpty()) {
-                for (File f : files) {
-                    out.writeObject(f);
-                }
+            for(String node: removed) {
+                out.writeObject(node);
             }
 
             out.writeObject(Config.DONE);
             // client will then query to update Successor
+            clientSocket.close();
+        } catch(UnknownHostException e){
+
+        } catch (EOFException e){
+
+        } catch (IOException e){
+
+        }
+    }
+
+    private void fileRorder(String nodeId, Connection conn){
+        ObjectInputStream in;
+        ObjectOutputStream out;
+        Socket clientSocket;
+
+        try {
+            clientSocket = new Socket(conn.getIpAddr(), conn.getPort());
+
+            out = new ObjectOutputStream(clientSocket.getOutputStream());
+            in = new ObjectInputStream(clientSocket.getInputStream());
+
+            out.writeObject(Config.REORDER);
+
+            out.writeObject(nodeId);
+            // client will then update file storage
+
             clientSocket.close();
         } catch(UnknownHostException e){
 

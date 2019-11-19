@@ -350,18 +350,12 @@ public class  TCPClientNode extends Thread{
                         }
 
                     } else if(str.equals(Config.REMOVED)){
-                        Set<String> removed = (Set<String>)in.readObject();
-                        for(String r: removed){
-                            System.out.println("Node has gone offline: " + r);
-                        }
+                        String obj;
+                        obj = (String) in.readObject();
 
-                        Object obj = in.readObject();
-                        File f;
-                        while(!(obj instanceof String)){
-                            f = (File)obj;
-                            System.out.println("File added to Node: " + f.getPath());
-                            node.getStorage().add(f);
-                            in.readObject();
+                        while(!obj.equals(Config.DONE)){
+                            System.out.println("Node has gone offline: " + obj);
+                            obj = (String) in.readObject();
                         }
 
                         for (int i = 0; i < node.getTable().getFingers().size(); i++) {
@@ -379,14 +373,18 @@ public class  TCPClientNode extends Thread{
 
                         insertLocation(node,file, hopCount++);
                     } else if(str.equals(Config.REORDER)) {
-                        int ideal = Integer.parseInt(str);
 
+                        int newNode = Integer.parseInt((String)in.readObject());
+                        int ideal = node.getId();
+
+                        // TODO
                         for(File f: node.getStorage()){
-                            if(f.hashCode() % node.getTable().getMaxNodes() != ideal){
+                            if(f.hashCode() % node.getTable().getMaxNodes() != ideal /* and file belongs at newNode*/){
                                 node.getStorage().remove(f);
                                 insertLocation(node, f, 0);
                             }
                         }
+
                     } else if(str.equals(Config.LOOKUP)){
                         System.out.println("Looking up File");
 

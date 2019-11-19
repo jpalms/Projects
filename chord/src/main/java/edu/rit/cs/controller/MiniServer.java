@@ -15,7 +15,7 @@ import java.util.HashMap;
  **/
 public class MiniServer extends Thread {
     private ArrayList<Worker> workers = new ArrayList<>();
-    private HashMap<String, ArrayList<File>> removedNodes;
+    private ArrayList<String> removedNodes;
     private ArrayList<String> newNodes;
     boolean running;
     private int maxNodeNum;
@@ -28,7 +28,7 @@ public class MiniServer extends Thread {
         this.anchorNode = anchorNode;
         this.running = true;
         this.maxNodeNum = 0;
-        this.removedNodes = new HashMap<>();
+        this.removedNodes = new ArrayList<>();
         this.newNodes = new ArrayList<>();
     }
 
@@ -88,22 +88,19 @@ public class MiniServer extends Thread {
         return this.maxNodeNum;
     }
 
-    private synchronized void nodeRemoved(Node node, ArrayList<File> files){
+    private synchronized void nodeRemoved(Node node){
         anchorNode.removeNode(node.getId() + "");
 
-        if(!removedNodes.containsKey(node.getId() + ""))
-            removedNodes.put(node.getId() + "", files);
-        else
-            removedNodes.get(node.getId() + "").addAll(files);
+        removedNodes.add(node.getId() + "");
     }
 
     public synchronized boolean update(){
         return !removedNodes.isEmpty() || !newNodes.isEmpty();
     }
 
-    public synchronized HashMap<String, ArrayList<File>> getRemovedNodes() {
-        HashMap<String, ArrayList<File>> temp = removedNodes;
-        removedNodes = new HashMap<>();
+    public synchronized ArrayList<String> getRemovedNodes() {
+        ArrayList <String> temp = removedNodes;
+        removedNodes = new ArrayList<>();
         return temp;
     }
 
@@ -156,15 +153,8 @@ public class MiniServer extends Thread {
                         out.writeObject(anchorNode.getSuccessor(ideal));
 
                     } else if(Config.QUIT.equals(obj)){
-                        obj = in.readObject();
-                        int numFiles = ((Integer) obj).intValue();
-
-                        ArrayList<File> files = new ArrayList<>();
-                        for (int i = 0; i < numFiles; i++) {
-                            files.add((File)in.readObject());
-                        }
-
-                        nodeRemoved(node, files);
+                        // ping server that node is disconnecting
+                        nodeRemoved(node);
                     }
                 }
 
