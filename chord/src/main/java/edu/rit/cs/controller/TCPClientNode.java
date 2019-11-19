@@ -153,6 +153,7 @@ public class  TCPClientNode extends Thread{
             // Get the next biggest hop connection to the destination from ourselves
             Connection connection = this.node.getTable().getConnectionGivenStartAndDestinationID(this.node.getId(), destination);
 
+            this.turnOff();
             TCPClientNode nextNode = new TCPClientNode(connection);
             nextNode.insertLocation(this.node, file, hopCounter++);
         }
@@ -179,6 +180,7 @@ public class  TCPClientNode extends Thread{
      */
     public File lookupLocation(Node node, String name, int hopCounter){
         if(hopCounter > this.node.getTable().getFingers().size()){
+            this.turnOff();
             return new File("DNE");
         }
 
@@ -186,13 +188,14 @@ public class  TCPClientNode extends Thread{
         int destination = name.length() % this.node.getTable().getMaxNodes() + 1;
 
         if(this.node.getId() == destination){
-            lookup(node, name, hopCounter);
+            return lookup(node, name, hopCounter);
         }
 
         // Get the next biggest hop connection to the destination from ourselves
         Connection connection = this.node.getTable().getConnectionGivenStartAndDestinationID(this.node.getId(), destination);
 
         // Tell the next node to lookup this file and give it back to us
+        this.turnOff();
         TCPClientNode nextNode = new TCPClientNode(connection);
         return nextNode.lookupLocation(this.node, name, hopCounter++);
     }
