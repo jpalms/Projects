@@ -8,6 +8,7 @@ public class Config {
 
     public static final String LOOKUP= "lookup";
     public static final String INSERT = "insert";
+    public static final String REORDER = "reorder";
 
     public static final String QUERY = "query";
 
