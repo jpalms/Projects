@@ -405,6 +405,7 @@ public class  TCPClientNode extends Thread {
         ObjectInputStream in;
         ObjectOutputStream out;
         Socket clientSocket;
+        boolean loop = false;
 
         /**
          * Worker constructor. Assigns the socket given and dispatches to commands.
@@ -417,6 +418,7 @@ public class  TCPClientNode extends Thread {
 
                 in = new ObjectInputStream(clientSocket.getInputStream());
                 out = new ObjectOutputStream(clientSocket.getOutputStream());
+                loop = true;
 
                 this.start();
             } catch (IOException e) {
@@ -428,8 +430,9 @@ public class  TCPClientNode extends Thread {
          * Function to look for new notification from the server and prints them
          */
         public void run() {
-                try {
-                    //wait for connection from server
+            while (loop) {
+            try {
+                //wait for connection from server
 
                     String str = (String) in.readObject();
 
@@ -440,7 +443,7 @@ public class  TCPClientNode extends Thread {
 
                         node.rehash(str);
 
-                    } else if(str.equals(Config.UPDATE)){
+                    } else if (str.equals(Config.UPDATE)) {
                         queryAll(node);
 
                     } else if (str.equals(Config.REMOVED)) {
@@ -493,20 +496,23 @@ public class  TCPClientNode extends Thread {
 
                     turnOff();
 
-                } catch (IOException e) {
+                } catch(IOException e){
                     System.err.println("IO: " + e.getMessage());
                     turnOff();
-                } catch (ClassNotFoundException e) {
+                } catch(ClassNotFoundException e){
                     System.err.println("CLASS: " + e.getMessage());
                     turnOff();
                 }
+
             }
+        }
 
         /**
          * Close a socket connection
          */
         public void turnOff() {
             try {
+                loop = false;
                 clientSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
