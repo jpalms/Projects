@@ -145,7 +145,7 @@ public class  TCPClientNode extends Thread{
         int destination = (file.hashCode() % node.getTable().getMaxNodes()) + 1;
 
         // If this is the ideal spot, place it here
-        if(node.getId() == destination || hopCounter > node.getTable().getFingers().size()){
+        if(node.getId() == destination || hopCounter >= node.getTable().getFingers().size()){
             //insert(node, file, hopCounter);
             node.getStorage().add(file);
         }
@@ -155,7 +155,7 @@ public class  TCPClientNode extends Thread{
 
 
             TCPClientNode nextNode = new TCPClientNode(connection);
-            nextNode.insert(node, file, hopCounter++);
+            nextNode.insert(node, file, hopCounter + 1);
         }
     }
 
@@ -179,23 +179,30 @@ public class  TCPClientNode extends Thread{
      * @return File being looked up. Can Return DNE
      */
     public File lookupLocation(Node node, String name, int hopCounter){
-        if(hopCounter > this.node.getTable().getFingers().size()){
+        /*if(hopCounter > node.getTable().getFingers().size()){
             return new File("DNE");
-        }
+        }*/
 
         // Calculate ideal successor for filename hash
-        int destination = name.length() % this.node.getTable().getMaxNodes() + 1;
+        int destination = name.length() % node.getTable().getMaxNodes() + 1;
 
-        if(this.node.getId() == destination){
-            return lookup(node, name, hopCounter);
+        // If the file is here
+        if((node.getId() == destination) || hopCounter >= node.getTable().getFingers().size()){
+            for(File f : node.getStorage()){
+                if(f.getFileName().equals(name)){
+                    return f;
+                }
+            }
+
+            return new File("Not Found");
         }
 
         // Get the next biggest hop connection to the destination from ourselves
-        Connection connection = this.node.getTable().getConnectionGivenStartAndDestinationID(this.node.getId(), destination);
+        Connection connection = node.getTable().getConnectionGivenStartAndDestinationID(node.getId(), destination);
 
         // Tell the next node to lookup this file and give it back to us
         TCPClientNode nextNode = new TCPClientNode(connection);
-        return nextNode.lookupLocation(this.node, name, hopCounter++);
+        return nextNode.lookup(node, name, hopCounter + 1);
     }
 
     /**
@@ -393,7 +400,8 @@ public class  TCPClientNode extends Thread{
                         Integer hopCount = (Integer)in.readObject();
                         System.out.println("# Hops in Lookup: " + hopCount);
 
-                        sendObject(lookupLocation(node, hash, hopCount++));
+                        //TODO FIX
+                        out.writeObject(lookupLocation(node, hash, hopCount));
                     }
 
                     turnOff();
