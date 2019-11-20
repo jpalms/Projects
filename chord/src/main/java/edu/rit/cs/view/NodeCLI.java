@@ -42,6 +42,7 @@ public class NodeCLI {
             System.out.println("Commands available to Node: \n" +
                     "Insert File (\"i\") \t" +
                     "Lookup File (\"l\") \t" +
+                    "Display Files (\"f\") \t" +
                     "Show Finger Table (\"s\") \t" +
                     "Quit (\"q\")"
             );
@@ -85,6 +86,9 @@ public class NodeCLI {
                     String hash = input.nextLine();
 
                     helper.lookup(hash);
+                    break;
+                case "f":
+                    helper.displayFile();
                     break;
                 case "s":
                     helper.showTable();

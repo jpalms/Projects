@@ -2,6 +2,7 @@ package edu.rit.cs.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Node implements Comparable, Serializable {
 
@@ -13,7 +14,7 @@ public class Node implements Comparable, Serializable {
 
     private FingerTable table;
 
-    private ArrayList<File> storage;
+    private ConcurrentLinkedQueue<File> storage;
 
     public Node(int id, int maxNumNodes, String ipAdrr, String serverIp, int port, int nextId, int prevId){
         this.id = id;
@@ -23,7 +24,7 @@ public class Node implements Comparable, Serializable {
         this.table = new FingerTable(id, maxNumNodes);
         this.nextId = nextId;
         this.prevId = prevId;
-        this.storage = new ArrayList<>();
+        this.storage = new ConcurrentLinkedQueue<>();
     }
 
     //------------------- Getter --------------
@@ -50,7 +51,7 @@ public class Node implements Comparable, Serializable {
 
     public synchronized FingerTable getTable() { return table; }
 
-    public synchronized ArrayList<File> getStorage() { return storage; }
+    public synchronized ConcurrentLinkedQueue<File> getStorage() { return storage; }
 
     public synchronized String getServerIp() {
         return serverIp;

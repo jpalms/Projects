@@ -108,6 +108,12 @@ public class NodeCLI_Helper {
 
     }
 
+    public void displayFile() {
+        for(File f : node.getStorage()){
+            System.out.println("\t" + f.toString() + "\t" + (f.hashCode() % node.getTable().getMaxNodes() + 1) + "\t" + "Stored at Node: " + node.getId());
+        }
+    }
+
     public void showTable(){
         System.out.println(this.node.getTable().toString());
     }
