@@ -226,6 +226,19 @@ public class  TCPClientNode extends Thread {
         // Get the next biggest hop connection to the destination from ourselves
         Connection connection = node.getTable().getConnectionGivenStartAndDestinationID(node.getId(), destination);
 
+
+        System.out.println(node.getTable().toString());
+        for(int i = 0; i < node.getTable().getFingers().size(); i++){
+            Finger finger = node.getTable().getFingers().get(i);
+            if(finger.getIdeal() == destination){
+                connection = finger.getActualConnection();
+                hopCounter = node.getTable().getFingers().size();
+                System.out.println("ideal " + finger.getIdeal());
+                System.out.println("connection: " + connection.toString());
+                break;
+            }
+        }
+
         // Tell the next node to lookup this file and give it back to us
         TCPClientNode nextNode = new TCPClientNode(connection);
         return nextNode.lookup(node, name, hopCounter + 1);

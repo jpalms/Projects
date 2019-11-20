@@ -61,30 +61,13 @@ public class FingerTable implements Serializable {
          */
 
         // Normal Case
-        if(startNodeID < destinationNodeID){
-            int maxBeforeIdeal = -1;
-            for(Finger f : fingers){
-                if(f.getIdeal() <= destinationNodeID && f.getIdeal() > maxBeforeIdeal){
-                    maxBeforeIdeal = f.getIdeal();
-                }
+        int maxBeforeIdeal = -1;
+        for(Finger f : fingers){
+            if(f.getIdeal() <= destinationNodeID && f.getIdeal() > maxBeforeIdeal){
+                maxBeforeIdeal = f.getIdeal();
             }
-            return getActualConnectionGivenIdeal(maxBeforeIdeal);
         }
-        // If we pass zero
-        // TODO Add Logic and Test
-        else if(startNodeID > destinationNodeID){
-            int maxBeforeIdeal = -1;
-            for(Finger f : fingers){
-                if(f.getIdeal() <= destinationNodeID + getMaxNodes() && f.getIdeal() > maxBeforeIdeal + getMaxNodes()){
-                    maxBeforeIdeal = f.getIdeal() + getMaxNodes();
-                }
-            }
-            return getActualConnectionGivenIdeal(maxBeforeIdeal % getMaxNodes());
-        }
-        // Should never get here
-        else{
-            return getActualConnectionGivenIdeal(startNodeID);
-        }
+        return getActualConnectionGivenIdeal(maxBeforeIdeal);
     }
 
     /**
