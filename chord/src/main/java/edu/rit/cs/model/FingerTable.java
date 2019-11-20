@@ -93,7 +93,7 @@ public class FingerTable implements Serializable {
             }
 
             // biggest number less than ideal
-            if(f.getIdeal() < ideal){
+            if(f.getIdeal() < ideal && (less == -1 || less < f.getIdeal())){
                 less = f.getIdeal();
             }
 
