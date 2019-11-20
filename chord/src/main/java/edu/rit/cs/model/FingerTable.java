@@ -54,7 +54,7 @@ public class FingerTable implements Serializable {
      * @param destinationNodeID NodeID we are trying to reach
      * @return Connection that is the biggest hop available to destination
      */
-    public Connection getConnectionGivenStartAndDestinationID(int startNodeID, int destinationNodeID){
+    public synchronized Connection getConnectionGivenStartAndDestinationID(int startNodeID, int destinationNodeID){
         /*
         Depending on how ideal is calculated, we may not need the various if cases.
         If ideal properly hops, the logic will be different.
@@ -93,7 +93,7 @@ public class FingerTable implements Serializable {
      * @param destinationNodeID NodeID we are trying to reach
      * @return Connection that is the biggest hop available to destination
      */
-    public int getConnectionSuccessor(int startNodeID, int destinationNodeID){
+    public synchronized int getConnectionSuccessor(int startNodeID, int destinationNodeID){
         /*
         Depending on how ideal is calculated, we may not need the various if cases.
         If ideal properly hops, the logic will be different.

@@ -152,10 +152,13 @@ public class  TCPClientNode extends Thread {
             //insert(node, file, hopCounter);
             node.getStorage().add(file);
         } else {
+            System.out.println(node.getTable().toString());
             // Get the next biggest hop connection to the destination from ourselves
             Connection connection = node.getTable().getConnectionGivenStartAndDestinationID(node.getId(), destination);
 
-            for(Finger finger: node.getTable().getFingers()){
+            System.out.println(node.getTable().toString());
+            for(int i = 0; i < node.getTable().getFingers().size(); i++){
+                Finger finger = node.getTable().getFingers().get(i);
                 if(finger.getIdeal() == destination){
                     connection = finger.getActualConnection();
                     hopCounter = node.getTable().getFingers().size();
@@ -381,12 +384,12 @@ public class  TCPClientNode extends Thread {
                         node.rehash(str);
 
                     } else if(str.equals(Config.UPDATE)){
+                        System.out.println("update");
 
-                        for (int i = 0; i < node.getTable().getFingers().size(); i++) {
-                            TCPClientNode clientNode = new TCPClientNode(node.getServerIp());
-                            Connection conn = clientNode.query(node, node.getTable().getIdealAtIndex(i));
-                            node.getTable().setSuccessorAtIndex(i, conn);
-                        }
+                        queryAll(node);
+
+                        System.out.println(node.getTable().toString());
+                        System.out.println("check it");
 
                     } else if (str.equals(Config.REMOVED)) {
                         String obj;
@@ -422,6 +425,9 @@ public class  TCPClientNode extends Thread {
                         int newNode = Integer.parseInt((String) in.readObject());
                         int ideal = node.getId();
 
+                        System.out.println("REORDER");
+                        queryAll(node);
+                        System.out.println(node.getTable().toString());
                         // TODO
                         for (File f : node.getStorage()) {
                             if (f.hashCode() % node.getTable().getMaxNodes() + 1 != ideal /* and file belongs at newNode*/) {
@@ -462,6 +468,14 @@ public class  TCPClientNode extends Thread {
                 clientSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+
+        public synchronized void queryAll(Node node){
+            for (int i = 0; i < node.getTable().getFingers().size(); i++) {
+                TCPClientNode clientNode = new TCPClientNode(node.getServerIp());
+                Connection conn = clientNode.query(node, node.getTable().getIdealAtIndex(i));
+                node.getTable().setSuccessorAtIndex(i, conn);
             }
         }
     }

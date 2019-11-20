@@ -75,6 +75,10 @@ public class MiniServer extends Thread {
             this.maxNodeNum = id;
         }
 
+
+    }
+
+    private synchronized void newNodeOnline(int id){
         newNodes.add(id + "");
     }
 
@@ -198,6 +202,8 @@ public class MiniServer extends Thread {
             int prevId =  Integer.parseInt(anchorNode.getPrev(node.getId()));
 
             out.writeObject(new Node(node.getId(), getMaxNodeNum(), node.getIpAddr(), node.getServerIp(), Config.port + node.getId(),nextId , prevId));
+
+            newNodeOnline(Integer.parseInt(id));
         }
 
         /**
