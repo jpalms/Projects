@@ -68,6 +68,7 @@ public class NotifyNodes extends Thread {
                         }
                     }
 
+                    // tels node to update finger table
                     if(newNodes.size() > 0) {
                         for (Object conn: connections) {
                                 update((Connection)conn);
@@ -89,7 +90,11 @@ public class NotifyNodes extends Thread {
         }
     }
 
-    //update online node about new Node
+    /**
+     * Connects to node and tells node that another node has come online
+     * @param conn - how to connect to node
+     * @param nodeId - node to notify
+     */
     private void newNodeOnline(String nodeId, Connection conn){
         ObjectInputStream in;
         ObjectOutputStream out;
@@ -114,6 +119,12 @@ public class NotifyNodes extends Thread {
 
         }
     }
+
+    /**
+     * Connects to node and tells node what nodes have gone offline
+     * @param conn - how to connect to node
+     * @param removed - node to notify
+     */
     private void sendInfo(Connection conn, ArrayList<String> removed){
 
         ObjectInputStream in;
@@ -144,6 +155,11 @@ public class NotifyNodes extends Thread {
         }
     }
 
+    /**
+     * Connects to node and tells node to reorder its files
+     * @param conn - how to connect to node
+     * @param nodeId - node to notify
+     */
     private void fileRorder(String nodeId, Connection conn){
         ObjectInputStream in;
         ObjectOutputStream out;
@@ -170,6 +186,10 @@ public class NotifyNodes extends Thread {
         }
     }
 
+    /**
+     * Connects to node and tells node to update its finger table
+     * @param conn - node to connect to
+     */
     private void update(Connection conn){
         ObjectInputStream in;
         ObjectOutputStream out;

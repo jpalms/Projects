@@ -8,7 +8,6 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Class to Handle the creations of all threads that communicate with clients
@@ -70,38 +69,64 @@ public class MiniServer extends Thread {
         }
     }
 
+    /**
+     * Updates number of nodes if new online node is bigger than current max
+     * @param id - new online node id
+     */
     private synchronized void newNode(int id){
         if(id > maxNodeNum){
             this.maxNodeNum = id;
         }
-
-
     }
 
+    /**
+     * Adds new to list of nodes to update other nodes about
+     * @param id - new online node id
+     */
     private synchronized void newNodeOnline(int id){
         newNodes.add(id + "");
     }
 
+    /**
+     * Gets the new online nodes and empties the list
+     * @return - list of online nodes
+     */
     public synchronized ArrayList<String> getNewNodes(){
         ArrayList<String> temp = newNodes;
         newNodes = new ArrayList<>();
         return temp;
     }
 
+    /**
+     * Getter method for maxNodeNum
+     * @return - the max number of nodes that can be on in the system
+     */
     public synchronized int getMaxNodeNum(){
         return this.maxNodeNum;
     }
 
+    /**
+     * Removes offline node
+     * @param node - offline node
+     */
     private synchronized void nodeRemoved(Node node){
         anchorNode.removeNode(node.getId() + "");
 
         removedNodes.add(node.getId() + "");
     }
 
+    /**
+     * determines if there information to update other nodes with
+     * @return - true if new online or offline nodes, false otherwise
+     */
     public synchronized boolean update(){
         return !removedNodes.isEmpty() || !newNodes.isEmpty();
     }
 
+    /**
+     * Getter method for removedNodes
+     * @return -
+     */
     public synchronized ArrayList<String> getRemovedNodes() {
         ArrayList <String> temp = removedNodes;
         removedNodes = new ArrayList<>();
@@ -125,7 +150,6 @@ public class MiniServer extends Thread {
         public Worker(Socket aClientSocket) {
             // Make a connection
             try {
-                //System.out.println("Made a connection");
                 clientSocket = aClientSocket;
                 in = new ObjectInputStream(clientSocket.getInputStream());
                 out = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -176,7 +200,7 @@ public class MiniServer extends Thread {
         }
 
         /**
-         * Validates a unique username, than adds the new user to list of subscribers
+         * Validates a unique node id, than adds the node to list of online nodes
          *
          * @throws IOException
          * @throws ClassNotFoundException

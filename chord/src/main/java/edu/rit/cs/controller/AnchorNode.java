@@ -27,13 +27,6 @@ public class AnchorNode {
 		cli.startCLI(this, notifyAll);
 	}
 
-	/**
-	 *  Stop the repo service
-	 * @param h Handler instance that takes care of shutdown
-	 */
-	public void stopService(MiniServer h) {
-		h.turnOff();
-	}
 // ___________________________________________________________
 
 	/**
@@ -43,14 +36,19 @@ public class AnchorNode {
 	
 
     /**
-     * adds a user to list of all users that have an account
+     * adds a node to list of all online nodes
      *
-     * @param
+     * @param id - node id
+	 * @param conn Connection to node
      */
 	public synchronized void addNode(String id, Connection conn){
 		onlineNodes.put(new Integer(id), conn);
 	}
 
+	/**
+	 * remove node from list of online nodes
+	 * @param id - node id
+	 */
 	public synchronized void removeNode(String id){
 		onlineNodes.remove(new Integer(id));
 	}
@@ -64,30 +62,44 @@ public class AnchorNode {
 	/**
 	 * Gets size of the onlineNodes list
 	 *
-	 * @return		int, size of the onlineNodes list
+	 * @return	- int, size of the onlineNodes list
 	 */
 	public synchronized int getNumOnline(){
 		return onlineNodes.size();
 	}
 
+	/**
+	 * Gets the connections for each online node
+	 * @return - List of online node's connections
+	 */
 	public synchronized Collection<Connection> getOnlineConnections(){
 		return this.onlineNodes.values();
 	}
 	/**
-	 * Gets TreeMap of onlineNodes
+	 * Gets Map of onlineNodes
 	 *
-	 * @return		TreeMap of onlineNodes
+	 * @return - Map of onlineNodes
 	 */
 	public synchronized ConcurrentSkipListMap<Integer, Connection> getOnlineNodes(){
 		return onlineNodes;
 	}
 
+	/**
+	 * Determines if a user is online
+	 * @param id - node id to check
+	 * @return - true if online, false otherwise
+	 */
 	public synchronized boolean isOnline(String id){
 		if(this.getOnlineNodes().isEmpty())
 			return false;
 		return this.getOnlineNodes().containsKey(new Integer(id));
 	}
 
+	/**
+	 * Gets the next node
+	 * @param ideal - current node
+	 * @return - next node in map
+	 */
 	public synchronized String getNext(int ideal){
         if (this.getNumOnline() == 1) {
             return this.getOnlineNodes().firstKey().toString();
@@ -102,7 +114,12 @@ public class AnchorNode {
         }
     }
 
-    public synchronized Connection getSuccessor(int ideal){
+	/**
+	 * Gets the successor node
+	 * @param ideal - ideal node id
+	 * @return - actual node connection
+	 */
+	public synchronized Connection getSuccessor(int ideal){
 		Integer id = new Integer(ideal);
         if (this.getNumOnline() == 1) {
             return this.getOnlineNodes().get(this.getOnlineNodes().firstKey());
@@ -120,15 +137,19 @@ public class AnchorNode {
         }
     }
 
-    public synchronized Connection getNode(String id){
-		return onlineNodes.get(id);
-	}
-
+	/**
+	 * Displays all the online nodes
+	 */
 	public synchronized void showAllNode(){
 		for(Integer node: this.getOnlineNodes().keySet())
 		System.out.println("Node: " + node + "\n");
 	}
 
+	/**
+	 * Gets the previous node
+	 * @param id - current node
+	 * @return - previous node in map
+	 */
 	public synchronized String getPrev(int id){
 		if (this.getNumOnline() == 1){
 			return id + "";

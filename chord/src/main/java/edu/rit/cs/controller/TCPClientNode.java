@@ -11,7 +11,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Set;
 
 /*
  * Class for handles User connection to the Server
@@ -203,7 +202,7 @@ public class  TCPClientNode extends Thread {
     }
 
     /**
-     * Helper function for insertLocation. Sends the objects over TCP
+     * Tells node to store this file
      *
      * @param file File to send over network
      */
@@ -295,6 +294,13 @@ public class  TCPClientNode extends Thread {
         return file;
     }
 
+    /**
+     * Queries the server for finger table
+     *
+     * @param node - node doing the query
+     * @param ideal - ideal node id
+     * @return - succesor connection
+     */
     public Connection query(Node node, int ideal) {
         sendObject(node);
         sendObject(Config.QUERY);
@@ -305,6 +311,10 @@ public class  TCPClientNode extends Thread {
         return result;
     }
 
+    /**
+     * Tells the server that this node is turning off and sends all of its files to the next node
+     * @param node - node turning offline
+     */
     public void quit(Node node) {
         sendObject(node);
         sendObject(Config.QUIT);
@@ -313,6 +323,10 @@ public class  TCPClientNode extends Thread {
         sendAllFiles(node);
     }
 
+    /**
+     * Sends all files to the next online node
+     * @param node - node sending its files
+     */
     private void sendAllFiles(Node node) {
         for (File f : node.getStorage()) {
             new TCPClientNode(node.getTable().getFingers().get(0).getActualConnection()).insert_quit(f);
@@ -320,6 +334,10 @@ public class  TCPClientNode extends Thread {
         }
     }
 
+    /**
+     * Setter for node
+     * @param node - online node
+     */
     public void setNode(Node node) {
         this.node = node;
     }
@@ -387,7 +405,6 @@ public class  TCPClientNode extends Thread {
         ObjectInputStream in;
         ObjectOutputStream out;
         Socket clientSocket;
-        private boolean loop;
 
         /**
          * Worker constructor. Assigns the socket given and dispatches to commands.
@@ -402,7 +419,6 @@ public class  TCPClientNode extends Thread {
                 in = new ObjectInputStream(clientSocket.getInputStream());
                 out = new ObjectOutputStream(clientSocket.getOutputStream());
 
-                loop = true;
                 this.start();
             } catch (IOException e) {
                 System.err.println(e.getMessage());
@@ -412,10 +428,7 @@ public class  TCPClientNode extends Thread {
         /**
          * Function to look for new notification from the server and prints them
          */
-        //todo - refactor this to be similar to handler, TCP_Handler
         public void run() {
-            while (loop) {
-
                 try {
                     //wait for connection from server
 
@@ -473,7 +486,6 @@ public class  TCPClientNode extends Thread {
                         System.out.println("REORDER");
                         queryAll(node);
                         System.out.println(node.getTable().toString());
-                        // TODO
                         for (File f : node.getStorage()) {
                             if (f.hashCode() % node.getTable().getMaxNodes() + 1 != ideal /* and file belongs at newNode*/) {
                                 node.getStorage().remove(f);
@@ -488,7 +500,6 @@ public class  TCPClientNode extends Thread {
                         Integer hopCount = (Integer) in.readObject();
                         System.out.println("# Hops in Lookup: " + hopCount);
 
-                        //TODO FIX
                         out.writeObject(lookupLocation(node, hash, hopCount));
                     }
 
@@ -502,20 +513,22 @@ public class  TCPClientNode extends Thread {
                     turnOff();
                 }
             }
-        }
 
         /**
          * Close a socket connection
          */
         public void turnOff() {
             try {
-                loop = false;
                 clientSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
+        /**
+         * Queries all the fingers in the table
+         * @param node - node being updated
+         */
         public synchronized void queryAll(Node node){
             for (int i = 0; i < node.getTable().getFingers().size(); i++) {
                 TCPClientNode clientNode = new TCPClientNode(node.getServerIp());
