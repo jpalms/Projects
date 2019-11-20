@@ -79,21 +79,34 @@ public class FingerTable implements Serializable {
         // Normal Case
         int nextHighest = getMaxNodes() + 1;
         int smallest = getMaxNodes() + 1;
+        int less = -1;
         for(Finger f : fingers){
+
+            // equal to ideal
             if(f.getIdeal() == ideal){
                 return f.getIdeal();
             }
 
+            // smallest number
             if(smallest > f.getIdeal()){
                 smallest = f.getIdeal();
             }
 
-            if(f.getIdeal() > ideal && nextHighest > f.getIdeal() ){
+            // biggest number less than ideal
+            if(f.getIdeal() < ideal){
+                less = f.getIdeal();
+            }
+
+            // biggest number greater than ideal
+            if(f.getIdeal() > ideal){
                 nextHighest = f.getIdeal();
             }
         }
 
-        if(nextHighest == getMaxNodes() + 1 || (ideal - smallest) > 0){
+        if(less != -1 && (ideal - less) > 0){
+            return less;
+        }
+        if(nextHighest == getMaxNodes() + 1){
             return smallest;
         }
 
