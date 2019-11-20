@@ -1,7 +1,12 @@
 package edu.rit.cs.model;
 
+/**
+ * All Global Non-Argument Parameters.
+ * Mostly used for Switch Cases.
+ */
 public class Config {
 
+    // Base port for Server
     public static final int port = 13787;
 
     public static final String QUIT = "quit";

@@ -2,16 +2,18 @@ package edu.rit.cs.model;
 
 import java.io.Serializable;
 
+/**
+ * Finger Class. Used in Finger Table
+ */
 public class Finger implements Serializable {
     private int index, ideal;
     private Connection actualConnection;
 
-    public Finger(int index, int ideal, Connection actual){
-        this.index = index;
-        this.ideal = ideal;
-        this.actualConnection = actual;
-    }
-
+    /**
+     * Finger Constructor
+     * @param index
+     * @param ideal
+     */
     public Finger(int index, int ideal){
         this.index = index;
         this.ideal = ideal;
@@ -20,31 +22,13 @@ public class Finger implements Serializable {
 
     //---------------------- Getters -------------------------
 
-    /**
-     *
-     * @return
-     */
-    public int getIndex() {
-        return index;
-    }
-
     public int getIdeal() {
         return ideal;
     }
 
     public Connection getActualConnection() {return actualConnection;}
 
-
     //----------------------- Setters -------------------------
-
-
-    public void setIndex(int index) {
-        this.index = index;
-    }
-
-    public void setIdeal(int ideal) {
-        this.ideal = ideal;
-    }
 
     public void setActualConnection(Connection actualConnection) {this.actualConnection = actualConnection;}
 

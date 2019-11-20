@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * Node class is the model for a Chord Node
+ */
 public class Node implements Comparable, Serializable {
 
     private int id, nextId, prevId;
@@ -16,6 +19,16 @@ public class Node implements Comparable, Serializable {
 
     private ConcurrentLinkedQueue<File> storage;
 
+    /**
+     * Constructor for a Node Model
+     * @param id Id of the Node
+     * @param maxNumNodes max nodes in the network
+     * @param ipAdrr IP address of the node
+     * @param serverIp IP of the server
+     * @param port port
+     * @param nextId id of successor
+     * @param prevId id of previous
+     */
     public Node(int id, int maxNumNodes, String ipAdrr, String serverIp, int port, int nextId, int prevId){
         this.id = id;
         this.ipAddr = ipAdrr;
@@ -57,6 +70,11 @@ public class Node implements Comparable, Serializable {
         return serverIp;
     }
 
+    /**
+     * Rehashes a finger table entry
+     * @param str integer node id
+     * @return boolean
+     */
     public synchronized boolean rehash(String str){
         int num = Integer.parseInt(str);
         if(num > this.getTable().getMaxNodes()){

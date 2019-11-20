@@ -56,14 +56,6 @@ public class NodeCLI_Helper {
         }
     }
 
-    public void turnOff() {
-        while (connections.size() > 0) {
-            connections.get(0).turnOff();
-            connections.remove(0);
-        }
-    }
-
-
     /*
      * -------------------- Node -------------------------
      */

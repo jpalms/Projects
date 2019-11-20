@@ -1,6 +1,5 @@
 package edu.rit.cs.view;
 
-import edu.rit.cs.controller.TCPClientNode;
 import edu.rit.cs.model.File;
 
 import java.io.FileNotFoundException;

@@ -3,11 +3,23 @@ package edu.rit.cs.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * Finger Table class, uses Finger class
+ */
 public class FingerTable implements Serializable {
+
+    /*
+    Class Variables
+     */
 
     private int n, numFingers, index;
     private ArrayList<Finger> fingers;
 
+    /**
+     * Constructor of a Finger Table
+     * @param index index for start of fingertable
+     * @param numNodes num of network nodes
+     */
     public FingerTable(int index, int numNodes){
         this.n = numNodes;
         this.numFingers = log2(numNodes);
@@ -18,10 +30,18 @@ public class FingerTable implements Serializable {
         calcIdeal();
     }
 
+    /**
+     * Calculate log base 2 of the finger table
+     * @param num number to calculate log2 of
+     * @return log2(num)
+     */
     private int log2(int num){
         return (int) Math.ceil(((Math.log(num -1)/Math.log(2) + 1e-10)));
     }
 
+    /**
+     * Calculate the ideal successor for each finger in the fingertable
+     */
     public void calcIdeal(){
         fingers = new ArrayList<>();
         for (int i = 0; i < numFingers; i++) {
@@ -45,8 +65,6 @@ public class FingerTable implements Serializable {
     public int getMaxNodes(){
         return this.n;
     }
-
-    public Connection getSuccessorConnectionAtIndex(int i) {return fingers.get(i).getActualConnection();}
 
     /**
      * Given a destination node, return the ideal hop closest to that node
