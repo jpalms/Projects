@@ -142,7 +142,7 @@ public class AnchorNode {
 	 */
 	public synchronized void showAllNode(){
 		for(Integer node: this.getOnlineNodes().keySet())
-		System.out.println("Node: " + node + "\n");
+		System.out.println("Node: " + node);
 	}
 
 	/**
