@@ -88,6 +88,44 @@ public class FingerTable implements Serializable {
     }
 
     /**
+     * Given a destination node, return the ideal hop closest to that node
+     * @param startNodeID NodeID we are currently at
+     * @param destinationNodeID NodeID we are trying to reach
+     * @return Connection that is the biggest hop available to destination
+     */
+    public int getConnectionSuccessor(int startNodeID, int destinationNodeID){
+        /*
+        Depending on how ideal is calculated, we may not need the various if cases.
+        If ideal properly hops, the logic will be different.
+         */
+
+        // Normal Case
+        if(startNodeID < destinationNodeID){
+            int maxBeforeIdeal = -1;
+            for(Finger f : fingers){
+                if(f.getIdeal() <= destinationNodeID && f.getIdeal() > maxBeforeIdeal){
+                    maxBeforeIdeal = f.getIdeal();
+                }
+            }
+            return maxBeforeIdeal;
+        }
+        // If we pass zero
+        // TODO Add Logic and Test
+        else if(startNodeID > destinationNodeID){
+            int maxBeforeIdeal = -1;
+            for(Finger f : fingers){
+                if(f.getIdeal() <= destinationNodeID + getMaxNodes() && f.getIdeal() > maxBeforeIdeal + getMaxNodes()){
+                    maxBeforeIdeal = f.getIdeal() + getMaxNodes();
+                }
+            }
+            return maxBeforeIdeal;
+        }
+        // Should never get here
+        else{
+            return -1;
+        }
+    }
+    /**
      * Helper function for above. gets the connection given
      * a correct ideal. Assumed correct
      * @param i int representing ideal

@@ -7,6 +7,7 @@ public class Config {
     public static final String QUIT = "quit";
 
     public static final String LOOKUP= "lookup";
+    public static final String UPDATE = "update";
 
     public static final String INSERT = "insert";
     public static final String INSERT_QUIT = "insert/quit";

@@ -68,6 +68,13 @@ public class NotifyNodes extends Thread {
                         }
                     }
 
+                    if(newNodes.size() > 0) {
+                        for (Object conn: connections) {
+                                update((Connection)conn);
+                        }
+                    }
+
+
                     // tell nodes to update file storage
                     if(newNodes.size() > 0) {
                         for (Object conn: connections) {
@@ -163,6 +170,31 @@ public class NotifyNodes extends Thread {
         }
     }
 
+    private void update(Connection conn){
+        ObjectInputStream in;
+        ObjectOutputStream out;
+        Socket clientSocket;
+
+        try {
+            clientSocket = new Socket(conn.getIpAddr(), conn.getPort());
+
+            out = new ObjectOutputStream(clientSocket.getOutputStream());
+            in = new ObjectInputStream(clientSocket.getInputStream());
+
+            out.writeObject(Config.UPDATE);
+
+            //out.writeObject(nodeId);
+            // client will then update file storage
+
+            clientSocket.close();
+        } catch(UnknownHostException e){
+
+        } catch (EOFException e){
+
+        } catch (IOException e){
+
+        }
+    }
     // stops the loop
     public void turnOff () {
         running = false;
