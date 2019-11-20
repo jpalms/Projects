@@ -442,12 +442,7 @@ public class  TCPClientNode extends Thread {
                         node.rehash(str);
 
                     } else if(str.equals(Config.UPDATE)){
-                        System.out.println("update");
-
                         queryAll(node);
-
-                        System.out.println(node.getTable().toString());
-                        System.out.println("check it");
 
                     } else if (str.equals(Config.REMOVED)) {
                         String obj;
@@ -467,9 +462,7 @@ public class  TCPClientNode extends Thread {
                     } else if (str.equals(Config.INSERT)) {
                         File file = (File) in.readObject();
 
-                        System.out.println("Inserting File Check: " + file.getPath());
                         Integer hopCount = (Integer) in.readObject();
-                        System.out.println("# Hops in Lookup: " + hopCount);
 
                         insertLocation(node, file, hopCount);
 
@@ -483,9 +476,7 @@ public class  TCPClientNode extends Thread {
                         int newNode = Integer.parseInt((String) in.readObject());
                         int ideal = node.getId();
 
-                        System.out.println("REORDER");
                         queryAll(node);
-                        System.out.println(node.getTable().toString());
                         for (File f : node.getStorage()) {
                             if (f.hashCode() % node.getTable().getMaxNodes() + 1 != ideal /* and file belongs at newNode*/) {
                                 node.getStorage().remove(f);
@@ -494,11 +485,9 @@ public class  TCPClientNode extends Thread {
                         }
 
                     } else if (str.equals(Config.LOOKUP)) {
-                        System.out.println("Looking up File");
 
                         String hash = (String) in.readObject();
                         Integer hopCount = (Integer) in.readObject();
-                        System.out.println("# Hops in Lookup: " + hopCount);
 
                         out.writeObject(lookupLocation(node, hash, hopCount));
                     }
