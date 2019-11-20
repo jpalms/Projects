@@ -413,7 +413,6 @@ public class  TCPClientNode extends Thread {
          */
         public Worker(Socket clientSocket) {
             try {
-                System.out.println("Connection Made");
                 this.clientSocket = clientSocket;
 
                 in = new ObjectInputStream(clientSocket.getInputStream());
