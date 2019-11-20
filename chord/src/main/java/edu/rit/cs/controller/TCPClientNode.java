@@ -153,19 +153,20 @@ public class  TCPClientNode extends Thread {
             node.getStorage().add(file);
         } else {
             System.out.println(node.getTable().toString());
-            // Get the next biggest hop connection to the destination from ourselves
-            Connection connection = node.getTable().getConnectionGivenStartAndDestinationID(node.getId(), destination);
 
-            System.out.println(node.getTable().toString());
-            for(int i = 0; i < node.getTable().getFingers().size(); i++){
-                Finger finger = node.getTable().getFingers().get(i);
-                if(finger.getIdeal() == destination){
-                    connection = finger.getActualConnection();
-                    hopCounter = node.getTable().getFingers().size();
-                    System.out.println("ideal " + finger.getIdeal());
-                    System.out.println("connection: " + connection.toString());
+            // Get the next biggest hop connection to the destination from ourselves
+            int successor = node.getTable().getSuccessor(destination);
+            Connection connection = null;
+
+            for(Finger f: node.getTable().getFingers()){
+                if(f.getIdeal() == successor){
+                    connection = f.getActualConnection();
                     break;
                 }
+            }
+
+            if (successor == destination || connection.getNodeId() == destination){
+                hopCounter = node.getTable().getFingers().size();
             }
 
             TCPClientNode nextNode = new TCPClientNode(connection);
@@ -224,20 +225,21 @@ public class  TCPClientNode extends Thread {
         }
 
         // Get the next biggest hop connection to the destination from ourselves
-        Connection connection = node.getTable().getConnectionGivenStartAndDestinationID(node.getId(), destination);
+        int successor = node.getTable().getSuccessor(destination);
+        Connection connection = null;
 
-
-        System.out.println(node.getTable().toString());
-        for(int i = 0; i < node.getTable().getFingers().size(); i++){
-            Finger finger = node.getTable().getFingers().get(i);
-            if(finger.getIdeal() == destination){
-                connection = finger.getActualConnection();
-                hopCounter = node.getTable().getFingers().size();
-                System.out.println("ideal " + finger.getIdeal());
-                System.out.println("connection: " + connection.toString());
+        for(Finger f: node.getTable().getFingers()){
+            if(f.getIdeal() == successor){
+                connection = f.getActualConnection();
                 break;
             }
         }
+
+        if (successor == destination || connection.getNodeId() == destination){
+            hopCounter = node.getTable().getFingers().size();
+        }
+
+        System.out.println(node.getTable().toString());
 
         // Tell the next node to lookup this file and give it back to us
         TCPClientNode nextNode = new TCPClientNode(connection);

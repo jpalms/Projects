@@ -68,64 +68,38 @@ public class FingerTable implements Serializable {
 
     /**
      * Given a destination node, return the ideal hop closest to that node
-     * @param startNodeID NodeID we are currently at
-     * @param destinationNodeID NodeID we are trying to reach
      * @return Connection that is the biggest hop available to destination
      */
-    public synchronized Connection getConnectionGivenStartAndDestinationID(int startNodeID, int destinationNodeID){
+    public synchronized int getSuccessor(int ideal){
         /*
         Depending on how ideal is calculated, we may not need the various if cases.
         If ideal properly hops, the logic will be different.
          */
 
         // Normal Case
-        int maxBeforeIdeal = -1;
+        int nextHighest = getMaxNodes() + 1;
+        int smallest = getMaxNodes() + 1;
         for(Finger f : fingers){
-            if(f.getIdeal() <= destinationNodeID && f.getIdeal() > maxBeforeIdeal){
-                maxBeforeIdeal = f.getIdeal();
+            if(f.getIdeal() == ideal){
+                return f.getIdeal();
+            }
+
+            if(smallest > f.getIdeal()){
+                smallest = f.getIdeal();
+            }
+
+            if(f.getIdeal() > ideal && nextHighest > f.getIdeal() ){
+                nextHighest = f.getIdeal();
             }
         }
-        return getActualConnectionGivenIdeal(maxBeforeIdeal);
+
+        if(nextHighest == getMaxNodes() + 1 || (ideal - smallest) > 0){
+            return smallest;
+        }
+
+        return nextHighest;
     }
 
-    /**
-     * Given a destination node, return the ideal hop closest to that node
-     * @param startNodeID NodeID we are currently at
-     * @param destinationNodeID NodeID we are trying to reach
-     * @return Connection that is the biggest hop available to destination
-     */
-    public synchronized int getConnectionSuccessor(int startNodeID, int destinationNodeID){
-        /*
-        Depending on how ideal is calculated, we may not need the various if cases.
-        If ideal properly hops, the logic will be different.
-         */
-
-        // Normal Case
-        if(startNodeID < destinationNodeID){
-            int maxBeforeIdeal = -1;
-            for(Finger f : fingers){
-                if(f.getIdeal() <= destinationNodeID && f.getIdeal() > maxBeforeIdeal){
-                    maxBeforeIdeal = f.getIdeal();
-                }
-            }
-            return maxBeforeIdeal;
-        }
-        // If we pass zero
-        // TODO Add Logic and Test
-        else if(startNodeID > destinationNodeID){
-            int maxBeforeIdeal = -1;
-            for(Finger f : fingers){
-                if(f.getIdeal() <= destinationNodeID + getMaxNodes() && f.getIdeal() > maxBeforeIdeal + getMaxNodes()){
-                    maxBeforeIdeal = f.getIdeal() + getMaxNodes();
-                }
-            }
-            return maxBeforeIdeal;
-        }
-        // Should never get here
-        else{
-            return -1;
-        }
-    }
     /**
      * Helper function for above. gets the connection given
      * a correct ideal. Assumed correct
