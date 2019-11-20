@@ -172,6 +172,15 @@ public class  TCPClientNode extends Thread{
     }
 
     /**
+     * Helper function for insertLocation. Sends the objects over TCP
+     * @param file File to send over network
+     */
+    private void insert_quit(File file){
+        sendObject(Config.INSERT_QUIT);
+        sendObject(file);
+    }
+
+    /**
      * Lookup a file given name of file
      * @param node Node we are at
      * @param name File name to look up
@@ -243,7 +252,7 @@ public class  TCPClientNode extends Thread{
 
     private void sendAllFiles(Node node){
         for (File f : node.getStorage()) {
-            new TCPClientNode(node.getTable().getFingers().get(0).getActualConnection()).insert(node, f, 0);
+            new TCPClientNode(node.getTable().getFingers().get(0).getActualConnection()).insert_quit(f);
             node.getStorage().remove(f);
         }
     }
@@ -380,7 +389,13 @@ public class  TCPClientNode extends Thread{
 
                         insertLocation(node, file, hopCount);
 
-                    } else if(str.equals(Config.REORDER)) {
+                    } else if(str.equals(Config.INSERT_QUIT)){
+                        File file = (File)in.readObject();
+
+                        node.getStorage().add(file);
+
+                    }
+                    else if(str.equals(Config.REORDER)) {
 
                         int newNode = Integer.parseInt((String)in.readObject());
                         int ideal = node.getId();
