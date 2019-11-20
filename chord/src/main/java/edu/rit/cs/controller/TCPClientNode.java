@@ -169,6 +169,21 @@ public class  TCPClientNode extends Thread {
                 hopCounter = node.getTable().getFingers().size();
             }
 
+            // ideal is offline and stored at actual
+            int actual = connection.getNodeId();
+            int ideal = successor;
+
+            // cycling
+            if(actual - ideal < 0){
+                actual += node.getTable().getMaxNodes();
+                destination += node.getTable().getMaxNodes();
+            }
+
+            // if stored at next node
+            if(actual > ideal && (destination > ideal && destination < actual)){
+                hopCounter = node.getTable().getFingers().size();
+            }
+
             TCPClientNode nextNode = new TCPClientNode(connection);
             nextNode.insert(node, file, hopCounter + 1);
         }
