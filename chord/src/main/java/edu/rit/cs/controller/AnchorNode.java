@@ -49,7 +49,7 @@ public class AnchorNode {
 	 * remove node from list of online nodes
 	 * @param id - node id
 	 */
-	public synchronized void removeNode(String id){
+	public synchronized void removeNode(int id){
 		onlineNodes.remove(new Integer(id));
 	}
 
@@ -126,11 +126,12 @@ public class AnchorNode {
         } else {
             ConcurrentSkipListMap<Integer, Connection> tree = this.getOnlineNodes();
             if(tree.containsKey(id)){
+				System.out.println("contains: " + id.toString());
                 return tree.get(id);
             }
-            String key = tree.higherKey(id).toString();
+            Integer key = tree.higherKey(id);
             if (key != null) {
-                return tree.get(new Integer(key));
+                return tree.get(key);
             } else {
                 return tree.get(tree.firstKey());
             }

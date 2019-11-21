@@ -45,9 +45,6 @@ public class NotifyNodes extends Thread {
             if(!onlineNodes.isEmpty()){
                 if(handler.update()) {
                     ArrayList<String> removedNodes = handler.getRemovedNodes();
-                    // send removed Node, Files that they get
-                    HashMap<String, ArrayList<File>> filesToNode = new HashMap<>();
-                    int n = (int) Math.pow(2, (int)Math.ceil(((int)(Math.log(handler.getMaxNodeNum())/Math.log(2)))));
 
                     // node online
                     ArrayList<String> newNodes = handler.getNewNodes();
@@ -63,13 +60,15 @@ public class NotifyNodes extends Thread {
 
                     // notify nodes of node that has gone offline
                     if(removedNodes.size() > 0) {
-                        for (Connection conn : onlineNodes.values()) {
-                            sendInfo(conn, removedNodes);
+                        for (Object conn: connections) {
+                            for(String node: removedNodes){
+                                offlineNode(node, (Connection)conn);
+                            }
                         }
                     }
 
                     // tels node to update finger table
-                    if(newNodes.size() > 0) {
+                    if(newNodes.size() > 0 || removedNodes.size() > 0) {
                         for (Object conn: connections) {
                                 update((Connection)conn);
                         }
@@ -84,6 +83,9 @@ public class NotifyNodes extends Thread {
                             }
                         }
                     }
+
+                    removedNodes = new ArrayList<>();
+                    newNodes = new ArrayList<>();
 
                 }
             }
@@ -123,9 +125,8 @@ public class NotifyNodes extends Thread {
     /**
      * Connects to node and tells node what nodes have gone offline
      * @param conn - how to connect to node
-     * @param removed - node to notify
      */
-    private void sendInfo(Connection conn, ArrayList<String> removed){
+    private void offlineNode(String node, Connection conn){
 
         ObjectInputStream in;
         ObjectOutputStream out;
@@ -139,11 +140,7 @@ public class NotifyNodes extends Thread {
 
             out.writeObject(Config.REMOVED);
 
-            for(String node: removed) {
-                out.writeObject(node);
-            }
-
-            out.writeObject(Config.DONE);
+            out.writeObject(node);
             // client will then query to update Successor
             clientSocket.close();
         } catch(UnknownHostException e){
@@ -205,6 +202,8 @@ public class NotifyNodes extends Thread {
 
             //out.writeObject(nodeId);
             // client will then update file storage
+
+            out.writeObject(Config.DONE);
 
             clientSocket.close();
         } catch(UnknownHostException e){

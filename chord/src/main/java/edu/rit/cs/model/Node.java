@@ -66,6 +66,10 @@ public class Node implements Comparable, Serializable {
 
     public synchronized ConcurrentLinkedQueue<File> getStorage() { return storage; }
 
+    public synchronized void emptyTable(){
+        this.table = new FingerTable(this.id, this.getTable().getMaxNodes());
+    }
+
     public synchronized String getServerIp() {
         return serverIp;
     }

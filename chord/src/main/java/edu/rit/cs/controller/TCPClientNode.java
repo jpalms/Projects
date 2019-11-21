@@ -100,7 +100,9 @@ public class  TCPClientNode extends Thread {
      */
     public Object readObject() {
         try {
-            return in.readObject();
+            Object obj = in.readObject();
+            //System.out.println(obj.toString());
+            return obj;
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -446,21 +448,13 @@ public class  TCPClientNode extends Thread {
                     } else if (str.equals(Config.UPDATE)) {
                         queryAll(node);
 
+                        in.readObject();
+
                     } else if (str.equals(Config.REMOVED)) {
                         String obj;
                         obj = (String) in.readObject();
 
-                        while (!obj.equals(Config.DONE)) {
-                            System.out.println("Node has gone offline: " + obj);
-                            obj = (String) in.readObject();
-                        }
-
-                        for (int i = 0; i < node.getTable().getFingers().size(); i++) {
-                            TCPClientNode clientNode = new TCPClientNode(node.getServerIp());
-                            Connection conn = clientNode.query(node, node.getTable().getIdealAtIndex(i));
-                            node.getTable().setSuccessorAtIndex(i, conn);
-                        }
-
+                        System.out.println("Node has gone offline: " + obj);
                     } else if (str.equals(Config.INSERT)) {
                         File file = (File) in.readObject();
 
@@ -478,7 +472,8 @@ public class  TCPClientNode extends Thread {
                         int newNode = Integer.parseInt((String) in.readObject());
                         int ideal = node.getId();
 
-                        queryAll(node);
+                        //queryAll(node);
+
                         for (File f : node.getStorage()) {
                             if (f.hashCode() % node.getTable().getMaxNodes() + 1 != ideal /* and file belongs at newNode*/) {
                                 node.getStorage().remove(f);

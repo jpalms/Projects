@@ -110,7 +110,7 @@ public class MiniServer extends Thread {
      * @param node - offline node
      */
     private synchronized void nodeRemoved(Node node){
-        anchorNode.removeNode(node.getId() + "");
+        anchorNode.removeNode(node.getId());
 
         removedNodes.add(node.getId() + "");
     }
@@ -178,7 +178,8 @@ public class MiniServer extends Thread {
                         Integer integer = (Integer) obj;
                         int ideal = integer.intValue();
 
-                        out.writeObject(anchorNode.getSuccessor(ideal));
+                        Connection conn = anchorNode.getSuccessor(ideal);
+                        out.writeObject(conn);
 
                     } else if(Config.QUIT.equals(obj)){
                         // ping server that node is disconnecting
