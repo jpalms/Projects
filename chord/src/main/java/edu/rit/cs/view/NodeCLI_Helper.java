@@ -101,12 +101,19 @@ public class NodeCLI_Helper {
     }
 
     public void displayFile() {
-        for(File f : node.getStorage()){
-            System.out.println("\t" + f.toString() + "\thash: " + (f.hashCode() % node.getTable().getMaxNodes() + 1) + "\t" + "Stored at Node: " + node.getId());
+        if(node.getStorage().isEmpty()){
+            System.out.println("No Files Stored");
+        }
+        else {
+            System.out.println("File Storage:");
+            for (File f : node.getStorage()) {
+                System.out.println("\t" + f.toString() + "\thash: " + (f.hashCode() % node.getTable().getMaxNodes() + 1) + "\t" + "Stored at Node: " + node.getId());
+            }
         }
     }
 
     public void showTable(){
+        System.out.printf("Node: %d\n", node.getId());
         System.out.println(this.node.getTable().toString());
     }
     /**

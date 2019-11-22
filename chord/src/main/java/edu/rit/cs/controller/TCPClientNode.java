@@ -152,6 +152,7 @@ public class  TCPClientNode extends Thread {
         if (node.getId() == destination || hopCounter >= node.getTable().getFingers().size()) {
             //insert(node, file, hopCounter);
             node.getStorage().add(file);
+            System.out.printf("File %s has been stored", file.getFileName());;
         } else {
             System.out.println(node.getTable().toString());
 

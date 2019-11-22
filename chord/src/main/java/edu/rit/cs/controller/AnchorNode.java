@@ -126,7 +126,6 @@ public class AnchorNode {
         } else {
             ConcurrentSkipListMap<Integer, Connection> tree = this.getOnlineNodes();
             if(tree.containsKey(id)){
-				System.out.println("contains: " + id.toString());
                 return tree.get(id);
             }
             Integer key = tree.higherKey(id);
