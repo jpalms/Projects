@@ -25,4 +25,5 @@ public class Config {
     public static final String REMOVED = "removed";
 
     public static final String DONE = "Done";
+    public static final int MAX_NODES = 512;
 }

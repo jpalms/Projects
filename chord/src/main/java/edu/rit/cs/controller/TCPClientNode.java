@@ -152,13 +152,11 @@ public class  TCPClientNode extends Thread {
         if (node.getId() == destination || hopCounter >= node.getTable().getFingers().size()) {
             //insert(node, file, hopCounter);
             node.getStorage().add(file);
-            System.out.printf("File %s has been stored", file.getFileName());;
+            System.out.printf("\nFile %s has been stored\n", file.getFileName());;
         } else {
-            System.out.println(node.getTable().toString());
-
             // Get the next biggest hop connection to the destination from ourselves
             int successor = node.getTable().getSuccessor(destination);
-            Connection connection = null;
+            Connection connection = new Connection(node.getIpAddr(), node.getPort(), node.getId());
 
             for(Finger f: node.getTable().getFingers()){
                 if(f.getIdeal() == successor){
@@ -186,6 +184,7 @@ public class  TCPClientNode extends Thread {
                 hopCounter = node.getTable().getFingers().size();
             }
 
+            System.out.printf("File Insert %s:\n\tJump from Node: %d to ideal: %d actual: %d\n",file.getFileName(), node.getId(), ideal, actual);;
             TCPClientNode nextNode = new TCPClientNode(connection);
             nextNode.insert(node, file, hopCounter + 1);
         }
@@ -271,9 +270,8 @@ public class  TCPClientNode extends Thread {
             hopCounter = node.getTable().getFingers().size();
         }
 
-        System.out.println(node.getTable().toString());
-
         // Tell the next node to lookup this file and give it back to us
+        System.out.printf("File Lookup %s:\n\tJump from Node: %d to ideal: %d actual: %d\n", name, node.getId(), ideal, actual);;
         TCPClientNode nextNode = new TCPClientNode(connection);
         return nextNode.lookup(node, name, hopCounter + 1);
     }
@@ -408,8 +406,6 @@ public class  TCPClientNode extends Thread {
         ObjectInputStream in;
         ObjectOutputStream out;
         Socket clientSocket;
-        boolean loop = false;
-
         /**
          * Worker constructor. Assigns the socket given and dispatches to commands.
          *
@@ -421,7 +417,6 @@ public class  TCPClientNode extends Thread {
 
                 in = new ObjectInputStream(clientSocket.getInputStream());
                 out = new ObjectOutputStream(clientSocket.getOutputStream());
-                loop = true;
 
                 this.start();
             } catch (IOException e) {
@@ -433,7 +428,6 @@ public class  TCPClientNode extends Thread {
          * Function to look for new notification from the server and prints them
          */
         public void run() {
-            while (loop) {
             try {
                 //wait for connection from server
 
@@ -452,10 +446,9 @@ public class  TCPClientNode extends Thread {
                         in.readObject();
 
                     } else if (str.equals(Config.REMOVED)) {
-                        String obj;
-                        obj = (String) in.readObject();
+                        str = (String) in.readObject();
 
-                        System.out.println("Node has gone offline: " + obj);
+                        System.out.println("Node has gone offline: " + str);
                     } else if (str.equals(Config.INSERT)) {
                         File file = (File) in.readObject();
 
@@ -468,12 +461,14 @@ public class  TCPClientNode extends Thread {
 
                         node.getStorage().add(file);
 
+                        System.out.printf("\nFile %s has been stored\n", file.getFileName());
+
                     } else if (str.equals(Config.REORDER)) {
 
                         int newNode = Integer.parseInt((String) in.readObject());
                         int ideal = node.getId();
 
-                        //queryAll(node);
+                        queryAll(node);
 
                         for (File f : node.getStorage()) {
                             if (f.hashCode() % node.getTable().getMaxNodes() + 1 != ideal /* and file belongs at newNode*/) {
@@ -490,17 +485,13 @@ public class  TCPClientNode extends Thread {
                         out.writeObject(lookupLocation(node, hash, hopCount));
                     }
 
-                    turnOff();
-
                 } catch(IOException e){
                     System.err.println("IO: " + e.getMessage());
-                    turnOff();
                 } catch(ClassNotFoundException e){
                     System.err.println("CLASS: " + e.getMessage());
+                } finally {
                     turnOff();
                 }
-
-            }
         }
 
         /**
@@ -508,7 +499,6 @@ public class  TCPClientNode extends Thread {
          */
         public void turnOff() {
             try {
-                loop = false;
                 clientSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();

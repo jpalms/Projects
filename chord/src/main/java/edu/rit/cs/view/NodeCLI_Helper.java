@@ -2,6 +2,7 @@ package edu.rit.cs.view;
 
 import edu.rit.cs.controller.TCPClientNode;
 
+import edu.rit.cs.model.Config;
 import edu.rit.cs.model.Connection;
 import edu.rit.cs.model.File;
 import edu.rit.cs.model.Node;
@@ -42,10 +43,18 @@ public class NodeCLI_Helper {
         firstThread.sendObject("");
         while (true){
             System.out.println("Enter Node id: ");
-            String id = input.nextLine();
-            firstThread.sendObject(id);
+            int id;
+            id = input.nextInt();
+
+            while(id < 0 || id > Config.MAX_NODES){
+                System.out.println("Node id's are numbers inbetween 1 and " + Config.MAX_NODES);
+                System.out.println("Enter Node id: ");
+                id = input.nextInt();
+            }
+
+            firstThread.sendObject(id + "");
             if (firstThread.readObject().equals("false")) {
-                firstThread.sendObject(new Node(Integer.parseInt(id), 1, firstThread.getIpAddr(), server, firstThread.getPort(), 0, 0));
+                firstThread.sendObject(new Node(id, 1, firstThread.getIpAddr(), server, firstThread.getPort(), 0, 0));
                 this.node = (Node)firstThread.readObject();
                 firstThread.setNode(node);
                 firstThread.start();
@@ -96,6 +105,7 @@ public class NodeCLI_Helper {
         File f = clientNode.lookupLocation(node, hash, 0);
 
         System.out.println(f.toString());
+        System.out.println(f.getFileContent());
         System.out.println(f.getFileContent());
 
     }

@@ -51,21 +51,24 @@ public class NotifyNodes extends Thread {
 
                     // notify nodes of new online node
                     if(newNodes.size() > 0) {
-                        for (Object conn: connections) {
+                        for (Connection conn: connections) {
                             for(String node: newNodes){
-                                newNodeOnline(node, (Connection)conn);
+                                newNodeOnline(node, conn);
                             }
                         }
                     }
 
                     // notify nodes of node that has gone offline
                     if(removedNodes.size() > 0) {
-                        for (Object conn: connections) {
+                        for (Connection conn: connections) {
                             for(String node: removedNodes){
-                                offlineNode(node, (Connection)conn);
+                                //System.out.println("removed node update " + conn.getNodeId());
+                                offlineNode(node, conn);
                             }
                         }
                     }
+
+                    //System.out.println("boop");
 
                     // tels node to update finger table
                     if(newNodes.size() > 0 || removedNodes.size() > 0) {
@@ -83,9 +86,6 @@ public class NotifyNodes extends Thread {
                             }
                         }
                     }
-
-                    removedNodes = new ArrayList<>();
-                    newNodes = new ArrayList<>();
 
                 }
             }
