@@ -105,9 +105,7 @@ public class NodeCLI_Helper {
         File f = clientNode.lookupLocation(node, hash, 0);
 
         System.out.println(f.toString());
-        System.out.println(f.getFileContent());
-        System.out.println(f.getFileContent());
-
+        System.out.println("\t" + f.getFileContent());
     }
 
     public void displayFile() {

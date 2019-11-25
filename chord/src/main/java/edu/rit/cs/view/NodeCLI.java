@@ -66,14 +66,18 @@ public class NodeCLI {
                     } while(notFound);
 
                     File f = new File(path);
-
-                    Scanner file = new Scanner(path);
                     String content = "";
 
-                    while(file.hasNextLine()) {
-                        content += file.nextLine() + "\n";
-                    }
+                    try {
+                        Scanner file = new Scanner(temp);
 
+                        while (file.hasNextLine()) {
+                            content += file.nextLine() + "\n";
+                        }
+
+                    } catch (FileNotFoundException e){
+
+                    }
                     f.setFileContent(content);
                     f.setFileName(temp.getName());
 
