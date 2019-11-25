@@ -271,7 +271,7 @@ public class  TCPClientNode extends Thread {
         }
 
         // Tell the next node to lookup this file and give it back to us
-        System.out.printf("File Lookup %s:\n\tJump from Node: %d to ideal: %d actual: %d\n", name, node.getId(), ideal, actual);;
+        System.out.printf("File Lookup %s:\n\tJump from Node: %d to ideal: %d actual: %d destination: %d\n", name, node.getId(), ideal, actual, destination);;
         TCPClientNode nextNode = new TCPClientNode(connection);
         return nextNode.lookup(node, name, hopCounter + 1);
     }
