@@ -13,7 +13,7 @@ java -cp target/chord-1.0.jar edu.rit.cs.controller.AnchorNode
 java -cp target/chord-1.0.jar edu.rit.cs.view.NodeCLI 127.0.0.1
 
 // Follow the prompts.
-// For file path, the path must be absolute, but when querying, only the name must be specified.
+// For file path, the path can be absolute or relative, but when querying, only the name must be specified.
 // Example:
 //      Insert:     chord/exampleFile.txt
 //      Lookup:     exampleFile.txt
