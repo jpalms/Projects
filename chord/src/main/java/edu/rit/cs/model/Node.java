@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * Node class is the model for a Chord Node
  */
-public class Node implements Comparable, Serializable {
+public class Node implements Serializable {
 
     private int id, nextId, prevId;
 
@@ -96,10 +96,6 @@ public class Node implements Comparable, Serializable {
         this.prevId = prevId;
     }
     */
-    @Override
-    public synchronized int compareTo(Object cmp){
-        return this.id - ((Node)cmp).id;
-    }
 
     @Override
     public String toString(){
