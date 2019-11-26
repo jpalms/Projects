@@ -2,7 +2,6 @@ package edu.rit.cs.controller;
 
 import edu.rit.cs.model.Config;
 import edu.rit.cs.model.Connection;
-import edu.rit.cs.model.Node;
 
 import java.io.*;
 import java.net.Socket;

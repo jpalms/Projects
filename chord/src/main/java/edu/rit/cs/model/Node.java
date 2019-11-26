@@ -1,7 +1,6 @@
 package edu.rit.cs.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -66,10 +65,6 @@ public class Node implements Comparable, Serializable {
 
     public synchronized ConcurrentLinkedQueue<File> getStorage() { return storage; }
 
-    public synchronized void emptyTable(){
-        this.table = new FingerTable(this.id, this.getTable().getMaxNodes());
-    }
-
     public synchronized String getServerIp() {
         return serverIp;
     }
@@ -92,6 +87,7 @@ public class Node implements Comparable, Serializable {
 
     //------------------ Setter -----------------
 
+    /*
     public void setNextId(int nextId) {
         this.nextId = nextId;
     }
@@ -99,7 +95,7 @@ public class Node implements Comparable, Serializable {
     public void setPrevId(int prevId) {
         this.prevId = prevId;
     }
-
+    */
     @Override
     public synchronized int compareTo(Object cmp){
         return this.id - ((Node)cmp).id;

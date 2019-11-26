@@ -12,13 +12,11 @@ import java.util.Scanner;
 
 public class NodeCLI_Helper {
 
-    private ArrayList<TCPClientNode> connections;
     private Node node;
     private String server;
     private TCPClientNode firstThread;
 
     public NodeCLI_Helper(String server) {
-        connections = new ArrayList<>();
         this.server = server;
         this.firstThread = nodeSignin(server);
     }

@@ -113,21 +113,6 @@ public class FingerTable implements Serializable {
         return nextHighest;
     }
 
-    /**
-     * Helper function for above. gets the connection given
-     * a correct ideal. Assumed correct
-     * @param i int representing ideal
-     * @return Connection to node
-     */
-    private Connection getActualConnectionGivenIdeal(int i){
-        for(Finger f : fingers){
-            if(f.getIdeal() == i){
-                return f.getActualConnection();
-            }
-        }
-        return fingers.get(fingers.size() - 1).getActualConnection();
-    }
-
     public ArrayList<Finger> getFingers() {
         return fingers;
     }

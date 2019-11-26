@@ -186,18 +186,17 @@ public class  TCPClientNode extends Thread {
 
             System.out.printf("File Insert %s:\n\tJump from Node: %d to ideal: %d actual: %d\n",file.getFileName(), node.getId(), ideal, actual);;
             TCPClientNode nextNode = new TCPClientNode(connection);
-            nextNode.insert(node, file, hopCounter + 1);
+            nextNode.insert(file, hopCounter + 1);
         }
     }
 
     /**
      * Helper function for insertLocation. Sends the objects over TCP
      *
-     * @param node       Node we are talking about
      * @param file       File to send over network
      * @param hopCounter hops to make over network
      */
-    private void insert(Node node, File file, int hopCounter) {
+    private void insert(File file, int hopCounter) {
         sendObject(Config.INSERT);
         sendObject(file);
         sendObject(hopCounter);
@@ -273,17 +272,16 @@ public class  TCPClientNode extends Thread {
         // Tell the next node to lookup this file and give it back to us
         System.out.printf("File Lookup %s:\n\tJump from Node: %d to ideal: %d actual: %d destination: %d\n", name, node.getId(), ideal, actual, destination);;
         TCPClientNode nextNode = new TCPClientNode(connection);
-        return nextNode.lookup(node, name, hopCounter + 1);
+        return nextNode.lookup(name, hopCounter + 1);
     }
 
     /**
      * Helper function for lookupLocation. Sends the objects over TCP
      *
-     * @param node       Node we are talking about
      * @param hash       hash of the file we are looking up
      * @param hopCounter hops to make over network
      */
-    private File lookup(Node node, String hash, int hopCounter) {
+    private File lookup(String hash, int hopCounter) {
         File file;
 
         sendObject(Config.LOOKUP);
