@@ -51,8 +51,10 @@ public class NotifyNodes extends Thread {
                     // notify nodes of new online node
                     if(newNodes.size() > 0) {
                         for (Connection conn: connections) {
-                            for(String node: newNodes){
-                                newNodeOnline(node, conn);
+                            if (!removedNodes.contains(conn.getNodeId())) {
+                                for (String node : newNodes) {
+                                    newNodeOnline(node, conn);
+                                }
                             }
                         }
                     }
@@ -75,7 +77,6 @@ public class NotifyNodes extends Thread {
                     if(newNodes.size() > 0 || removedNodes.size() > 0) {
                         for (Connection conn: connections) {
                             if (!removedNodes.contains(conn.getNodeId())) {
-
                                 update(conn);
                             }
                         }
@@ -84,9 +85,11 @@ public class NotifyNodes extends Thread {
 
                     // tell nodes to update file storage
                     if(newNodes.size() > 0) {
-                        for (Object conn: connections) {
-                            for(String node: newNodes){
-                                fileRorder(node, (Connection)conn);
+                        for (Connection conn: connections) {
+                            if (!removedNodes.contains(conn.getNodeId())) {
+                                for(String node: newNodes) {
+                                    fileRorder(node, conn);
+                                }
                             }
                         }
                     }
