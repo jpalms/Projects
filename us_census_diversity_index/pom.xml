@@ -4,7 +4,7 @@
 
   <!-- parent pom -->
   <parent>
-    <artifactId>parallelcomputing</artifactId>
+    <artifactId>CoPaDS</artifactId>
     <groupId>edu.rit.cs</groupId>
     <version>1.0-SNAPSHOT</version>
   </parent>
