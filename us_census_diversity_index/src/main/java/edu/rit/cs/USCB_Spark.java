@@ -1,5 +1,7 @@
 package edu.rit.cs;
 
+import edu.rit.cs.model.USCBPopulationStat;
+import org.apache.spark.SparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
@@ -51,5 +53,12 @@ public class USCB_Spark
     public static void main( String[] args )
     {
        // fill your code
+
+        SparkSession sparkSession = SparkSession.builder()
+                                                .appName("Census Report")
+                                                .config("spark.master", "local")
+                                                .getOrCreate();
+        System.out.println("get ready");
+        uscb(sparkSession);
     }
 }
