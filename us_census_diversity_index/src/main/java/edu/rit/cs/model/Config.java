@@ -1,5 +1,11 @@
 package edu.rit.cs.model;
 
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import scala.collection.Seq;
+
+import java.util.ArrayList;
+
 public class Config {
 
     public final String YEAR_1 = "April 1, 2010 census population";
@@ -13,8 +19,36 @@ public class Config {
     public final String YEAR_9 = "July 1, 2016 population estimate";
     public final String YEAR_10 = "July 1, 2017 population estimate";
 
-    public final int AGEGRP = 0;
-    public final int NUM_RACES = 6;
+    public static final int AGEGRP = 0;
+    public static final int NUM_RACES = 6;
+
+    public static final String STATE = "STNAME";
+    public static final String CITY = "CTYNAME";
+    public static final String TOTAL_POP = "TOT_POP";
+
+    public static final String WA = "WA";
+    public static final String WA_MALE = "WA_MALE";
+    public static final String WA_FEMALE = "WA_FEMALE";
+
+    public static final String BA = "BA";
+    public static final String BA_MALE = "BA_MALE";
+    public static final String BA_FEMALE = "BA_FEMALE";
+
+    public static final String IA = "IA";
+    public static final String IA_MALE = "IA_MALE";
+    public static final String IA_FEMALE = "IA_FEMALE";
+
+    public static final String AA = "AA";
+    public static final String AA_MALE = "AA_MALE";
+    public static final String AA_FEMALE = "AA_FEMALE";
+
+    public static final String NA = "NA";
+    public static final String NA_MALE = "NA_MALE";
+    public static final String NA_FEMALE = "NA_FEMALE";
+
+    public static final String TOM = "WA";
+    public static final String TOM_MALE = "WA_MALE";
+    public static final String TOM_FEMALE = "WA_FEMALE";
 
     public String getYear(int year){
         switch (year){
@@ -57,13 +91,22 @@ public class Config {
         return AGEGRP;
     }
 
-    public double calcDivIndex(int total, int [] individual){
-        double result = 0;
+    public static String calcDivIndex(Row row){
 
-        for (int i = 0; i < individual.length; i++) {
-            result += individual[i] * (total - individual[i]);
-        }
-        result = result/(total ^ 2);
-        return result;
+        int total = 0;
+        double result = 0;
+        double [] arr = new double[NUM_RACES];
+
+            for (int i = 0; i < NUM_RACES; i++) {
+                arr[i] = row.getLong(i * 2 + 2) + row.getLong(i * 2 + 3);
+                total += arr[i];
+            }
+
+            for (int i = 0; i < arr.length; i++) {
+                result += arr[i] * (total - arr[i]);
+            }
+            result = result / Math.pow(total, 2);
+
+        return "[" + row.getString(0) + "," + row.getString(1) + "," + result + "]";
     }
 }
