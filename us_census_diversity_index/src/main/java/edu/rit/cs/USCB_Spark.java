@@ -76,9 +76,24 @@ public class USCB_Spark
 
         ds3 = ds3.withColumn(Config.TOTAL_POP, ds3.col(Config.WA).plus(ds3.col(Config.BA)).plus(ds3.col(Config.IA).plus(ds3.col(Config.AA).plus(ds3.col(Config.NA).plus(ds3.col(Config.TOM))))));
 
-
         System.out.println("Show ds3");
         ds3.show();
+
+        String [] arr = ds3.columns();
+
+        for (int i = 0; i < Config.NUM_RACES; i++) {
+            String col = arr[i + 2];
+            if(i == 0)
+                ds3 = ds3.withColumn(Config.SIGMA, ds3.col(col).multiply(ds3.col(Config.TOTAL_POP).minus(ds3.col(col)))).drop(col);
+            else
+                ds3 = ds3.withColumn(Config.SIGMA, ds3.col(Config.SIGMA).plus(ds3.col(col).multiply(ds3.col(Config.TOTAL_POP).minus(ds3.col(col))))).drop(col);
+        }
+
+        ds3 = ds3.withColumn(Config.DIV, ds3.col(Config.SIGMA).divide(ds3.col(Config.TOTAL_POP).multiply(ds3.col(Config.TOTAL_POP)))).drop(Config.TOTAL_POP, Config.SIGMA);
+        ds3.show();
+
+
+
         //Dataset
 
     }
