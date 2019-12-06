@@ -3,6 +3,7 @@ package edu.rit.cs;
 import edu.rit.cs.model.Config;
 import edu.rit.cs.model.Partition;
 import edu.rit.cs.model.USCBPopulationStat;
+import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.ForeachFunction;
@@ -34,7 +35,7 @@ public class USCB_Spark
         return directoryToBeDeleted.delete();
     }
 
-    public static void uscb(SparkSession spark) throws SQLException {
+    public static void uscb(SparkSession spark) {
         // parse dataset file
         int year = 2010;
         Dataset ds = spark.read()
@@ -83,15 +84,16 @@ public class USCB_Spark
     {
        // fill your code
 
-        SparkSession sparkSession = SparkSession.builder()
-                                                .appName("Census Report")
-                                                .config("spark.master", "local")
-                                                .getOrCreate();
+        SparkConf sparkConf = new SparkConf();
+        sparkConf.set("spark.master", "local[4]");
+        sparkConf.setAppName("Census Report");
+
+        SparkSession sparkSession = SparkSession.builder().config(sparkConf).getOrCreate();
+
         System.out.println("get ready");
-        try {
-            uscb(sparkSession);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+
+        uscb(sparkSession);
+
+        sparkSession.close();
     }
 }
