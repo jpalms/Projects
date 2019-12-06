@@ -5,6 +5,7 @@ import org.apache.spark.sql.Row;
 import scala.collection.Seq;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Config {
 
@@ -91,11 +92,14 @@ public class Config {
         return AGEGRP;
     }
 
-    public static String calcDivIndex(Row row){
+    public static String calcDivIndex(Iterator rows) {
 
-        int total = 0;
-        double result = 0;
-        double [] arr = new double[NUM_RACES];
+        String answer = "";
+        while (rows.hasNext()) {
+            Row row = (Row)rows.next();
+            int total = 0;
+            double result = 0;
+            double[] arr = new double[NUM_RACES];
 
             for (int i = 0; i < NUM_RACES; i++) {
                 arr[i] = row.getLong(i * 2 + 2) + row.getLong(i * 2 + 3);
@@ -107,6 +111,8 @@ public class Config {
             }
             result = result / Math.pow(total, 2);
 
-        return "[" + row.getString(0) + "," + row.getString(1) + "," + result + "]";
+            answer += ("[" + row.getString(0) + "," + row.getString(1) + "," + result + "]\n");
+        }
+        return answer;
     }
 }

@@ -1,15 +1,21 @@
 package edu.rit.cs;
 
 import edu.rit.cs.model.Config;
+import edu.rit.cs.model.Partition;
 import edu.rit.cs.model.USCBPopulationStat;
 import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.ForeachFunction;
+import org.apache.spark.api.java.function.VoidFunction;
+import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.functions;
 import org.apache.spark.sql.*;
+import scala.Function1;
 
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * U.S. Census Diversity Index
@@ -41,7 +47,7 @@ public class USCB_Spark
         Encoder<USCBPopulationStat> uscbEncoder = Encoders.bean(USCBPopulationStat.class);
         Dataset<USCBPopulationStat> ds1 = ds.as(uscbEncoder);
         // show initial table after import
-        ds1.show();
+        //ds1.show();
 
         // filter and sum data across multiple years for all year groups
         Dataset ds2 = ds1.filter("AGEGRP = " + Config.AGEGRP)
@@ -52,45 +58,31 @@ public class USCB_Spark
 
         // You need to complete the rest
         System.out.println("Show ds2");
-        ds2.show();
+        //ds2.show();
             // create threads to have maps for each year
                 // user provided map code is state or year
                 // Reduce code is the value
         //Config.calcDivIndex();
 
-         Dataset<Row> WA;
-         WA = ds2.select("sum(" + Config.WA_MALE + ")", "sum(" + Config.WA_FEMALE + ")");
-
-        Dataset<Row> BA;
-        BA = ds2.select("sum(" + Config.BA_MALE + ")", "sum(" + Config.BA_FEMALE + ")");
-
-        Dataset<Row> IA;
-        IA = ds2.select("sum(" + Config.IA_MALE + ")", "sum(" + Config.IA_FEMALE + ")");
-
-        Dataset<Row> AA;
-        AA = ds2.select("sum(" + Config.AA_MALE + ")", "sum(" + Config.AA_FEMALE + ")");
-
-        Dataset<Row> NA;
-        NA = ds2.select("sum(" + Config.NA_MALE + ")", "sum(" + Config.NA_FEMALE + ")");
-
-        Dataset<Row> TOM;
-        TOM = ds2.select("sum(" + Config.TOM_MALE + ")", "sum(" + Config.TOM_FEMALE + ")");
-
-        ArrayList<Dataset<Row>> list = new ArrayList<>();
-        list.add(WA);
-        list.add(BA);
-        list.add(IA);
-        list.add(AA);
-        list.add(NA);
-        list.add(TOM);
-
         String str = "";
-        ds2.foreach((ForeachFunction<Row>) row -> System.out.println(Config.calcDivIndex(row)));
+        JavaRDD javaRDD = ds2.javaRDD();
+        javaRDD = javaRDD.coalesce(4, true);//javaRDD.repartition(4);
+        ArrayList<Partition> list = new ArrayList<>();
+        javaRDD.foreachPartition((VoidFunction<Iterator>) row -> {
+            Partition partition = new Partition(row);
+            partition.start();
+            partition.join();
+            System.out.println("thread");
+        });
+        //System.out.println(list.size());
+        //ds2.foreach((ForeachFunction<Row>) row -> System.out.println(Config.calcDivIndex(row)));
+
     }
 
     public static void main( String[] args )
     {
        // fill your code
+
         SparkSession sparkSession = SparkSession.builder()
                                                 .appName("Census Report")
                                                 .config("spark.master", "local")
