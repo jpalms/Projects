@@ -16,6 +16,7 @@ import scala.Function1;
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -48,7 +49,7 @@ public class USCB_Spark
         Encoder<USCBPopulationStat> uscbEncoder = Encoders.bean(USCBPopulationStat.class);
         Dataset<USCBPopulationStat> ds1 = ds.as(uscbEncoder);
         // show initial table after import
-        //ds1.show();
+        ds1.show();
 
         // filter and sum data across multiple years for all year groups
         Dataset ds2 = ds1.filter("AGEGRP = " + Config.AGEGRP)
@@ -58,25 +59,27 @@ public class USCB_Spark
                 .sum().orderBy("STNAME", "CTYNAME");
 
         // You need to complete the rest
-        System.out.println("Show ds2");
-        //ds2.show();
-            // create threads to have maps for each year
-                // user provided map code is state or year
-                // Reduce code is the value
-        //Config.calcDivIndex();
 
-        String str = "";
-        JavaRDD javaRDD = ds2.javaRDD();
-        javaRDD = javaRDD.coalesce(4, true);//javaRDD.repartition(4);
-        ArrayList<Partition> list = new ArrayList<>();
-        javaRDD.foreachPartition((VoidFunction<Iterator>) row -> {
-            Partition partition = new Partition(row);
-            partition.start();
-            partition.join();
-            System.out.println("thread");
-        });
-        //System.out.println(list.size());
-        //ds2.foreach((ForeachFunction<Row>) row -> System.out.println(Config.calcDivIndex(row)));
+        System.out.println("Show ds2");
+        ds2.show();
+
+        Dataset ds3 = ds2
+                        .withColumn(Config.WA, ds2.col(Config.WA_MALE).plus(ds2.col(Config.WA_FEMALE))).drop(Config.WA_MALE).drop(Config.WA_FEMALE)
+                        .withColumn(Config.BA, ds2.col(Config.BA_MALE).plus(ds2.col(Config.BA_FEMALE))).drop(Config.BA_MALE).drop(Config.BA_FEMALE)
+                        .withColumn(Config.IA, ds2.col(Config.IA_MALE).plus(ds2.col(Config.IA_FEMALE))).drop(Config.IA_MALE).drop(Config.IA_FEMALE)
+                        .withColumn(Config.AA, ds2.col(Config.AA_MALE).plus(ds2.col(Config.AA_FEMALE))).drop(Config.AA_MALE).drop(Config.AA_FEMALE)
+                        .withColumn(Config.NA, ds2.col(Config.NA_MALE).plus(ds2.col(Config.NA_FEMALE))).drop(Config.NA_MALE).drop(Config.NA_FEMALE)
+                        .withColumn(Config.TOM, ds2.col(Config.TOM_MALE).plus(ds2.col(Config.TOM_FEMALE))).drop(Config.TOM_MALE).drop(Config.TOM_FEMALE);
+
+        System.out.println("Show ds3");
+        ds3.show();
+
+        ds3 = ds3.withColumn(Config.TOTAL_POP, ds3.col(Config.WA).plus(ds3.col(Config.BA)).plus(ds3.col(Config.IA).plus(ds3.col(Config.AA).plus(ds3.col(Config.NA).plus(ds3.col(Config.TOM))))));
+
+
+        System.out.println("Show ds3");
+        ds3.show();
+        //Dataset
 
     }
 
