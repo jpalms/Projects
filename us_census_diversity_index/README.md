@@ -53,7 +53,11 @@
 
 #### Note:
 Please download the [census dataset](https://www2.census.gov/programs-surveys/popest/datasets/2010-2017/counties/asrh/cc-est2017-alldata.csv) from the USCB web site and place this dataset into the ```dataset``` folder.
+Please download [Hadoop] and store it in C:\winutils\bin (http://public-repo-1.hortonworks.com/hdp-win-alpha/winutils.exe)
 
-
-# Bug fixes
-Note, if you run into problem with `saveAsTextFile` on Windows, you may want to try [these method](https://stackoverflow.com/questions/40764807/null-entry-in-command-string-exception-in-saveastextfile-on-pyspark).
+#Enhancements:
+<p>
+Through spark the dataset is split into 4 partitions. Which are then manipulated to be a table where all ages are
+included, and the male and female of each Race are added together. After that process is done a new dataset is generated
+of [State, Counter, Diversity Index] and finally is stored in dataset/USCB-outputs/USCP-outputs.txt
+<\p>
