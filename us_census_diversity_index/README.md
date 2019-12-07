@@ -53,7 +53,7 @@
 
 #### Note:
 Please download the [census dataset](https://www2.census.gov/programs-surveys/popest/datasets/2010-2017/counties/asrh/cc-est2017-alldata.csv) from the USCB web site and place this dataset into the ```dataset``` folder.
-Please download [Hadoop] and store it in C:\winutils\bin (http://public-repo-1.hortonworks.com/hdp-win-alpha/winutils.exe)
+<\br>Please download [Hadoop] and store it in C:\winutils\bin (http://public-repo-1.hortonworks.com/hdp-win-alpha/winutils.exe)
 
 ### Enhancements:
 <p>
