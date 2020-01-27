@@ -23,4 +23,4 @@ gradle-app.setting
 
 ### Datasets
 /basic_word_count/amazon-fine-food-reviews/*.csv
-/us_census_diversity_index/dataset/*.csv
+/us_census_diversity_index/dataset/USCB.csv
